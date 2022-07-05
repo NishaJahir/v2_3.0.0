@@ -16,6 +16,8 @@
 namespace Novalnet\Assistants;
 
 use Plenty\Modules\Wizard\Services\WizardProvider;
+use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class NovalnetAssistant
@@ -24,6 +26,33 @@ use Plenty\Modules\Wizard\Services\WizardProvider;
  */
 class NovalnetAssistant extends WizardProvider
 {
+    use Loggable;
+ 
+    /**
+     * @var WebstoreRepositoryContract
+     */
+    private $webstoreRepository;
+ 
+    /**
+     * @var $mainWebstore
+     */
+    private $mainWebstore;
+    
+    /**
+     * @var $webstoreValues
+     */
+    private $webstoreValues;
+    
+    /**
+    * Constructor.
+    *
+    * @param WebstoreRepositoryContract $webstoreRepository
+    */
+    public function __construct(WebstoreRepositoryContract $webstoreRepository) 
+    {
+         $this->webstoreRepository = $webstoreRepository;
+     }
+ 
     protected function structure()
     {
         $config = [
@@ -31,7 +60,7 @@ class NovalnetAssistant extends WizardProvider
             "shortDescription" => 'NovalnetAssistant.novalnetAssistantShortDescription',
             "iconPath" => $this->getIcon(),
             "settingsHandlerClass" => NovalnetAssistantSettingsHandler::class,
-            "dataSource" => NovalnetAssistantDataSource::class,
+            //"dataSource" => NovalnetAssistantDataSource::class,
             "translationNamespace" => 'Novalnet',
             "key" => 'payment-novalnet-assistant',
             "topics" => ['payment'],
@@ -54,6 +83,48 @@ class NovalnetAssistant extends WizardProvider
         $config = $this->createGlobalConfiguration($config);
 
         return $config;
+    }
+ 
+   /**
+     * Load the Novalnet Icon
+     *
+     * @return string
+     */
+    protected function getIcon()
+    {
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('Novalnet').'/images/novalnet_icon.png';
+        return $icon;
+    }
+ 
+    private function getMainWebstore()
+    {
+        if($this->mainWebstore === null) {
+            $this->mainWebstore = $this->webstoreRepository->findById(0)->storeIdentifier;
+        }
+        $this->getLogger(__METHOD__)->error('getMainWebstore', $this->mainWebstore);
+        return $this->mainWebstore;
+    }
+ 
+    /**
+     * @return array
+     */
+    private function getWebstoreListForm()
+    {
+        if($this->webstoreValues === null)
+        {
+            $webstores = $this->webstoreRepository->loadAll();
+            $this->webstoreValues = [];
+            /** @var Webstore $webstore */
+            foreach ($webstores as $webstore) {
+                $this->webstoreValues[] = [
+                    "caption" => $webstore->name,
+                    "value" => $webstore->storeIdentifier,
+                ];
+            }
+        }
+     $this->getLogger(__METHOD__)->error('getWebstoreListForm', $this->webstoreValues);
+        return $this->webstoreValues;
     }
     
     /**
@@ -120,17 +191,5 @@ class NovalnetAssistant extends WizardProvider
                 ]
         ];
         return $config;
-    }
- 
-    /**
-     * Load the Novalnet Icon
-     *
-     * @return string
-     */
-    protected function getIcon()
-    {
-        $app = pluginApp(Application::class);
-        $icon = $app->getUrlPath('Novalnet').'/images/novalnet_icon.png';
-        return $icon;
     }
 }
