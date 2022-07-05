@@ -52,7 +52,7 @@ class PaymentHelper
      * 
      * @return array
      */
-    public function getPaymentMethods()
+    public static function getPaymentMethods()
     {
         return [
             NovalnetCcPaymentMethod::PAYMENT_KEY => NovalnetCcPaymentMethod::class,
