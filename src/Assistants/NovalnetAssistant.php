@@ -150,7 +150,8 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetVendorIdLabel',
-                                    'required' => true
+                                    'required' => true,
+                                    'pattern'  => '^[1-9]\d*$'
                                 ]
                             ],
                             'novalnetAuthCode' => [
@@ -164,14 +165,16 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetProductIdLabel',
-                                    'required' => true
+                                    'required' => true,
+                                    'pattern'  => '^[1-9]\d*$'
                                 ]
                             ],
                             'novalnetTariffId' => [
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetTariffIdLabel',
-                                    'required' => true
+                                    'required' => true,
+                                    'pattern'  => '^[1-9]\d*$'
                                 ]
                             ],
                             'novalnetAccessKey' => [
