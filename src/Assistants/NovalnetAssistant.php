@@ -121,4 +121,16 @@ class NovalnetAssistant extends WizardProvider
         ];
         return $config;
     }
+ 
+    /**
+     * Load the Novalnet Icon
+     *
+     * @return string
+     */
+    protected function getIcon()
+    {
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('Novalnet').'/images/novalnet_icon.png';
+        return $icon;
+    }
 }
