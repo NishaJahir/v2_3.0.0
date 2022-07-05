@@ -16,6 +16,7 @@
 namespace Novalnet\Assistants;
 
 use Plenty\Modules\Wizard\Services\WizardProvider;
+use Novalnet\Assistants\SettingsHandlers\NovalnetAssistantSettingsHandler;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
