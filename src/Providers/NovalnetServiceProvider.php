@@ -22,6 +22,7 @@ use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Novalnet\Helper\PaymentHelper;
 use Plenty\Modules\Wizard\Contracts\WizardContainerContract;
+use Novalnet\Assistants\NovalnetAssistant;
 use Plenty\Plugin\Log\Loggable;
 
 /**
