@@ -84,4 +84,18 @@ class PaymentHelper
         }
         return 'no_paymentmethod_found';
     }
+    
+     /**
+     * Get the payment method class
+     * 
+     * @return array
+     */
+    public function getPaymentMethodsKey()
+    {
+        return [
+            NovalnetCcPaymentMethod::PAYMENT_KEY,
+            NovalnetInvoicePaymentMethod::PAYMENT_KEY,
+            NovalnetIdealPaymentMethod::PAYMENT_KEY
+        ];
+    }
 }
