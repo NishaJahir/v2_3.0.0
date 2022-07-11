@@ -19,6 +19,7 @@ use Plenty\Modules\Wizard\Services\WizardProvider;
 use Novalnet\Assistants\SettingsHandlers\NovalnetAssistantSettingsHandler;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Plugin\Application;
+use Novalnet\Helper\PaymentHelper;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -44,15 +45,24 @@ class NovalnetAssistant extends WizardProvider
      * @var $webstoreValues
      */
     private $webstoreValues;
+ 
+    /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
     
     /**
     * Constructor.
     *
     * @param WebstoreRepositoryContract $webstoreRepository
+    * @param PaymentHelper $paymentHelper
     */
-    public function __construct(WebstoreRepositoryContract $webstoreRepository) 
+    public function __construct(WebstoreRepositoryContract $webstoreRepository,
+                                PaymentHelper $paymentHelper
+                               ) 
     {
          $this->webstoreRepository = $webstoreRepository;
+         $this->paymentHelper = $paymentHelper;
      }
  
     protected function structure()
@@ -83,6 +93,9 @@ class NovalnetAssistant extends WizardProvider
         ];
 
         $config = $this->createGlobalConfiguration($config);
+        $config = $this->createWebhookConfiguration($config);
+        $config = $this->createPaymentMethodConfiguration($config);
+        
 
         return $config;
     }
@@ -104,7 +117,6 @@ class NovalnetAssistant extends WizardProvider
         if($this->mainWebstore === null) {
             $this->mainWebstore = $this->webstoreRepository->findById(0)->storeIdentifier;
         }
-        $this->getLogger(__METHOD__)->error('getMainWebstore', $this->mainWebstore);
         return $this->mainWebstore;
     }
  
@@ -125,7 +137,6 @@ class NovalnetAssistant extends WizardProvider
                 ];
             }
         }
-     $this->getLogger(__METHOD__)->error('getWebstoreListForm', $this->webstoreValues);
         return $this->webstoreValues;
     }
     
@@ -140,7 +151,6 @@ class NovalnetAssistant extends WizardProvider
     {
         $config['steps']['novalnetGlobalConf'] = [
                 "title" => 'NovalnetAssistant.novalnetGlobalConf',
-                "description" => 'NovalnetAssistant.novalnetGlobalConfDesc',
                 "sections" => [
                     [
                         "title" => 'NovalnetAssistant.novalnetGlobalConf',
@@ -197,4 +207,60 @@ class NovalnetAssistant extends WizardProvider
         ];
         return $config;
     }
+ 
+    /**
+    * Create the configuration for Webhook process
+    * 
+    * @param array $config
+    * 
+    * @return array
+    */
+    public function createWebhookConfiguration($config) 
+    {
+        $config['steps']['novalnetWebhookConf'] = [
+                "title" => 'NovalnetAssistant.novalnetGlobalConf',
+                "sections" => [
+                    [
+                        "title" => 'NovalnetAssistant.novalnetWebhookConf',
+                        "description" => 'NovalnetAssistant.novalnetWebhookConfDesc',
+                        "form" => [
+                            'novalnetWebhookTestMode' => [
+                                'type' => 'checkbox',
+                                'options' => [
+                                    'name' => 'NovalnetAssistant.novalnetWebhookTestModeLabel'
+                                ]
+                            ],
+                            'novalnetWebhookEmailTo' => [
+                                'type' => 'text',
+                                'options' => [
+                                    'name' => 'NovalnetAssistant.novalnetWebhookEnableEmailLabel'
+                                ]
+                            ]
+                        ]
+                    ]
+        ];
+        return $config;
+    }
+
+    /**
+    * Create the configuration for Payment methods
+    * 
+    * @param array $config
+    * 
+    * @return array
+    */
+    public function createPaymentMethodConfiguration($config)
+    {
+       foreach($this->paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
+          $config['steps'][$paymentMethodKey] = [
+                "title" => 'NovalnetAssistant'.$paymentMethodKey,
+                "sections" => [
+                 ]
+          ];
+          
+       }
+       return $config;
+    }
+         
+    
 }
