@@ -177,7 +177,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetProductIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetProductIdTooltip'
+                                    'tooltip' => 'NovalnetAssistant.novalnetProductIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -240,7 +240,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetWebhookEmailToLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip',
+                                    'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip'
                                 ]
                             ]
                         ]
