@@ -198,6 +198,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetClientKeyLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetClientKeyTooltip',
                                     'required' => true
                                 ]
                             ]
@@ -218,7 +219,7 @@ class NovalnetAssistant extends WizardProvider
     public function createWebhookConfiguration($config) 
     {
         $config['steps']['novalnetWebhookConf'] = [
-                "title" => 'NovalnetAssistant.novalnetGlobalConf',
+                "title" => 'NovalnetAssistant.novalnetWebhookConf',
                 "sections" => [
                     [
                         "title" => 'NovalnetAssistant.novalnetWebhookConf',
@@ -233,7 +234,9 @@ class NovalnetAssistant extends WizardProvider
                             'novalnetWebhookEmailTo' => [
                                 'type' => 'text',
                                 'options' => [
-                                    'name' => 'NovalnetAssistant.novalnetWebhookEnableEmailLabel'
+                                    'name' => 'NovalnetAssistant.novalnetWebhookEmailToLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip',
+                                    'label' => 'test
                                 ]
                             ]
                         ]
@@ -253,8 +256,11 @@ class NovalnetAssistant extends WizardProvider
     public function createPaymentMethodConfiguration($config)
     {
        foreach($this->paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
+          $paymentMethodKey = str_replace('_','',ucwords($paymentMethodKey,'_'));
+          $paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
+          
           $config['steps'][$paymentMethodKey] = [
-                "title" => 'NovalnetAssistant'.strtolower($paymentMethodKey),
+                "title" => 'NovalnetAssistant.'. $paymentMethodKey,
                 "sections" => [
                  ]
           ];
