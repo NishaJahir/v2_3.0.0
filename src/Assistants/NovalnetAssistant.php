@@ -236,7 +236,7 @@ class NovalnetAssistant extends WizardProvider
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetWebhookEmailToLabel',
                                     'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip',
-                                    'label' => 'test
+                                    'label' => 'test'
                                 ]
                             ]
                         ]
@@ -256,9 +256,8 @@ class NovalnetAssistant extends WizardProvider
     public function createPaymentMethodConfiguration($config)
     {
        foreach($this->paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
-          $this->getLogger(__METHOD__)->error('key', $paymentMethodKey);
-          //$paymentMethodKey = str_replace('_','',ucwords($paymentMethodKey,'_'));
-          //$paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
+          $paymentMethodKey = str_replace('_','',ucwords($paymentMethodKey,'_'));
+          $paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
           
           $config['steps'][$paymentMethodKey] = [
                 "title" => 'NovalnetAssistant.'. $paymentMethodKey,
