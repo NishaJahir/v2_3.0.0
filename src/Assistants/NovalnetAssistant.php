@@ -236,7 +236,6 @@ class NovalnetAssistant extends WizardProvider
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetWebhookEmailToLabel',
                                     'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip',
-                                    'label' => 'test'
                                 ]
                             ]
                         ]
@@ -260,14 +259,43 @@ class NovalnetAssistant extends WizardProvider
           $paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
           
           $config['steps'][$paymentMethodKey] = [
-                "title" => 'NovalnetAssistant.'. $paymentMethodKey,
+                "title" => 'NovalnetAssistant.' . $paymentMethodKey,
                 "sections" => [
+                    [
+                        "title" => 'NovalnetAssistant.' .$paymentMethodKey,
+                        "description" => 'NovalnetAssistant.' .$paymentMethodKey. 'Desc',
+                        "form" => [
+                            $paymentMethodKey.'PaymentActive' => [
+                                'type' => 'checkbox',
+                                'options' => [
+                                    'name' => 'NovalnetAssistant.novalnetPaymentActiveLabel'
+                                ]
+                            ],
+                            $paymentMethodKey. 'TestMode' => [
+                                'type' => 'checkbox',
+                                'options' => [
+                                    'name' => 'NovalnetAssistant.novalnetTestModeLabel'
+                                ]
+                            ],
+                           $paymentMethodKey. 'PaymentLogo' => [
+                                'type' => 'file',
+                                'options' => [
+                                    'name' => 'NovalnetAssistant.novalnetPaymentLogoLabel',
+                                    'defaultValue' => 'images/'. $paymentMethodKey . '.png',
+                                ]
+                            ]
+                        ]
+                    ]
                  ]
           ];
           
-       }
-       return $config;
+        }
+     
+        
+        return $config;
     }
-         
+    
+    
+     
     
 }
