@@ -160,6 +160,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetVendorIdLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetVendorIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -168,6 +169,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetAuthCodeLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetAuthCodeTooltip',
                                     'required' => true
                                 ]
                             ],
@@ -175,6 +177,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetProductIdLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetProductIdTooltip'
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -183,6 +186,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetTariffIdLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetTariffIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -191,6 +195,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetAccessKeyLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetAccessKeyTooltip',
                                     'required' => true
                                 ]
                             ],
@@ -290,10 +295,72 @@ class NovalnetAssistant extends WizardProvider
           ];
           
         }
-
+     
+        $config['steps']['novalnetCc']['sections'][]['form'] = [
+             'novalnetCcEnforce' => [
+                           'type' => 'checkbox',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetEnforceCcLabel'
+                           ]
+                       ],
+            $this->createOnHoldConfiguration($config, 'novalnetCc');
+            'novalnetCcStandardStyleLabel' => [
+                           'type' => 'text',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetCcStandardStyleLabelLabel'
+                           ]
+                       ],
+             'novalnetCcStandardStyleField' => [
+                           'type' => 'text',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetCcStandardStyleFieldLabel'
+                           ]
+                       ],
+             'novalnetCcStandardStyleCss' => [
+                           'type' => 'text',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetCcStandardStyleCssLabel'
+                           ]
+                       ],
+              
+         
+        ];
+        
         return $config;
     }
     
+    
+    public function createOnHoldConfiguration($config, $paymentMethodKey) {
+       $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
+           $paymentMethodKey. 'PaymentAction' => [
+               'type' => 'select',
+               'defaultValue' => 0,
+               'options' => [
+                   'name' => 'NovalnetAssistant.novalnetPaymentActionLabel',
+                   'listBoxValues' => [
+                       [
+                          'caption' => 'NovalnetAssistant.novalnetOnHoldCaptureLabel',
+                          'value' => 0
+                       ],
+                       [
+                          'caption' => 'NovalnetAssistant.novalnetOnHoldAuthorizeLabel',
+                          'value' => 1
+                       ]
+                    ]
+               ]
+            ],
+           $paymentMethodKey. 'OnHold' => [
+                'type' => 'text',
+                'options' => [
+                    'name' => 'NovalnetAssistant.novalnetOnHoldLabel',
+                    'tooltip' => 'NovalnetAssistant.novalnetOnHoldTooltip'
+                ]
+            ]
+        ];
+     
+        return $config;
+     
+    }
     
      
     
