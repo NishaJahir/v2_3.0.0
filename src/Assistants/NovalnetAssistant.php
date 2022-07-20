@@ -320,7 +320,7 @@ class NovalnetAssistant extends WizardProvider
                        ],
             'novalnetCcLogos' => [
                            'type' => 'checkboxGroup',
-                           'defaultValue' => ['Visa', 'MasterCard', 'AmericanExpress' , 'Mastero', 'Cartesi', 'UnionPay', 'Discover', 'DinersClub', 'Jcb', 'CarteBleue'],
+                           'defaultValue' => ['Visa', 'MasterCard', 'AmericanExpress' , 'Mastero', 'Cartasi', 'UnionPay', 'Discover', 'DinersClub', 'Jcb', 'CarteBleue'],
                             'options' => [
                                 'name' => 'NovalnetAssistant.novalnetCcLogosLabel',
                                 'checkboxValues' => $this->getAllowedCreditCardTypes()
