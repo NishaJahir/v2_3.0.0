@@ -300,10 +300,29 @@ class NovalnetAssistant extends WizardProvider
              'novalnetCcEnforce' => [
                            'type' => 'checkbox',
                            'options' => [
-                               'name' => 'NovalnetAssistant.novalnetEnforceCcLabel'
+                               'name' => 'NovalnetAssistant.novalnetCcEnforceLabel'
                            ]
                        ],
-            $this->createOnHoldConfiguration($config, 'novalnetCc'),
+            'novalnetCcInlineForm' => [
+                           'type' => 'checkbox',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetCcDisplayInlineFormLabel'
+                           ]
+                       ],
+            'novalnetCcLogos' => [
+                           'type' => 'checkboxGroup',
+                           'defaultValue' => ['Visa', 'MasterCard', 'AmericanExpress' , 'Mastero', 'Cartesi', 'UnionPay', 'Discover', 'DinersClub', 'Jcb', 'CarteBleue'],
+                            'options' => [
+                                'name' => 'NovalnetAssistant.novalnetCcLogosLabel',
+                                'checkboxValues' => $this->getAllowedCreditCardTypes()
+                            ]
+                       ],
+            'novalnetCcOneClickShoppping' => [
+                           'type' => 'checkbox',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetOneClickShopppingLabel'
+                           ]
+                       ],
             'novalnetCcStandardStyleLabel' => [
                            'type' => 'text',
                            'options' => [
@@ -322,6 +341,7 @@ class NovalnetAssistant extends WizardProvider
                                'name' => 'NovalnetAssistant.novalnetCcStandardStyleCssLabel'
                            ]
                        ],
+             $this->createOnHoldConfiguration($config, 'novalnetCc'),
               
          
         ];
@@ -362,6 +382,16 @@ class NovalnetAssistant extends WizardProvider
      
     }
     
+    public function getAllowedCreditCardTypes()
+    {
+        $cardTypes = ['Visa', 'MasterCard', 'AmericanExpress' , 'Mastero', 'Cartesi', 'UnionPay', 'Discover', 'DinersClub', 'Jcb', 'CarteBleue'];
+        foreach($cardTypes as $cardType) {
+            $allowedCreditCardTypes = [
+                'caption' => 'NovalnetAssistant.novalnetCc'. $cardType .'Label',
+                'value' => $cardType
+            ];
+        }
+    }
      
     
 }
