@@ -296,7 +296,7 @@ class NovalnetAssistant extends WizardProvider
           
         }
      
-        $config['steps']['novalnetCc']['sections'][]['form'][] = [
+        $config['steps']['novalnetCc']['sections'][]['form'] = [
              'novalnetCcEnforce' => [
                            'type' => 'checkbox',
                            'options' => [
@@ -331,7 +331,7 @@ class NovalnetAssistant extends WizardProvider
     
     
     public function createOnHoldConfiguration(&$config, $paymentMethodKey) {
-       $config['steps'][$paymentMethodKey]['sections'][]['form'][] = [
+       $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
            $paymentMethodKey. 'PaymentAction' => [
                'type' => 'select',
                'defaultValue' => 0,
