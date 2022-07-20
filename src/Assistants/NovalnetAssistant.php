@@ -298,7 +298,7 @@ class NovalnetAssistant extends WizardProvider
         }
         
         // Load the Novalnet Credit card payment configuration
-        $this->createNovalnetCcPaymentConfiguration($config);
+        $config = $this->createNovalnetCcPaymentConfiguration($config);
         
         return $config;
     }
