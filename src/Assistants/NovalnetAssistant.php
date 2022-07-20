@@ -264,11 +264,11 @@ class NovalnetAssistant extends WizardProvider
           $paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
           
           $config['steps'][$paymentMethodKey] = [
-                "title" => 'NovalnetAssistant.' . $paymentMethodKey,
+                "title" => 'NovalnetAssistant.'. $paymentMethodKey,
                 "sections" => [
                     [
                         "title" => 'NovalnetAssistant.' .$paymentMethodKey,
-                        "description" => 'NovalnetAssistant.' .$paymentMethodKey. 'Desc',
+                        "description" => 'NovalnetAssistant.'. $paymentMethodKey .'Desc',
                         "form" => [
                             $paymentMethodKey.'PaymentActive' => [
                                 'type' => 'checkbox',
@@ -286,16 +286,25 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'file',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetPaymentLogoLabel',
-                                    'defaultValue' => 'images/'. $paymentMethodKey . '.png',
+                                    'defaultValue' => 'images/'. $paymentMethodKey .'.png',
                                 ]
-                            ]
+                            ],
+                            $this->CreateOptionalPaymentDisplayConfiguration($config, 'novalnetCc')
                         ]
                     ]
                  ]
           ];
           
         }
-     
+        
+        // Load the Novalnet Credit card payment configuration
+        $this->CreateOptionalPaymentDisplayConfiguration($config);
+        
+        return $config;
+    }
+    
+    public function createNovalnetCcPaymentConfiguration($config)
+    {
         $config['steps']['novalnetCc']['sections'][]['form'] = [
              'novalnetCcEnforce' => [
                            'type' => 'checkbox',
@@ -342,13 +351,9 @@ class NovalnetAssistant extends WizardProvider
                            ]
                        ],
              $this->createOnHoldConfiguration($config, 'novalnetCc'),
-              
-         
         ];
-        
         return $config;
     }
-    
     
     public function createOnHoldConfiguration($config, $paymentMethodKey) {
        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
@@ -391,6 +396,33 @@ class NovalnetAssistant extends WizardProvider
                 'value' => $cardType
             ];
         }
+    }
+    
+    public function CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey)
+    {
+        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
+            $paymentMethodKey. 'MinimumOrderAmount' => [
+                               'type' => 'text',
+                               'options' => [
+                                   'name' => 'NovalnetAssistant.novalnetMinimumOrderAmountLabel',
+                                   'tooltip' => 'NovalnetAssistant.novalnetMinimumOrderAmountTooltip'
+                               ]
+                           ],
+            $paymentMethodKey. 'MaximumOrderAmount' => [
+                               'type' => 'text',
+                               'options' => [
+                                   'name' => 'NovalnetAssistant.novalnetMaximumOrderAmountLabel',
+                                   'tooltip' => 'NovalnetAssistant.novalnetMaximumOrderAmountTooltip',
+                               ]
+                           ],
+            $paymentMethodKey. 'AllowedCountry' => [
+                               'type' => 'text',
+                               'options' => [
+                                   'name' => 'NovalnetAssistant.novalnetAllowedCountryLabel'
+                               ]
+                           ]
+        ];
+        return $config;
     }
      
     
