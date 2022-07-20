@@ -296,7 +296,7 @@ class NovalnetAssistant extends WizardProvider
           
         }
      
-        $config['steps']['novalnetCc']['sections'][]['form'] = [
+        $config['steps']['novalnetCc']['sections'][]['form'][] = [
              'novalnetCcEnforce' => [
                            'type' => 'checkbox',
                            'options' => [
