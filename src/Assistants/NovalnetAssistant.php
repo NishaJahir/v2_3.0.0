@@ -303,7 +303,7 @@ class NovalnetAssistant extends WizardProvider
                                'name' => 'NovalnetAssistant.novalnetEnforceCcLabel'
                            ]
                        ],
-            $this->createOnHoldConfiguration($config, 'novalnetCc');
+            $this->createOnHoldConfiguration($config, 'novalnetCc'),
             'novalnetCcStandardStyleLabel' => [
                            'type' => 'text',
                            'options' => [
