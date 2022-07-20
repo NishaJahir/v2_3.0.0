@@ -330,7 +330,7 @@ class NovalnetAssistant extends WizardProvider
     }
     
     
-    public function createOnHoldConfiguration($config, $paymentMethodKey) {
+    public function createOnHoldConfiguration(&$config, $paymentMethodKey) {
        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
            $paymentMethodKey. 'PaymentAction' => [
                'type' => 'select',
@@ -357,8 +357,6 @@ class NovalnetAssistant extends WizardProvider
                 ]
             ]
         ];
-     
-        return $config;
      
     }
     
