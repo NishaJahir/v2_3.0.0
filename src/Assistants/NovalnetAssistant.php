@@ -288,13 +288,14 @@ class NovalnetAssistant extends WizardProvider
                                     'name' => 'NovalnetAssistant.novalnetPaymentLogoLabel',
                                     'defaultValue' => 'images/'. $paymentMethodKey .'.png',
                                 ]
-                            ],
-                            $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey)
+                            ]
+                           
                         ]
                     ]
                  ]
           ];
           
+	   $config = $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey)
         }
         
         // Load the Novalnet Credit card payment configuration
@@ -352,9 +353,11 @@ class NovalnetAssistant extends WizardProvider
                            'options' => [
                                'name' => 'NovalnetAssistant.novalnetCcStandardStyleCssLabel'
                            ]
-                       ],
-             $this->createOnHoldConfiguration($config, 'novalnetCc'),
+                       ]
         ];
+	    
+	$config = $this->createOnHoldConfiguration($config, 'novalnetCc');
+	    
         return $config;
     }
     
@@ -367,10 +370,11 @@ class NovalnetAssistant extends WizardProvider
 		       'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
 		       //'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
 		   ]
-	       ],
-		$this->createOnHoldConfiguration($config, 'novalnetInvoice'),
+	       ]
+		
 	];
-
+       $config = $this->createOnHoldConfiguration($config, 'novalnetInvoice'),
+	    
 	return $config;
 		
     }
