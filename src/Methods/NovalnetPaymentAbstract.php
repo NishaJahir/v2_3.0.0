@@ -19,11 +19,11 @@ use Plenty\Modules\Payment\Method\Services\PaymentMethodBaseService;
 
 
 /**
- * Class NovalnetPaymentAbstrct
+ * Class NovalnetPaymentAbstract
  *
  * @package Novalnet\Methods
  */
-class NovalnetPaymentAbstrct extends PaymentMethodBaseService
+class NovalnetPaymentAbstract extends PaymentMethodBaseService
 {
     
 }
