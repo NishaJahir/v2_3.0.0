@@ -360,18 +360,20 @@ class NovalnetAssistant extends WizardProvider
     
     public function createNovalnetInvoicePaymentConfiguration($config)
     {
-		$config['steps']['novalnetCc']['sections'][]['form'] = [
-			'novalnetInvoiceDuedate' => [
-                           'type' => 'text',
-                           'options' => [
-                               'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
-                               'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
-                           ]
-                       ],
-			$this->createOnHoldConfiguration($config, 'novalnetInvoice'),
-		];
+	$config['steps']['novalnetInvoice']['sections'][]['form'] = [
+		'novalnetInvoiceDuedate' => [
+		   'type' => 'text',
+		   'options' => [
+		       'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
+		       'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
+		   ]
+	       ],
+		$this->createOnHoldConfiguration($config, 'novalnetInvoice'),
+	];
+
+	return $config;
 		
-	}
+    }
 	
     public function createOnHoldConfiguration($config, $paymentMethodKey) {
        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
