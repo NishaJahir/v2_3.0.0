@@ -289,7 +289,7 @@ class NovalnetAssistant extends WizardProvider
                                     'defaultValue' => 'images/'. $paymentMethodKey .'.png',
                                 ]
                             ],
-                            $this->CreateOptionalPaymentDisplayConfiguration($config, 'novalnetCc')
+                            $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey)
                         ]
                     ]
                  ]
