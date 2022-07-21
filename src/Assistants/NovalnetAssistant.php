@@ -287,7 +287,8 @@ class NovalnetAssistant extends WizardProvider
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetPaymentLogoLabel',
 			            'showPreview' => true,
-                                    'defaultValue' => 'images/'. $paymentMethodKey .'.png',
+			            'allowedExtensions' => ['svg', 'png', 'jpg', 'jpeg'],
+				    'allowFolders' => false
                                 ]
                             ]
                            
@@ -370,7 +371,7 @@ class NovalnetAssistant extends WizardProvider
 		   'type' => 'text',
 		   'options' => [
 		       'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
-		       //'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
+		       'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
 		   ]
 	       ]
 		
@@ -404,7 +405,7 @@ class NovalnetAssistant extends WizardProvider
                 'type' => 'text',
                 'options' => [
                     'name' => 'NovalnetAssistant.novalnetOnHoldLabel',
-                    //'tooltip' => 'NovalnetAssistant.novalnetOnHoldTooltip'
+                    'tooltip' => 'NovalnetAssistant.novalnetOnHoldTooltip'
                 ]
             ]
         ];
