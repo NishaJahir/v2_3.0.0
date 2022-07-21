@@ -373,7 +373,7 @@ class NovalnetAssistant extends WizardProvider
 	       ]
 		
 	];
-       $config = $this->createOnHoldConfiguration($config, 'novalnetInvoice'),
+       $config = $this->createOnHoldConfiguration($config, 'novalnetInvoice');
 	    
 	return $config;
 		
