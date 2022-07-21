@@ -160,7 +160,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetVendorIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetVendorIdTooltip',
+                                    //'tooltip' => 'NovalnetAssistant.novalnetVendorIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -169,7 +169,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetAuthCodeLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetAuthCodeTooltip',
+                                    //'tooltip' => 'NovalnetAssistant.novalnetAuthCodeTooltip',
                                     'required' => true
                                 ]
                             ],
@@ -177,7 +177,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetProductIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetProductIdTooltip',
+                                    //'tooltip' => 'NovalnetAssistant.novalnetProductIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -186,7 +186,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetTariffIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetTariffIdTooltip',
+                                    //'tooltip' => 'NovalnetAssistant.novalnetTariffIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -195,7 +195,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetAccessKeyLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetAccessKeyTooltip',
+                                   //'tooltip' => 'NovalnetAssistant.novalnetAccessKeyTooltip',
                                     'required' => true
                                 ]
                             ],
@@ -203,7 +203,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetClientKeyLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetClientKeyTooltip',
+                                    //'tooltip' => 'NovalnetAssistant.novalnetClientKeyTooltip',
                                     'required' => true
                                 ]
                             ]
@@ -240,7 +240,7 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetWebhookEmailToLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip'
+                                    //'tooltip' => 'NovalnetAssistant.novalnetWebhookEmailToTooltip'
                                 ]
                             ]
                         ]
@@ -365,7 +365,7 @@ class NovalnetAssistant extends WizardProvider
 		   'type' => 'text',
 		   'options' => [
 		       'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
-		       'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
+		       //'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
 		   ]
 	       ],
 		$this->createOnHoldConfiguration($config, 'novalnetInvoice'),
@@ -398,7 +398,7 @@ class NovalnetAssistant extends WizardProvider
                 'type' => 'text',
                 'options' => [
                     'name' => 'NovalnetAssistant.novalnetOnHoldLabel',
-                    'tooltip' => 'NovalnetAssistant.novalnetOnHoldTooltip'
+                    //'tooltip' => 'NovalnetAssistant.novalnetOnHoldTooltip'
                 ]
             ]
         ];
@@ -425,14 +425,14 @@ class NovalnetAssistant extends WizardProvider
                                'type' => 'text',
                                'options' => [
                                    'name' => 'NovalnetAssistant.novalnetMinimumOrderAmountLabel',
-                                   'tooltip' => 'NovalnetAssistant.novalnetMinimumOrderAmountTooltip'
+                                   //'tooltip' => 'NovalnetAssistant.novalnetMinimumOrderAmountTooltip'
                                ]
                            ],
             $paymentMethodKey. 'MaximumOrderAmount' => [
                                'type' => 'text',
                                'options' => [
                                    'name' => 'NovalnetAssistant.novalnetMaximumOrderAmountLabel',
-                                   'tooltip' => 'NovalnetAssistant.novalnetMaximumOrderAmountTooltip',
+                                   //'tooltip' => 'NovalnetAssistant.novalnetMaximumOrderAmountTooltip',
                                ]
                            ],
             $paymentMethodKey. 'AllowedCountry' => [
