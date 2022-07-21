@@ -295,7 +295,7 @@ class NovalnetAssistant extends WizardProvider
                  ]
           ];
           
-	   $config = $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey)
+	   $config = $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey);
         }
         
         // Load the Novalnet Credit card payment configuration
