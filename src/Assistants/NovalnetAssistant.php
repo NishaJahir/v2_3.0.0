@@ -300,7 +300,6 @@ class NovalnetAssistant extends WizardProvider
 	   $config = $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey);
         }
         
-	$this->getLogger(__METHOD__)->error('config', $config);
         // Load the Novalnet Credit card payment configuration
         $config = $this->createNovalnetCcPaymentConfiguration($config);
         // Load the Novalnet Invoice payment configuration
@@ -417,11 +416,12 @@ class NovalnetAssistant extends WizardProvider
     public function getAllowedCreditCardTypes()
     {
         $cardTypes = ['Visa', 'MasterCard', 'AmericanExpress' , 'Mastero', 'Cartesi', 'UnionPay', 'Discover', 'DinersClub', 'Jcb', 'CarteBleue'];
-        foreach($cardTypes as $cardType) {
-            $allowedCreditCardTypes = [
-                'caption' => 'NovalnetAssistant.novalnetCc'. $cardType .'Label',
-                'value' => $cardType
-            ];
+        $allowedCreditCardTypes = [];
+	foreach($cardTypes as $cardTypeIndex => $cardType) {
+		    $allowedCreditCardTypes[] = [
+			'caption' => 'NovalnetAssistant.novalnetCc'. $cardType .'Label',
+			'value' => $cardType
+		    ];
         }
     }
     
