@@ -267,8 +267,8 @@ class NovalnetAssistant extends WizardProvider
                 "title" => 'NovalnetAssistant.'. $paymentMethodKey,
                 "sections" => [
                     [
-                        "title" => 'NovalnetAssistant.' .$paymentMethodKey,
-                        "description" => 'NovalnetAssistant.'. $paymentMethodKey .'Desc',
+                        "title" => 'Customize.' .$paymentMethodKey,
+                        "description" => 'Customize.'. $paymentMethodKey .'Desc',
                         "form" => [
                             $paymentMethodKey.'PaymentActive' => [
                                 'type' => 'checkbox',
@@ -299,6 +299,9 @@ class NovalnetAssistant extends WizardProvider
         
         // Load the Novalnet Credit card payment configuration
         $config = $this->createNovalnetCcPaymentConfiguration($config);
+        // Load the Novalnet Invoice payment configuration
+        $config = $this->createNovalnetInvoicePaymentConfiguration($config);
+        
         
         return $config;
     }
@@ -355,6 +358,21 @@ class NovalnetAssistant extends WizardProvider
         return $config;
     }
     
+    public function createNovalnetInvoicePaymentConfiguration($config)
+    {
+		$config['steps']['novalnetCc']['sections'][]['form'] = [
+			'novalnetInvoiceDuedate' => [
+                           'type' => 'text',
+                           'options' => [
+                               'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
+                               'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
+                           ]
+                       ],
+			$this->createOnHoldConfiguration($config, 'novalnetInvoice'),
+		];
+		
+	}
+	
     public function createOnHoldConfiguration($config, $paymentMethodKey) {
        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
            $paymentMethodKey. 'PaymentAction' => [
