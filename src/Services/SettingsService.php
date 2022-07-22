@@ -7,6 +7,7 @@ use Novalnet\Models\Settings;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\PluginSet\Contracts\PluginSetRepositoryContract;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class SettingsService
@@ -15,9 +16,11 @@ use Plenty\Plugin\Application;
  */
 class SettingsService
 { 
-	/**
-     * @var DataBase
-     */
+    use Loggable;
+     
+    /**
+    * @var DataBase
+    */
     protected $database;
     
     /**
