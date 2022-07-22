@@ -5,6 +5,7 @@ namespace Novalnet\Assistants\SettingsHandlers;
 
 use Plenty\Modules\Plugin\PluginSet\Contracts\PluginSetRepositoryContract;
 use Plenty\Modules\Wizard\Contracts\WizardSettingsHandler;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class NovalnetAssistantSettingsHandler
@@ -13,6 +14,7 @@ use Plenty\Modules\Wizard\Contracts\WizardSettingsHandler;
  */
 class NovalnetAssistantSettingsHandler implements WizardSettingsHandler
 {
+    use Loggable;
     
     public function handle(array $data)
     {
