@@ -3,7 +3,7 @@
     "namespace": "Novalnet",
     "marketplaceName" : {"de":"Novalnet", "en":"Novalnet"},
     "type": "payment",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "license":"GPL-3.0",
     "pluginIcon":"icon_plugin_xs.png",
     "price":0.0,
@@ -35,7 +35,8 @@
     [
         "Novalnet\\Migrations\\CreateNewPaymentMethods",
         "Novalnet\\Migrations\\CreateTransactionTable",
-        "Novalnet\\Migrations\\UpdateTransactionTableDataType"
+        "Novalnet\\Migrations\\UpdateTransactionTableDataType",
+        "Novalnet\\Migrations\\CreateSettingsTable"
     ],
     "dataProviders": 
     [
