@@ -21,7 +21,7 @@ namespace Novalnet\Methods;
  *
  * @package Novalnet\Methods
  */
-class NovalnetIdealPaymentMethod extends NovalnetPaymentAbstrct
+class NovalnetIdealPaymentMethod extends NovalnetPaymentAbstract
 {
     const PAYMENT_KEY = 'NOVALNET_IDEAL';
 }
