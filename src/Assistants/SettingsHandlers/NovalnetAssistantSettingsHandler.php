@@ -14,8 +14,8 @@ use Plenty\Modules\Wizard\Contracts\WizardSettingsHandler;
 class NovalnetAssistantSettingsHandler implements WizardSettingsHandler
 {
     
-    public function handle(array $parameter)
+    public function handle(array $data)
     {
-        
+        $this->getLogger(__METHOD__)->error('post data', $data);
     }
 }
