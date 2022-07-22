@@ -33,7 +33,7 @@ class SettingsService
 	    $this->database = $database;
 	}
     
-	public function getSettings($clientId, $pluginSetId)
+	public function getNovalnetSettings($clientId, $pluginSetId)
 	{
 		if (is_null($clientId)) {
 	    /** @var Application $application */
@@ -52,13 +52,13 @@ class SettingsService
 							  ->where('pluginSetId', '=', $pluginSetId)
 							  ->get();
 		
-		$this->getLogger(__METHOD__)->error('db', $setting);
+		
 	}
 
-	public function createOrUpdateNovalnetConfigurationSettings($clientId, $pluginSetId)
+	public function createOrUpdateNovalnetConfigurationSettings($data, $clientId, $pluginSetId)
 	{
-
-
+	    $novalnetSettings = $this->getNovalnetSettings($clientId, $pluginSetId);
+            $this->getLogger(__METHOD__)->error('db', $novalnetSettings);
 	}
 }
 
