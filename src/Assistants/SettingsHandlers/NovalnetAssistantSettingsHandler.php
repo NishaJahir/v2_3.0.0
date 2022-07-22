@@ -41,7 +41,7 @@ class NovalnetAssistantSettingsHandler implements WizardSettingsHandler
         ];
         
         // Payment method common configuration values
-		foreach($this->paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
+		foreach($paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
 			$paymentKey = str_replace('_','',ucwords(strtolower($paymentMethodKey),'_'));
 			$paymentKey[0] = strtolower($paymentKey[0]);
 			$paymentMethodKey = strtolower($paymentMethodKey);
