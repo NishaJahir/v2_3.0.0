@@ -21,7 +21,7 @@ namespace Novalnet\Methods;
  *
  * @package Novalnet\Methods
  */
-class NovalnetCcPaymentMethod extends NovalnetPaymentAbstrct
+class NovalnetCcPaymentMethod extends NovalnetPaymentAbstract
 {
     const PAYMENT_KEY = 'NOVALNET_CC';
 }
