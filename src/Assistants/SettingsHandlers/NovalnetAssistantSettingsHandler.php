@@ -75,7 +75,7 @@ class NovalnetAssistantSettingsHandler implements WizardSettingsHandler
         
         /** @var SettingsService $settingsService */
         $settingsService = pluginApp(SettingsService::class);
-        $settingsService->createOrUpdateNovalnetConfigurationSettings($settings, $clientId, $pluginSetId);
+        $settingsService->createOrUpdateNovalnetConfigurationSettings($novalnetSettings, $clientId, $pluginSetId);
         
         return true;
     }
