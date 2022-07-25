@@ -70,5 +70,19 @@ class SettingsService
 	    return $novalnetSettings;
 	}
 	
+	public function getNnPaymentSettingsValue($settingsKey, $paymentKey, $clientId = null, $pluginSetId = null)
+    	{
+		$settings = $this->getNnSettings($clientId, $pluginSetId);
+		$settingsKey = $paymentKey ? $paymentKey . '_' . $settingsKey : $settingsKey;
+		
+		if(!is_null($settings)) {
+			if(isset($settings->value[$settingsKey])) {
+				return $settings->value[$settingsKey];
+			}
+		}
+                
+        	return null;
+	}
+	
 }
 
