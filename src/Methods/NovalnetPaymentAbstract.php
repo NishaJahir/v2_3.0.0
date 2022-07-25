@@ -106,7 +106,7 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      *
      * @return string
      */
-    public function getIcon(string $lang): string
+    public function getIcon(string $lang = 'de'): string
     {
         return '';
     }
@@ -116,7 +116,7 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      *
      * @return string
      */
-    public function getDescription(string $lang): string
+    public function getDescription(string $lang = 'de'): string
     {
        return '';
     }
@@ -158,7 +158,7 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      * @param string $lang
      * @return string
      */
-    public function getBackendName(string $lang): string
+    public function getBackendName(string $lang = 'de'): string
     {
         return $this->getName($lang);
     }
