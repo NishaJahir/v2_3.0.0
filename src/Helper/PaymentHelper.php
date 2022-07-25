@@ -220,6 +220,10 @@ class PaymentHelper
         return sprintf('%0.2f', $amount) * 100;
     }
     
+    public function dateFormatter($days) {
+        return date( 'Y-m-d', strtotime( date( 'y-m-d' ) . '+ ' . $days . ' days' ) );
+    }
+    
     /**
     * Get the translated text for the Novalnet key
     * @param string $key
@@ -232,5 +236,52 @@ class PaymentHelper
         $translator = pluginApp(Translator::class);
 
         return $lang == null ? $translator->trans("Novalnet::PaymentMethod.$key") : $translator->trans("Novalnet::PaymentMethod.$key",[], $lang);
+    }
+    
+    /**
+     * Execute curl process
+     *
+     * @param string $paymentRequestData
+     * @param string $paymentUrl
+     *
+     * @return array
+     */
+    public function executeCurl($paymentRequestData, $paymentUrl, $paymentAccessKey)
+    {
+        // Setting up the important information in the headers 
+        $headers = [
+                     'Content-Type:application/json',
+                     'charset:utf-8',
+                     'X-NN-Access-Key:'. base64_encode($paymentAccessKey),
+                   ];
+        
+        try {
+            $curl = curl_init();
+            // Set cURL options
+            curl_setopt($curl, CURLOPT_URL, $paymentUrl);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($paymentRequestData));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+            // Execute cURL
+            $paymentResponse = curl_exec($curl);
+            
+            // Handle cURL error
+            if (curl_errno($curl)) {
+               $errorText = curl_error($curl);
+            }
+            
+            // Close cURL
+            curl_close($curl);
+            
+            // Decoding the JSON string to array for further processing 
+            return [
+                'response' => json_decode($paymentResponse, true),
+                'error'    => $errorText
+            ];
+        } catch (\Exception $e) {
+            $this->getLogger(__METHOD__)->error('Novalnet::executeCurlError', $e);
+        }
     }
 }
