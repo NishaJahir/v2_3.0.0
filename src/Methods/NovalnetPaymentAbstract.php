@@ -92,20 +92,20 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 	    $is_payment_active = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
 	    if($is_payment_active) {
 			// Check if the payment allowed for mentioned countries
-			$active_payment_allowed_country = true;
+			$activate_payment_allowed_country = true;
 			if ($allowed_country = $this->settingsService->getNnPaymentSettingsValue('allowed_country', strtolower($this::PAYMENT_KEY))) {
 				$activate_payment_allowed_country  = $this->paymentService->allowedCountries($this->basketRepository, $allowed_country);
 			}
 			
 			// Check if the Minimum order amount value met to payment display condition
-			$active_payment_minimum_order_amount = true;
+			$activate_payment_minimum_amount = true;
 			$minimum_amount = trim($this->settingsService->getNnPaymentSettingsValue('minimum_order_amount', strtolower($this::PAYMENT_KEY)));
 			if (!empty($minimum_amount) && is_numeric($minimum_amount)) {
 				$activate_payment_minimum_amount = $this->paymentService->getMinBasketAmount($this->basketRepository, $minimum_amount);
 			}
 			
 			// Check if the Maximum order amount value met to payment display condition
-			$active_payment_maximum_order_amount = true;
+			$activate_payment_maximum_amount = true;
 			$maximum_amount = trim($this->settingsService->getNnPaymentSettingsValue('maximum_order_amount', strtolower($this::PAYMENT_KEY)));
 			if (!empty($maximum_amount) && is_numeric($maximum_amount)) {
 				$activate_payment_maximum_amount = $this->paymentService->getMaxBasketAmount($this->basketRepository, $maximum_amount);
