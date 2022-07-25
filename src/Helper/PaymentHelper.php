@@ -58,7 +58,7 @@ class PaymentHelper
      */
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 AddressRepositoryContract $addressRepository,
-                                CountryRepositoryContract $countryRepository,
+                                CountryRepositoryContract $countryRepository
                                )
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
