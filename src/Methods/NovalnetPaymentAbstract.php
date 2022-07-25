@@ -154,7 +154,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
         if(empty($logoUrl)){
             /** @var Application $app */
             $app = pluginApp(Application::class);
-            $logoUrl = $app->getUrlPath('novalnet') .'/images/'. strtolower($this::PAYMENT_KEY);
+            $logoUrl = $app->getUrlPath('novalnet') .'/images/'. strtolower($this::PAYMENT_KEY) .'png';
         } 
         return $logoUrl;
     }
