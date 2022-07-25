@@ -23,6 +23,7 @@ use Novalnet\Services\PaymentService;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -34,8 +35,8 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 {
     use Loggable;
     
-	const PAYMENT_KEY = 'Novalnet';
-	
+    const PAYMENT_KEY = 'Novalnet';
+    
     /** 
      * @var BasketRepositoryContract 
      */
@@ -43,12 +44,12 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 
     /** @var  ConfigRepository */
     private $configRepository;
-	
+    
     /**
      * @var PaymentService
      */
     private $paymentService;
-	
+    
     /**
      * @var PaymentHelper
      */
@@ -57,7 +58,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
     /**
      * @var SettingsService
      */
-    protected $settingsService;
+    private $settingsService;
     
     /**
      * NovalnetPaymentAbstract constructor.
@@ -70,14 +71,14 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
     public function __construct(BasketRepositoryContract $basketRepository,
                                 ConfigRepository $configRepository,
                                 PaymentService $paymentService,
-				PaymentHelper $paymentHelper,
+                                PaymentHelper $paymentHelper,
                                 SettingsService $settingsService
                                )
     {
         $this->basketRepository = $basketRepository->load();
         $this->configRepository = $configRepository;
         $this->paymentService  = $paymentService;
-		$this->paymentHelper = $paymentHelper;
+        $this->paymentHelper = $paymentHelper;
         $this->settingsService  = $settingsService;
     }
     
@@ -89,31 +90,31 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isActive(): bool
     {
-	    $is_payment_active = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
-	    if($is_payment_active) {
-			// Check if the payment allowed for mentioned countries
-			$activate_payment_allowed_country = true;
-			if ($allowed_country = $this->settingsService->getNnPaymentSettingsValue('allowed_country', strtolower($this::PAYMENT_KEY))) {
-				$activate_payment_allowed_country  = $this->paymentService->allowedCountries($this->basketRepository, $allowed_country);
-			}
-			
-			// Check if the Minimum order amount value met to payment display condition
-			$activate_payment_minimum_amount = true;
-			$minimum_amount = trim($this->settingsService->getNnPaymentSettingsValue('minimum_order_amount', strtolower($this::PAYMENT_KEY)));
-			if (!empty($minimum_amount) && is_numeric($minimum_amount)) {
-				$activate_payment_minimum_amount = $this->paymentService->getMinBasketAmount($this->basketRepository, $minimum_amount);
-			}
-			
-			// Check if the Maximum order amount value met to payment display condition
-			$activate_payment_maximum_amount = true;
-			$maximum_amount = trim($this->settingsService->getNnPaymentSettingsValue('maximum_order_amount', strtolower($this::PAYMENT_KEY)));
-			if (!empty($maximum_amount) && is_numeric($maximum_amount)) {
-				$activate_payment_maximum_amount = $this->paymentService->getMaxBasketAmount($this->basketRepository, $maximum_amount);
-			}
-			
-			return (bool) ($this->paymentService->isMerchantConfigurationValid() && $activate_payment_allowed_country && $activate_payment_minimum_amount && $activate_payment_maximum_amount);
-	    }
-      	    return false;
+        $is_payment_active = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
+        if($is_payment_active) {
+            // Check if the payment allowed for mentioned countries
+            $activate_payment_allowed_country = true;
+            if ($allowed_country = $this->settingsService->getNnPaymentSettingsValue('allowed_country', strtolower($this::PAYMENT_KEY))) {
+                $activate_payment_allowed_country  = $this->paymentService->allowedCountries($this->basketRepository, $allowed_country);
+            }
+            
+            // Check if the Minimum order amount value met to payment display condition
+            $activate_payment_minimum_amount = true;
+            $minimum_amount = trim($this->settingsService->getNnPaymentSettingsValue('minimum_order_amount', strtolower($this::PAYMENT_KEY)));
+            if (!empty($minimum_amount) && is_numeric($minimum_amount)) {
+                $activate_payment_minimum_amount = $this->paymentService->getMinBasketAmount($this->basketRepository, $minimum_amount);
+            }
+            
+            // Check if the Maximum order amount value met to payment display condition
+            $activate_payment_maximum_amount = true;
+            $maximum_amount = trim($this->settingsService->getNnPaymentSettingsValue('maximum_order_amount', strtolower($this::PAYMENT_KEY)));
+            if (!empty($maximum_amount) && is_numeric($maximum_amount)) {
+                $activate_payment_maximum_amount = $this->paymentService->getMaxBasketAmount($this->basketRepository, $maximum_amount);
+            }
+            
+            return (bool) ($this->paymentService->isMerchantConfigurationValid() && $activate_payment_allowed_country && $activate_payment_minimum_amount && $activate_payment_maximum_amount);
+        }
+            return false;
     }
 
     /**
@@ -123,10 +124,15 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function getName(string $lang = 'de'): string
     {   
-       return 'invoice';
+            $paymentMethodKey = str_replace('_','',ucwords(strtolower($this::PAYMENT_KEY),'_'));
+            $paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
+          
+            /** @var Translator $translator */
+            $translator = pluginApp(Translator::class);
+            return $translator->trans('Novalnet::Customize.'. $paymentMethodKey, [], $lang);
     }
-	
-	/**
+    
+    /**
      * Return an additional payment fee for the payment method.
      *
      * @return float
@@ -143,7 +149,13 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function getIcon(string $lang = 'de'): string
     {
-        return '';
+        $logoUrl = $this->settingsService->getNnPaymentSettingsValue('payment_logo', strtolower($this::PAYMENT_KEY));
+        if(empty($logoUrl)){
+            /** @var Application $app */
+            $app = pluginApp(Application::class);
+            $logoUrl = $app->getUrlPath('novalnet') .'/images/'. strtolower($this::PAYMENT_KEY);
+        } 
+        return $logoUrl;
     }
     
     /**
@@ -153,7 +165,12 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function getDescription(string $lang = 'de'): string
     {
-       return '';
+            $paymentMethodKey = str_replace('_','',ucwords(strtolower($this::PAYMENT_KEY),'_'));
+            $paymentMethodKey[0] = strtolower($paymentMethodKey[0]);
+          
+            /** @var Translator $translator */
+            $translator = pluginApp(Translator::class);
+            return $translator->trans('Novalnet::Customize.'. $paymentMethodKey .'Desc', [], $lang);
     }
 
     /**
@@ -174,7 +191,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isSwitchableFrom($orderId = null): bool
     {
-		return false;
+        return false;
     }
      
      /**
@@ -205,6 +222,8 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function getBackendIcon(): string
     {
-        return '';
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('novalnet') . '/images/logos/' . strtolower($this::PAYMENT_KEY) .'_backend_icon.svg';
+        return $icon;
     }
 }
