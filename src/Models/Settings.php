@@ -63,7 +63,7 @@ class Settings extends Model
     
     public function update($data)
     {
-	    $thsi->getLogger(__METHOD__)->error('update', $data);
+	    $this->getLogger(__METHOD__)->error('update', $data);
 		if (isset($data['novalnet_merchant_id'])) {
             $this->value['novalnet_merchant_id'] = $data['novalnet_merchant_id'];
         }
