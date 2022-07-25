@@ -72,7 +72,7 @@ class SettingsService
 	
 	public function create($data)
     {
-		$thsi->getLogger(__METHOD__)->error('create', $data);
+		$this->getLogger(__METHOD__)->error('create', $data);
         $this->clientId = $data['clientId'];
         $this->pluginSetId = $data['pluginSetId'];
         $this->createdAt = (string)Carbon::now();
