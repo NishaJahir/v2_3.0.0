@@ -23,6 +23,7 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use \Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
+use Plenty\Plugin\Translation\Translator;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -193,5 +194,20 @@ class PaymentHelper
     
     public function ConvertAmountToSmallerUnit($amount) {
         return sprintf('%0.2f', $amount) * 100;
+    }
+    
+     /**
+    * Get the customized translated text for the Novalnet key
+    *
+    * @param string $key
+    * @param string $lang
+    *
+    * @return string
+    */
+    public function getCustomizedTranslatedText($key, $lang = null)
+    {
+        $translator = pluginApp(Translator::class);
+
+        return $lang == null ? $translator->trans("Novalnet::Customize.$key") : $translator->trans("Novalnet::Customize.$key", [], $lang);
     }
 }
