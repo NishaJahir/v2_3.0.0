@@ -19,7 +19,7 @@ use Plenty\Modules\Payment\Method\Services\PaymentMethodBaseService;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
-use Novalnet\Services\PaymentService;
+//use Novalnet\Services\PaymentService;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Log\Loggable;
@@ -58,13 +58,13 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function __construct(BasketRepositoryContract $basketRepository,
                                 ConfigRepository $configRepository,
-                                PaymentService $paymentService,
+                                //PaymentService $paymentService,
                                 SettingsService $settingsService
                                )
     {
         $this->basketRepository = $basketRepository->load();
         $this->configRepository = $configRepository;
-        $this->paymentService  = $paymentService;
+        //$this->paymentService  = $paymentService;
         $this->settingsService  = $settingsService;
     }
     
@@ -86,9 +86,9 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      *
      * @return string
      */
-    public function getName():string
+    public function getName(string $lang = 'de'): string
     {   
-       
+       return 'test';
     }
 	
 	/**
@@ -106,9 +106,9 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      *
      * @return string
      */
-    public function getIcon():string
+    public function getIcon(string $lang): string
     {
-        
+        return '';
     }
     
     /**
@@ -116,9 +116,9 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
      *
      * @return string
      */
-    public function getDescription():string
+    public function getDescription(string $lang): string
     {
-       
+       return '';
     }
 
     /**
@@ -164,22 +164,12 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
     }
     
     /**
-     * Check if this payment method can handle subscriptions.
-     *
-     * @return bool
-     */
-    public function canHandleSubscriptions(): bool
-    {
-        return false;
-    }
-    
-    /**
      * Return the icon for the back end, shown in the payments UI.
      *
      * @return string
      */
     public function getBackendIcon(): string
     {
-        
+        return '';
     }
 }
