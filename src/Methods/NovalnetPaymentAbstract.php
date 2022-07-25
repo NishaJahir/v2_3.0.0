@@ -33,7 +33,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 {
     use Loggable;
     
-	const PAYMENT_CODE = 'Novalnet';
+	const PAYMENT_CODE = 'plenty_novalnet';
 	
     /** 
      * @var BasketRepositoryContract 
@@ -77,7 +77,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
     public function isActive(): bool
     {
        $active = $this->settingsService->getNnPaymentSettingsValue('payment_active', $this::PAYMENT_CODE);
-        $this->getLogger(__METHOD__)->error('active', $active);
+        $this->getLogger(__METHOD__)->error('active123', $active);
 	    
 	    return true;
     
