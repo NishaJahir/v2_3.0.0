@@ -72,13 +72,13 @@ class SettingsService
 	
 	public function getNnPaymentSettingsValue($settingsKey, $paymentKey = null, $clientId = null, $pluginSetId = null)
     	{
-		$this->getLogger(__METHOD__)->error('key', $paymentKey);
-		$this->getLogger(__METHOD__)->error('settings', $settingsKey);
+		$this->getLogger(__METHOD__)->error('ke1y', $paymentKey);
+		$this->getLogger(__METHOD__)->error('settings1', $settingsKey);
 		
 		$settings = $this->getNnSettings($clientId, $pluginSetId);
 		
 		if(!is_null($settings)) {
-			if(isset($settings->value[$paymentKey])) {
+			if(!empty($paymentKey) && isset($settings->value[$paymentKey])) {
 				return $settings->value[$paymentKey][$settingsKey];
 			} else {
 				return $settings->value[$settingsKey];
