@@ -65,7 +65,7 @@ class SettingsService
 		    $novalnetSettings->pluginSetId = $pluginSetId;
 		    $novalnetSettings->createdAt = (string)Carbon::now();
             }
-	    $novalnetSettings = $novalnetSettings->updateValues($data);
+	    $novalnetSettings = $this->updateValues($data);
             $this->getLogger(__METHOD__)->error('db123', $novalnetSettings);
 	    return $novalnetSettings;
 	}
