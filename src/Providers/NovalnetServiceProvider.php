@@ -23,6 +23,7 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Novalnet\Helper\PaymentHelper;
 use Plenty\Modules\Wizard\Contracts\WizardContainerContract;
 use Novalnet\Assistants\NovalnetAssistant;
+use Novalnet\Methods\NovalnetPaymentAbstract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
