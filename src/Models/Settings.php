@@ -6,6 +6,7 @@ namespace Novalnet\Models;
 use Carbon\Carbon;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class Settings
@@ -19,6 +20,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  */
 class Settings extends Model
 {
+    use Loggable;
+	
     public $id;
     public $clientId;
     public $pluginSetId;
