@@ -20,6 +20,7 @@ use Novalnet\Methods\NovalnetInvoicePaymentMethod;
 use Novalnet\Methods\NovalnetIdealPaymentMethod;
 
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use \Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
