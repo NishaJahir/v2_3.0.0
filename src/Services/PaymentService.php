@@ -17,6 +17,7 @@ namespace Novalnet\Services;
 
 use Plenty\Modules\Basket\Models\Basket;
 use Novalnet\Services\SettingsService;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
@@ -60,6 +61,11 @@ class PaymentService
     private $countryRepository;
     
     /**
+     * @var FrontendSessionStorageFactoryContract
+     */
+    private $sessionStorage;
+    
+    /**
      * Constructor.
      *
      * @param SettingsService $settingsService
@@ -67,12 +73,14 @@ class PaymentService
      * @param WebstoreHelper $webstoreHelper
      * @param AddressRepositoryContract $addressRepository
      * @param CountryRepositoryContract $countryRepository
+     * @param FrontendSessionStorageFactoryContract $sessionStorage
      */
     public function __construct(SettingsService $settingsService,
                                 PaymentHelper $paymentHelper,
                                 WebstoreHelper $webstoreHelper,
 				AddressRepositoryContract $addressRepository,
-                                CountryRepositoryContract $countryRepository
+                                CountryRepositoryContract $countryRepository,
+                                FrontendSessionStorageFactoryContract $sessionStorage
                                )
     {
         $this->settingsService = $settingsService;
@@ -80,6 +88,7 @@ class PaymentService
         $this->webstoreHelper = $webstoreHelper;
 	$this->addressRepository  = $addressRepository;
         $this->countryRepository  = $countryRepository;
+        $this->sessionStorage  = $sessionStorage;
         
     }
     
@@ -182,6 +191,8 @@ class PaymentService
                                                'system_ip'  => $_SERVER['SERVER_ADDR']
                                              ];
         
+		$this->getPaymentData($paymentRequestData, $paymentKey);
+		    
         return $paymentRequestData;
     }
 
@@ -211,6 +222,17 @@ class PaymentService
         $lastName = empty ($lastName) ? $firstName : $lastName;
         return ['firstName' => $firstName, 'lastName' => $lastName];
     }
+    
+    public function getPaymentData(&$paymentRequestData, $paymentKey)
+    {
+		if($paymentKey == 'NOVALNET_INVOICE') {
+			$paymentRequestData['transaction']['payment_type'] = 'INVOICE';
+			$invoiceDueDate = $this->settingsService->getNnPaymentSettingsValue('due_date', strtolower($paymentKey));
+			if(is_numeric($invoiceDueDate)) {
+				$paymentRequestData['transaction']['due_date'] = $this->paymentHelper->dateFormatter($invoiceDueDate);
+			}
+		}
+	}
     
     /**
      * Check if the merchant details configured
@@ -286,5 +308,12 @@ class PaymentService
         } 
         return false;
     }
-    
+	
+    public function performServerCall()
+    {
+	 $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+        $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
+        $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
+        $response = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
+    }
 }
