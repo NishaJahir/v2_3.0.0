@@ -57,7 +57,7 @@ class SettingsService
 
 	public function createOrUpdateNovalnetConfigurationSettings($data, $clientId, $pluginSetId)
 	{
-	    $novalnetSettings = $this->getNovalnetSettings($clientId, $pluginSetId);
+	    $novalnetSettings = $this->getNnSettings($clientId, $pluginSetId);
             if (!$novalnetSettings instanceof Settings) {
 		    /** @var Settings $settings */
 		    $novalnetSettings = pluginApp(Settings::class);
