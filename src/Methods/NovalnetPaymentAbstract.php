@@ -41,7 +41,7 @@ class NovalnetPaymentAbstract extends PaymentMethodBaseService
     private $basketRepository;
 
     /** @var  ConfigRepository */
-    private $config;
+    private $configRepository;
     
     /**
      * @var SettingsService
