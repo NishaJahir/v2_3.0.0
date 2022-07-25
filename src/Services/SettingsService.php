@@ -79,9 +79,15 @@ class SettingsService
 		$this->getLogger(__METHOD__)->error('setting123', $settings);
 		
 		if(!is_null($settings)) {
+			$this->getLogger(__METHOD__)->error('enter if', 'here');
 			if(!empty($paymentKey) && isset($settings->value[$paymentKey])) {
+				$this->getLogger(__METHOD__)->error('key', $paymentKey);
+				$this->getLogger(__METHOD__)->error('key1', $settings->value[$paymentKey][$settingsKey]);
+				$this->getLogger(__METHOD__)->error('key2', $settings->value->$paymentKey->$settingsKey);
+				$this->getLogger(__METHOD__)->error('key3', $settings->value[$paymentKey]->$settingsKey);
 				return $settings->value[$paymentKey][$settingsKey];
 			} else {
+				$this->getLogger(__METHOD__)->error('enter else', 'here');
 				return $settings->value[$settingsKey];
 			}
 		}
