@@ -33,7 +33,7 @@ class SettingsService
 	    $this->database = $database;
 	}
     
-	public function getNovalnetSettings($clientId, $pluginSetId)
+	public function getNnSettings($clientId, $pluginSetId)
 	{
 		if (is_null($clientId)) {
 	    /** @var Application $application */
