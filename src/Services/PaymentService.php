@@ -18,6 +18,7 @@ namespace Novalnet\Services;
 use Plenty\Modules\Basket\Models\Basket;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Constants\NovalnetConstants;
@@ -47,6 +48,16 @@ class PaymentService
      * @var WebstoreHelper
      */
     private $webstoreHelper;
+	
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
+    
+    /**
+     * @var CountryRepositoryContract
+     */
+    private $countryRepository;
     
     /**
      * Constructor.
@@ -54,15 +65,21 @@ class PaymentService
      * @param SettingsService $settingsService
      * @param PaymentHelper $paymentHelper
      * @param WebstoreHelper $webstoreHelper
+     * @param AddressRepositoryContract $addressRepository
+     * @param CountryRepositoryContract $countryRepository
      */
     public function __construct(SettingsService $settingsService,
                                 PaymentHelper $paymentHelper,
-                                WebstoreHelper $webstoreHelper
+                                WebstoreHelper $webstoreHelper,
+				AddressRepositoryContract $addressRepository,
+                                CountryRepositoryContract $countryRepository
                                )
     {
         $this->settingsService = $settingsService;
         $this->paymentHelper = $paymentHelper;
-        $this->webstoreHelper           = $webstoreHelper;
+        $this->webstoreHelper = $webstoreHelper;
+	$this->addressRepository  = $addressRepository;
+        $this->countryRepository  = $countryRepository;
         
     }
     
@@ -219,12 +236,11 @@ class PaymentService
         try {
             if (! is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {         
                 $billingAddressId = $basket->customerInvoiceAddressId;              
-                $address = $this->addressRepository->findAddressById($billingAddressId);
-                $country = $this->countryRepository->findIsoCode($address->countryId, 'iso_code_2');
-                if(!empty($address) && !empty($country) && in_array($country,$allowed_country_array)) {                             
+                $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
+                $country = $this->countryRepository->findIsoCode($billingAddress->countryId, 'iso_code_2');
+                if(!empty($billingAddress) && !empty($country) && in_array($country,$allowed_country_array)) {                             
                         return true;
                 }
-        
             }
         } catch(\Exception $e) {
             return false;
