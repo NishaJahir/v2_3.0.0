@@ -19,7 +19,7 @@ use Plenty\Modules\Payment\Method\Services\PaymentMethodBaseService;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
-//use Novalnet\Services\PaymentService;
+use Novalnet\Services\PaymentService;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Payment\Models\Payment;
@@ -34,7 +34,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 {
     use Loggable;
     
-	const PAYMENT_CODE = 'plenty_novalnet';
+	const PAYMENT_KEY = 'Novalnet';
 	
     /** 
      * @var BasketRepositoryContract 
@@ -43,6 +43,11 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 
     /** @var  ConfigRepository */
     private $configRepository;
+	
+    /**
+     * @var PaymentService
+     */
+    private $paymentService;
 	
     /**
      * @var PaymentHelper
@@ -64,14 +69,14 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function __construct(BasketRepositoryContract $basketRepository,
                                 ConfigRepository $configRepository,
-                                //PaymentService $paymentService,
+                                PaymentService $paymentService,
 				PaymentHelper $paymentHelper,
                                 SettingsService $settingsService
                                )
     {
         $this->basketRepository = $basketRepository->load();
         $this->configRepository = $configRepository;
-        //$this->paymentService  = $paymentService;
+        $this->paymentService  = $paymentService;
 	$this->paymentHelper = $paymentHelper;
         $this->settingsService  = $settingsService;
     }
@@ -84,6 +89,8 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isActive(): bool
     {
+	    $test = $this->settingsService->getNnPaymentSettingsValue('payment_active', $this::PAYMENT_KEY);
+	    $this->getLogger(__METHOD__)->error('activity', $test);
       return true;
     
     }
