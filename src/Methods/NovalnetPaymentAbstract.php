@@ -76,8 +76,15 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isActive(): bool
     {
-       $active = $this->settingsService->getNnPaymentSettingsValue('payment_active', $this::PAYMENT_CODE);
-        $this->getLogger(__METHOD__)->error('active123', $active);
+       foreach($paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
+	    $is_payment_active = $this->settingsService->getNnPaymentSettingsValue(strtolower($paymentMethodKey). 'payment_active');
+	       $this->getLogger(__METHOD__)->error('find'.$paymentMethodKey, $is_payment_active);
+	    if($is_payment_active) {
+		return true;    
+	    }
+	    return false;
+       }
+        
 	    
 	    return true;
     
