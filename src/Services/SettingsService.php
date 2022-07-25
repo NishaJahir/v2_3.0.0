@@ -53,7 +53,7 @@ class SettingsService
 							  ->get();
 		
 		
-		return $setting;
+		return $setting[0];
 	}
 
 	public function createOrUpdateNovalnetConfigurationSettings($data, $clientId, $pluginSetId)
@@ -76,7 +76,7 @@ class SettingsService
 		
 		$settings = $this->getNnSettings($clientId, $pluginSetId);
 		
-		$this->getLogger(__METHOD__)->error('setting', $settings);
+		$this->getLogger(__METHOD__)->error('setting123', $settings);
 		
 		if(!is_null($settings)) {
 			if(!empty($paymentKey) && isset($settings->value[$paymentKey])) {
