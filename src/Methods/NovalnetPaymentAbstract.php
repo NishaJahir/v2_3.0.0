@@ -29,7 +29,7 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @package Novalnet\Methods
  */
-class NovalnetPaymentAbstract extends PaymentMethodBaseService
+abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 {
     use Loggable;
     
