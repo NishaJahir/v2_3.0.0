@@ -33,7 +33,7 @@ class SettingsService
 	    $this->database = $database;
 	}
     
-	public function getNnSettings($clientId, $pluginSetId)
+	public function getNnSettings($clientId = null, $pluginSetId = null)
 	{
 		if (is_null($clientId)) {
 	    /** @var Application $application */
@@ -53,6 +53,7 @@ class SettingsService
 							  ->get();
 		
 		
+		return $setting;
 	}
 
 	public function createOrUpdateNovalnetConfigurationSettings($data, $clientId, $pluginSetId)
@@ -75,7 +76,7 @@ class SettingsService
 		
 		$settings = $this->getNnSettings($clientId, $pluginSetId);
 		
-		$this->getLogger(__METHOD__)->error('set', $settings);
+		$this->getLogger(__METHOD__)->error('setting', $settings);
 		
 		if(!is_null($settings)) {
 			if(!empty($paymentKey) && isset($settings->value[$paymentKey])) {
