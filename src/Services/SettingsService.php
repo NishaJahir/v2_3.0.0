@@ -76,7 +76,9 @@ class SettingsService
 		$settingsKey = $paymentKey ? $paymentKey . '_' . $settingsKey : $settingsKey;
 		
 		if(!is_null($settings)) {
-			if(isset($settings->value[$settingsKey])) {
+			if(isset($settings->value[$paymentKey])) {
+				return $settings->value[$paymentKey][$settingsKey];
+			} else {
 				return $settings->value[$settingsKey];
 			}
 		}
