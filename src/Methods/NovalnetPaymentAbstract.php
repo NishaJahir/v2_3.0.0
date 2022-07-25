@@ -24,6 +24,7 @@ use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Translation\Translator;
 use Plenty\Plugin\Log\Loggable;
 
 /**
