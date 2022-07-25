@@ -20,6 +20,7 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 //use Novalnet\Services\PaymentService;
+use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Log\Loggable;
@@ -42,6 +43,11 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
 
     /** @var  ConfigRepository */
     private $configRepository;
+	
+    /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
     
     /**
      * @var SettingsService
@@ -59,12 +65,14 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
     public function __construct(BasketRepositoryContract $basketRepository,
                                 ConfigRepository $configRepository,
                                 //PaymentService $paymentService,
+				PaymentHelper $paymentHelper,
                                 SettingsService $settingsService
                                )
     {
         $this->basketRepository = $basketRepository->load();
         $this->configRepository = $configRepository;
         //$this->paymentService  = $paymentService;
+	$this->paymentHelper = $paymentHelper;
         $this->settingsService  = $settingsService;
     }
     
@@ -76,7 +84,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isActive(): bool
     {
-       foreach($paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
+       foreach($this->paymentHelper->getPaymentMethodsKey() as $paymentMethodKey) {
 	    $is_payment_active = $this->settingsService->getNnPaymentSettingsValue(strtolower($paymentMethodKey). 'payment_active');
 	       $this->getLogger(__METHOD__)->error('find'.$paymentMethodKey, $is_payment_active);
 	    if($is_payment_active) {
