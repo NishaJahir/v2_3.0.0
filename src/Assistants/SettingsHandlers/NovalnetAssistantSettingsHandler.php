@@ -30,11 +30,11 @@ class NovalnetAssistantSettingsHandler implements WizardSettingsHandler
         
         // Novalnet Global and Webhook Configuration values
         $novalnetSettings = [
-            'novalnet_merchant_id' => $data['novalnetMerchantId'] ?? '',
+            'novalnet_public_key' => $data['novalnetMerchantId'] ?? '',
             'novalnet_auth_Code' => $data['novalnetAuthCode'] ?? '',
             'novalnet_product_id' => $data['novalnetProductId'] ?? '',
             'novalnet_tariff_id' => $data['novalnetTariffId'] ?? '',
-            'novalnet_access_key' => $data['novalnetAccessKey'] ?? '',
+            'novalnet_private_key' => $data['novalnetAccessKey'] ?? '',
             'novalnet_client_key' => $data['novalnetClientKey'] ?? '',
             'novalnet_webhook_testmode' => $data['novalnetWebhookTestMode'] ?? '',
             'novalnet_webhook_email_to' => $data['novalnetWebhookEmailTo'] ?? '',
