@@ -107,6 +107,30 @@ class PaymentHelper
         return 'no_paymentmethod_found';
     }
     
+    /**
+     * Load the ID of the payment method
+     * Return the payment key for the payment method found
+     *
+     * @param int $mop
+     * @return string|bool
+     */
+    public function getPaymentKeyByMop($mop)
+    {
+        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plenty_novalnet');
+
+        if(!is_null($paymentMethods))
+        {
+            foreach($paymentMethods as $paymentMethod)
+            {
+                if($paymentMethod->id == $mop)
+                {
+                    return $paymentMethod->paymentKey;
+                }
+            }
+        }
+        return false;
+    }
+    
      /**
      * Get the payment method class
      * 
@@ -196,18 +220,17 @@ class PaymentHelper
         return sprintf('%0.2f', $amount) * 100;
     }
     
-     /**
-    * Get the customized translated text for the Novalnet key
-    *
+    /**
+    * Get the translated text for the Novalnet key
     * @param string $key
     * @param string $lang
     *
     * @return string
     */
-    public function getCustomizedTranslatedText($key, $lang = null)
+    public function getTranslatedText($key, $lang = null)
     {
         $translator = pluginApp(Translator::class);
 
-        return $lang == null ? $translator->trans("Novalnet::Customize.$key") : $translator->trans("Novalnet::Customize.$key", [], $lang);
+        return $lang == null ? $translator->trans("Novalnet::PaymentMethod.$key") : $translator->trans("Novalnet::PaymentMethod.$key",[], $lang);
     }
 }
