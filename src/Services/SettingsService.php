@@ -83,7 +83,6 @@ class SettingsService
 			if(!empty($paymentKey) && isset($settings->value[$paymentKey])) {
 				$this->getLogger(__METHOD__)->error('key', $paymentKey);
 				$this->getLogger(__METHOD__)->error('key1', $settings->value[$paymentKey][$settingsKey]);
-				$this->getLogger(__METHOD__)->error('key2', $settings->value->$paymentKey->$settingsKey);
 				$this->getLogger(__METHOD__)->error('key3', $settings->value[$paymentKey]->$settingsKey);
 				return $settings->value[$paymentKey][$settingsKey];
 			} else {
