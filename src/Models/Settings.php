@@ -45,11 +45,11 @@ class Settings extends Model
         $this->createdAt = (string)Carbon::now();
 
         $this->value = [
-            'novalnet_merchant_id' => $data['novalnet_merchant_id'],
+            'novalnet_public_key' => $data['novalnet_merchant_id'],
             'novalnet_auth_Code' => $data['novalnet_auth_Code'],
             'novalnet_product_id' => $data['novalnet_product_id'],
             'novalnet_tariff_id' => $data['novalnet_tariff_id'],
-            'novalnet_access_key' => $data['novalnet_access_key'],
+            'novalnet_private_key' => $data['novalnet_access_key'],
             'novalnet_client_key' => $data['novalnet_client_key'],
             'novalnet_webhook_testmode' => $data['novalnet_webhook_testmode'],
             'novalnet_webhook_email_to' => $data['novalnet_webhook_email_to'],
@@ -64,8 +64,8 @@ class Settings extends Model
     public function update($data)
     {
 	    $this->getLogger(__METHOD__)->error('update', $data);
-		if (isset($data['novalnet_merchant_id'])) {
-            $this->value['novalnet_merchant_id'] = $data['novalnet_merchant_id'];
+		if (isset($data['novalnet_public_key'])) {
+            $this->value['novalnet_public_key'] = $data['novalnet_public_key'];
         }
 		if (isset($data['novalnet_auth_Code'])) {
             $this->value['novalnet_auth_Code'] = $data['novalnet_auth_Code'];
@@ -76,8 +76,8 @@ class Settings extends Model
 		if (isset($data['novalnet_tariff_id'])) {
             $this->value['novalnet_tariff_id'] = $data['novalnet_tariff_id'];
         }
-		if (isset($data['novalnet_access_key'])) {
-            $this->value['novalnet_access_key'] = $data['novalnet_access_key'];
+		if (isset($data['novalnet_private_key'])) {
+            $this->value['novalnet_private_key'] = $data['novalnet_private_key'];
         }
 		if (isset($data['novalnet_client_key'])) {
             $this->value['novalnet_client_key'] = $data['novalnet_client_key'];
