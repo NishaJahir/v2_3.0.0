@@ -195,4 +195,80 @@ class PaymentService
         return ['firstName' => $firstName, 'lastName' => $lastName];
     }
     
+    /**
+     * Check if the merchant details configured
+     *
+     * @return bool
+     */
+    public function isMerchantConfigurationValid()
+    {
+		return (bool) ($this->settingsService->getNnPaymentSettingsValue('novalnet_public_key') != '' && $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key') != '' && $this->settingsService->getNnPaymentSettingsValue('novalnet_tariff_id') != '');
+	}
+    
+    /**
+     * Show payment for allowed countries
+     *
+     * @param string $allowed_country
+     *
+     * @return bool
+     */
+    public function allowedCountries(Basket $basket, $allowed_country) 
+    {
+        $allowed_country = str_replace(' ', '', strtoupper($allowed_country));
+        $allowed_country_array = explode(',', $allowed_country);    
+        try {
+            if (! is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {         
+                $billingAddressId = $basket->customerInvoiceAddressId;              
+                $address = $this->addressRepository->findAddressById($billingAddressId);
+                $country = $this->countryRepository->findIsoCode($address->countryId, 'iso_code_2');
+                if(!empty($address) && !empty($country) && in_array($country,$allowed_country_array)) {                             
+                        return true;
+                }
+        
+            }
+        } catch(\Exception $e) {
+            return false;
+        }
+        return false;
+    }
+    
+    /**
+     * Show payment for Minimum Order Amount
+     *
+     * @param object $basket
+     * @param int $minimum_amount
+     *
+     * @return bool
+     */
+    public function getMinBasketAmount(Basket $basket, $minimum_amount) 
+    {   
+        if (!is_null($basket) && $basket instanceof Basket) {
+            $amount = $this->paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount);
+            if (!empty($minimum_amount) && $minimum_amount<=$amount)    {
+                return true;
+            }
+        } 
+        return false;
+    }
+    
+    /**
+     * Show payment for Maximum Order Amount
+     *
+     * @param object $basket
+     * @param int $maximum_amount
+     *
+     * @return bool
+     */
+    public function getMaxBasketAmount(Basket $basket, $maximum_amount) 
+    {   
+        if (!is_null($basket) && $basket instanceof Basket) {
+            $amount = $this->paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount);
+            if (!empty($maximum_amount) && $maximum_amount>=$amount)    {
+            
+                return true;
+            }
+        } 
+        return false;
+    }
+    
 }
