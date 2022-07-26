@@ -20,6 +20,7 @@ use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Plugin\Events\Dispatcher;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -52,8 +53,11 @@ class NovalnetServiceProvider extends ServiceProvider
      * Boot additional services for the payment method
      * 
      * @param Dispatcher $eventDispatcher
-     * @param BasketRepositoryContract $basket
+     * @param BasketRepositoryContract $basketRepository
      * @param PaymentMethodContainer $payContainer
+     * @param PaymentHelper $paymentHelper
+     * @param PaymentService $paymentService
+     * @param FrontendSessionStorageFactoryContract $sessionStorage
      */
     public function boot(Dispatcher $eventDispatcher,
                         BasketRepositoryContract $basketRepository,
