@@ -159,8 +159,8 @@ class NovalnetAssistant extends WizardProvider
                             'novalnetPublicKey' => [
                                 'type' => 'text',
                                 'options' => [
-                                    'name' => 'NovalnetAssistant.novalnetVendorIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetVendorIdTooltip',
+                                    'name' => 'NovalnetAssistant.novalnetPublicKeyLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetPublicKeyTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
