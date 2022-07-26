@@ -23,4 +23,5 @@ namespace Novalnet\Constants;
 class NovalnetConstants
 {
     const PLUGIN_VERSION = '7.0.0-NN(3.0.0)';
+    const PAYMENT_URL = 'https://payport.novalnet.de/v2/payment';
 }
