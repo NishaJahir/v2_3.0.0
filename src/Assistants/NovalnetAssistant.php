@@ -156,37 +156,11 @@ class NovalnetAssistant extends WizardProvider
                         "title" => 'NovalnetAssistant.novalnetGlobalConf',
                         "description" => 'NovalnetAssistant.novalnetGlobalConfDesc',
                         "form" => [
-                            'novalnetMerchantId' => [
+                            'novalnetPublicKey' => [
                                 'type' => 'text',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetVendorIdLabel',
                                     'tooltip' => 'NovalnetAssistant.novalnetVendorIdTooltip',
-                                    'required' => true,
-                                    'pattern'  => '^[1-9]\d*$'
-                                ]
-                            ],
-                            'novalnetAuthCode' => [
-                                'type' => 'text',
-                                'options' => [
-                                    'name' => 'NovalnetAssistant.novalnetAuthCodeLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetAuthCodeTooltip',
-                                    'required' => true
-                                ]
-                            ],
-                            'novalnetProductId' => [
-                                'type' => 'text',
-                                'options' => [
-                                    'name' => 'NovalnetAssistant.novalnetProductIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetProductIdTooltip',
-                                    'required' => true,
-                                    'pattern'  => '^[1-9]\d*$'
-                                ]
-                            ],
-                            'novalnetTariffId' => [
-                                'type' => 'text',
-                                'options' => [
-                                    'name' => 'NovalnetAssistant.novalnetTariffIdLabel',
-                                    'tooltip' => 'NovalnetAssistant.novalnetTariffIdTooltip',
                                     'required' => true,
                                     'pattern'  => '^[1-9]\d*$'
                                 ]
@@ -197,6 +171,15 @@ class NovalnetAssistant extends WizardProvider
                                     'name' => 'NovalnetAssistant.novalnetAccessKeyLabel',
                                    'tooltip' => 'NovalnetAssistant.novalnetAccessKeyTooltip',
                                     'required' => true
+                                ]
+                            ],
+                            'novalnetTariffId' => [
+                                'type' => 'text',
+                                'options' => [
+                                    'name' => 'NovalnetAssistant.novalnetTariffIdLabel',
+                                    'tooltip' => 'NovalnetAssistant.novalnetTariffIdTooltip',
+                                    'required' => true,
+                                    'pattern'  => '^[1-9]\d*$'
                                 ]
                             ],
                             'novalnetClientKey' => [
