@@ -69,7 +69,7 @@ class NovalnetServiceProvider extends ServiceProvider
     {
         $this->registerPaymentMethods($payContainer);
         
-        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService);
+        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $sessionStorage);
 
         $this->registerPaymentExecute($eventDispatcher, $paymentHelper, $paymentService, $sessionStorage);
         
@@ -105,7 +105,8 @@ class NovalnetServiceProvider extends ServiceProvider
     protected function registerPaymentRendering(Dispatcher $eventDispatcher,
                                               BasketRepositoryContract $basketRepository,
                                               PaymentHelper $paymentHelper,
-                                              PaymentService $paymentService
+                                              PaymentService $paymentService,
+					      FrontendSessionStorageFactoryContract $sessionStorage
                                               )
     {
         // Listen for the event that gets the payment method content
@@ -160,7 +161,6 @@ class NovalnetServiceProvider extends ServiceProvider
                     $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
                     $sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
                     $paymentService->performServerCall();
-                    $paymentService->validateResponse();
                 }
             });
     
