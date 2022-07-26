@@ -119,7 +119,7 @@ class NovalnetServiceProvider extends ServiceProvider
 				if(in_array($paymentKey, ['NOVALNET_INVOICE'])) {
 					 $content = '';
                      $contentType = 'continue';
-                     $paymentRequestData = $paymentService->getRequestParameters($basketRepository->load(), $paymentKey);
+                     $paymentRequestData = $paymentService->generatePaymentParams($basketRepository->load(), $paymentKey);
 					 if(empty($paymentRequestData['customer']['first_name']) && empty($paymentRequestData['customer']['last_name'])) {
 							$content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
 							$contentType = 'errorCode';   
