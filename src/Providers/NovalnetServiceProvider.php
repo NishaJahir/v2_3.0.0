@@ -24,6 +24,7 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Novalnet\Helper\PaymentHelper;
+use Novalnet\Services\PaymentService;
 use Plenty\Modules\Wizard\Contracts\WizardContainerContract;
 use Novalnet\Assistants\NovalnetAssistant;
 use Novalnet\Methods\NovalnetPaymentAbstract;
@@ -58,14 +59,15 @@ class NovalnetServiceProvider extends ServiceProvider
                         BasketRepositoryContract $basketRepository,
                         PaymentMethodContainer $payContainer,
                         PaymentHelper $paymentHelper, 
+			PaymentService $paymentService,
                         FrontendSessionStorageFactoryContract $sessionStorage
                         )
     {
         $this->registerPaymentMethods($payContainer);
         
-        $this->registerPaymentRendering($eventDispatcher, $basketRepository);
+        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService);
 
-        $this->registerPaymentExecute($eventDispatcher, $basketRepository);
+        $this->registerPaymentExecute($eventDispatcher, $paymentHelper, $paymentService, $sessionStorage);
         
         pluginApp(WizardContainerContract::class)->register('payment-novalnet-assistant', NovalnetAssistant::class);
     }
