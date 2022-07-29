@@ -313,9 +313,9 @@ class PaymentService
     {
 	$paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
         $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
-	    $this->getLogger(__METHOD__)->error('request', $paymentRequestData);
+	$this->getLogger(__METHOD__)->error('request', $paymentRequestData);
         $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
-        $response = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
-	$this->getLogger(__METHOD__)->error('response', $response);
+        $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
+	$this->getLogger(__METHOD__)->error('response', $paymentResponseData);
     }
 }
