@@ -112,7 +112,8 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
             if (!empty($maximum_amount) && is_numeric($maximum_amount)) {
                 $activate_payment_maximum_amount = $this->paymentService->getMaxBasketAmount($this->basketRepository, $maximum_amount);
             }
-            
+            $result = (bool) ($this->paymentService->isMerchantConfigurationValid() && $activate_payment_allowed_country && $activate_payment_minimum_amount && $activate_payment_maximum_amount);
+            $this->getLogger(__METHOD__)->error('isactive', $result);
             return (bool) ($this->paymentService->isMerchantConfigurationValid() && $activate_payment_allowed_country && $activate_payment_minimum_amount && $activate_payment_maximum_amount);
         }
             return false;
@@ -202,6 +203,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isBackendActive(): bool
     {
+        $this->getLogger(__METHOD__)->error('isBackendActive', $this->isActive());
         return $this->isActive();
     }
     
