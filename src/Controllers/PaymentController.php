@@ -85,7 +85,7 @@ class PaymentController extends Controller
         if(!empty($paymentResponseData['tid'])) {
             
             // Checksum validation and transaction status call to retrieve the full response
-            $paymentResponseData = $this->paymentService->validateChecksumAndGetTxnStatus($paymentResponseData);
+            $paymentResponseData = $this->validateChecksumAndGetTxnStatus($paymentResponseData);
             
             $this->getLogger(__METHOD__)->error('redirect response', $paymentResponseData);
             
