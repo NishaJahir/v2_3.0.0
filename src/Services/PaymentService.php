@@ -66,6 +66,11 @@ class PaymentService
     private $sessionStorage;
     
     /**
+     * @var redirectPayment
+     */
+    private $redirectPayment = ['NOVALNET_IDEAL'];
+    
+    /**
      * Constructor.
      *
      * @param SettingsService $settingsService
@@ -78,7 +83,7 @@ class PaymentService
     public function __construct(SettingsService $settingsService,
                                 PaymentHelper $paymentHelper,
                                 WebstoreHelper $webstoreHelper,
-				AddressRepositoryContract $addressRepository,
+								AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
                                 FrontendSessionStorageFactoryContract $sessionStorage
                                )
@@ -86,7 +91,7 @@ class PaymentService
         $this->settingsService = $settingsService;
         $this->paymentHelper = $paymentHelper;
         $this->webstoreHelper = $webstoreHelper;
-	$this->addressRepository  = $addressRepository;
+		$this->addressRepository  = $addressRepository;
         $this->countryRepository  = $countryRepository;
         $this->sessionStorage  = $sessionStorage;
         
@@ -225,14 +230,49 @@ class PaymentService
     
     public function getPaymentData(&$paymentRequestData, $paymentKey)
     {
+		$paymentRequestData['transaction']['payment_type'] = $this->getNnPaymentType($paymentKey);
 		if($paymentKey == 'NOVALNET_INVOICE') {
-			$paymentRequestData['transaction']['payment_type'] = 'INVOICE';
 			$invoiceDueDate = $this->settingsService->getNnPaymentSettingsValue('due_date', strtolower($paymentKey));
 			if(is_numeric($invoiceDueDate)) {
 				$paymentRequestData['transaction']['due_date'] = $this->paymentHelper->dateFormatter($invoiceDueDate);
 			}
 		}
+		
+		if($paymentKey == 'NOVALNET_IDEAL') {
+			$paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
+		}
 	}
+	
+	public function getNnPaymentType($paymentKey)
+	{
+		$paymentMethodType = [
+			'NOVALNET_INVOICE' => 'INVOICE',
+			'NOVALNET_IDEAL' => 'IDEAL'
+		];
+		
+		return $paymentMethodType[$paymentKey];
+	}
+	
+	/**
+     * Check if the payment is redirection or not
+     *
+     * @param string $paymentKey
+     * @param bool $doRedirect
+     *
+     */
+    public function isRedirectPayment($paymentKey) {
+        return (bool) (in_array($paymentKey, $this->redirectPayment));
+    }
+	
+	/**
+     * Get the payment response controller URL to be handled
+     *
+     * @return string
+     */
+    private function getReturnPageUrl()
+    {   
+        return $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl . '/' . $this->sessionStorage->getLocaleSettings()->language . '/payment/novalnet/paymentResponse/';
+    }
     
     /**
      * Check if the merchant details configured
@@ -311,11 +351,51 @@ class PaymentService
 	
     public function performServerCall()
     {
-	$paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+		$paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
         $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
-	$this->getLogger(__METHOD__)->error('request', $paymentRequestData);
+        $paymentKey = $this->sessionStorage->getPlugin()->getValue('paymentkey');
+		$this->getLogger(__METHOD__)->error('request', $paymentRequestData);
         $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
-	$this->getLogger(__METHOD__)->error('response', $paymentResponseData);
+		$this->getLogger(__METHOD__)->error('response', $paymentResponseData);
+		
+		// if the payment method is redirect
+		if($this->isRedirectPayment($paymentKey)) {
+			// Do redirect if the redirect URL is present
+			if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
+				// Transaction secret used for the later checksum verification
+				$txnSecret = $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentResponseData['transaction']['txn_secret']);
+				header('Location: ' . $paymentResponseData['result']['redirect_url']);
+				exit;
+			} else {
+				$this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
+			}
+		}
+		$this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($serverRequestData['data'], $responseData));
+    }
+    
+    /**
+     * Push notification
+     *
+     */
+    public function pushNotification($message, $type, $code = 0) {
+        
+    $notifications = json_decode($this->sessionStorage->getPlugin()->getValue('notifications'), true);  
+        
+    $notification = [
+            'message'       => $message,
+            'code'          => $code,
+            'stackTrace'    => []
+           ];
+        
+    $lastNotification = $notifications[$type];
+
+    if(!is_null($lastNotification)) {
+            $notification['stackTrace'] = $lastNotification['stackTrace'];
+            $lastNotification['stackTrace'] = [];
+            array_push( $notification['stackTrace'], $lastNotification );
+        }
+        $notifications[$type] = $notification;
+        $this->sessionStorage->getPlugin()->setValue('notifications', json_encode($notifications));
     }
 }
