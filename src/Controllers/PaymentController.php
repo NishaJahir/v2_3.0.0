@@ -80,8 +80,6 @@ class PaymentController extends Controller
         // Get the initial payment call response
         $paymentResponseData = $this->request->all();
         $this->getLogger(__METHOD__)->error('initial response', $paymentResponseData);
-        // Get the customer order language
-        $language = $this->sessionStorage->getLocaleSettings()->language;
         
         // Checksum validation for redirects
         if(!empty($paymentResponseData['tid'])) {
@@ -104,9 +102,9 @@ class PaymentController extends Controller
             
         } else {
             $this->paymentService->pushNotification($paymentResponseData['status_text'], 'error', 100);  
-            return $this->response->redirectTo($language . '/confirmation');
+            return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
         }
        
-        return $this->response->redirectTo($language . '/confirmation');
+        return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
     }
 }
