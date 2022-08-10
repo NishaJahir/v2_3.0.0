@@ -49,7 +49,7 @@ class PaymentService
      * @var WebstoreHelper
      */
     private $webstoreHelper;
-	
+    
     /**
      * @var AddressRepositoryContract
      */
@@ -83,7 +83,7 @@ class PaymentService
     public function __construct(SettingsService $settingsService,
                                 PaymentHelper $paymentHelper,
                                 WebstoreHelper $webstoreHelper,
-								AddressRepositoryContract $addressRepository,
+                                AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
                                 FrontendSessionStorageFactoryContract $sessionStorage
                                )
@@ -91,7 +91,7 @@ class PaymentService
         $this->settingsService = $settingsService;
         $this->paymentHelper = $paymentHelper;
         $this->webstoreHelper = $webstoreHelper;
-		$this->addressRepository  = $addressRepository;
+        $this->addressRepository  = $addressRepository;
         $this->countryRepository  = $countryRepository;
         $this->sessionStorage  = $sessionStorage;
         
@@ -107,6 +107,7 @@ class PaymentService
      */
     public function generatePaymentParams(Basket $basket, $paymentKey = '')
     {
+        // Get the customer billing and shipping details
         $billingAddressId = $basket->customerInvoiceAddressId;
         $shippingAddressId = $basket->customerShippingAddressId;
         $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
@@ -195,9 +196,15 @@ class PaymentService
                                                'system_url' => $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl,
                                                'system_ip'  => $_SERVER['SERVER_ADDR']
                                              ];
+		
+		// Build the custom parameters
+		$paymentRequestData['custom'] = [
+										   'lang' => strtoupper($this->sessionStorage->getLocaleSettings()->language)
+										];
         
-		$this->getPaymentData($paymentRequestData, $paymentKey);
-		    
+        // Build additional specific payment method request parameters
+        $this->getPaymentData($paymentRequestData, $paymentKey);
+            
         return $paymentRequestData;
     }
 
@@ -230,30 +237,30 @@ class PaymentService
     
     public function getPaymentData(&$paymentRequestData, $paymentKey)
     {
-		$paymentRequestData['transaction']['payment_type'] = $this->getNnPaymentType($paymentKey);
-		if($paymentKey == 'NOVALNET_INVOICE') {
-			$invoiceDueDate = $this->settingsService->getNnPaymentSettingsValue('due_date', strtolower($paymentKey));
-			if(is_numeric($invoiceDueDate)) {
-				$paymentRequestData['transaction']['due_date'] = $this->paymentHelper->dateFormatter($invoiceDueDate);
-			}
-		}
-		
-		if($paymentKey == 'NOVALNET_IDEAL') {
-			$paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
-		}
-	}
-	
-	public function getNnPaymentType($paymentKey)
-	{
-		$paymentMethodType = [
-			'NOVALNET_INVOICE' => 'INVOICE',
-			'NOVALNET_IDEAL' => 'IDEAL'
-		];
-		
-		return $paymentMethodType[$paymentKey];
-	}
-	
-	/**
+        $paymentRequestData['transaction']['payment_type'] = $this->getNnPaymentType($paymentKey);
+        if($paymentKey == 'NOVALNET_INVOICE') {
+            $invoiceDueDate = $this->settingsService->getNnPaymentSettingsValue('due_date', strtolower($paymentKey));
+            if(is_numeric($invoiceDueDate)) {
+                $paymentRequestData['transaction']['due_date'] = $this->paymentHelper->dateFormatter($invoiceDueDate);
+            }
+        }
+        
+        if($paymentKey == 'NOVALNET_IDEAL') {
+            $paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
+        }
+    }
+    
+    public function getNnPaymentType($paymentKey)
+    {
+        $paymentMethodType = [
+            'NOVALNET_INVOICE' => 'INVOICE',
+            'NOVALNET_IDEAL' => 'IDEAL'
+        ];
+        
+        return $paymentMethodType[$paymentKey];
+    }
+    
+    /**
      * Check if the payment is redirection or not
      *
      * @param string $paymentKey
@@ -263,8 +270,8 @@ class PaymentService
     public function isRedirectPayment($paymentKey) {
         return (bool) (in_array($paymentKey, $this->redirectPayment));
     }
-	
-	/**
+    
+    /**
      * Get the payment response controller URL to be handled
      *
      * @return string
@@ -281,8 +288,8 @@ class PaymentService
      */
     public function isMerchantConfigurationValid()
     {
-		return (bool) ($this->settingsService->getNnPaymentSettingsValue('novalnet_public_key') != '' && $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key') != '' && $this->settingsService->getNnPaymentSettingsValue('novalnet_tariff_id') != '');
-	}
+        return (bool) ($this->settingsService->getNnPaymentSettingsValue('novalnet_public_key') != '' && $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key') != '' && $this->settingsService->getNnPaymentSettingsValue('novalnet_tariff_id') != '');
+    }
     
     /**
      * Show payment for allowed countries
@@ -348,30 +355,40 @@ class PaymentService
         } 
         return false;
     }
-	
+    
     public function performServerCall()
     {
-		$paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+        $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
         $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
         $paymentKey = $this->sessionStorage->getPlugin()->getValue('paymentkey');
-		$this->getLogger(__METHOD__)->error('request', $paymentRequestData);
+        $this->getLogger(__METHOD__)->error('request', $paymentRequestData);
         $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
-		$this->getLogger(__METHOD__)->error('response', $paymentResponseData);
-		
-		// if the payment method is redirect
-		if($this->isRedirectPayment($paymentKey)) {
-			// Do redirect if the redirect URL is present
-			if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
-				// Transaction secret used for the later checksum verification
-				$txnSecret = $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentResponseData['transaction']['txn_secret']);
-				header('Location: ' . $paymentResponseData['result']['redirect_url']);
-				exit;
-			} else {
-				$this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
-			}
-		}
-		$this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($serverRequestData['data'], $responseData));
+        $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $responseData['result']['status'] == 'SUCCESS';
+        $this->getLogger(__METHOD__)->error('response', $paymentResponseData);
+        
+        // if the payment method is redirect
+        if($this->isRedirectPayment($paymentKey)) {
+            // Do redirect if the redirect URL is present
+            if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
+                // Transaction secret used for the later checksum verification
+                $txnSecret = $this->sessionStorage->getPlugin()->setValue('txnSecret', $paymentResponseData['transaction']['txn_secret']);
+                header('Location: ' . $paymentResponseData['result']['redirect_url']);
+                exit;
+            } else {
+                $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
+            }
+        }
+        
+        // Push notification to customer regarding the payment response
+        if($isPaymentSuccess) {
+            $this->pushNotification($paymentResponseData['result']['status_text'], 'success', 100);
+        } else {
+            $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
+        }
+        
+        // Set the payment response in the session for the further processings
+        $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
     }
     
     /**
@@ -398,4 +415,41 @@ class PaymentService
         $notifications[$type] = $notification;
         $this->sessionStorage->getPlugin()->setValue('notifications', json_encode($notifications));
     }
+    
+    /**
+     * Validate the checksum generated for redirection payments
+     *
+     * @param  array  $paymentResponseData
+     * 
+     * @return array
+     */
+    public function validateChecksumAndGetTxnStatus($paymentResponseData)
+    {
+        if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
+            
+            $txnSecret = $this->sessionStorage->getPlugin()->getValue('txnSecret');
+            
+            // Condition to check whether the payment is redirect
+            if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($txnSecret)) {
+                                            
+                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . strrev($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key')));
+                
+                // If the checksum isn't matching, there could be a possible manipulation in the data received 
+                if ($generatedChecksum !== $paymentResponseData['checksum']) {
+                    $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
+                    $this->pushNotification($checksumInvalidMsg, 'error', 100);
+                }
+            }
+                                          
+            $paymentRequestData = [];
+            $paymentRequestData['transaction']['tid'] = $paymentResponseData['tid'];
+            
+            $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
+                
+            return $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::TXN_RESPONSE_URL, $payment_access_key);
+            
+        } else {
+            $this->pushNotification($paymentResponseData['status_text'], 'error', 100);
+        }                  
+    } 
 }
