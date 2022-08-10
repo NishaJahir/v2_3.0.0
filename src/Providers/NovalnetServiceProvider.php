@@ -26,10 +26,12 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\PaymentService;
+use Novalnet\Services\SettingsService;
 use Plenty\Modules\Wizard\Contracts\WizardContainerContract;
 use Novalnet\Assistants\NovalnetAssistant;
 use Novalnet\Methods\NovalnetPaymentAbstract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Novalnet\Constants\NovalnetConstants;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -63,13 +65,14 @@ class NovalnetServiceProvider extends ServiceProvider
                         BasketRepositoryContract $basketRepository,
                         PaymentMethodContainer $payContainer,
                         PaymentHelper $paymentHelper, 
-			PaymentService $paymentService,
+						PaymentService $paymentService,
+						SettingsService $settingsService,
                         FrontendSessionStorageFactoryContract $sessionStorage
                         )
     {
         $this->registerPaymentMethods($payContainer);
         
-        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $sessionStorage);
+        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $settingsService, $sessionStorage);
 
         $this->registerPaymentExecute($eventDispatcher, $paymentHelper, $paymentService, $sessionStorage);
         
@@ -93,7 +96,6 @@ class NovalnetServiceProvider extends ServiceProvider
         }
     }
     
-    
     /**
      * Rendering the Novalnet payment method content
      *
@@ -106,7 +108,7 @@ class NovalnetServiceProvider extends ServiceProvider
                                               BasketRepositoryContract $basketRepository,
                                               PaymentHelper $paymentHelper,
                                               PaymentService $paymentService,
-					      FrontendSessionStorageFactoryContract $sessionStorage
+											  FrontendSessionStorageFactoryContract $sessionStorage
                                               )
     {
         // Listen for the event that gets the payment method content
@@ -116,17 +118,16 @@ class NovalnetServiceProvider extends ServiceProvider
 				
 			if($paymentHelper->getPaymentKeyByMop($event->getMop())) {
 				$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
-				if(in_array($paymentKey, ['NOVALNET_INVOICE'])) {
-					 $content = '';
-                     $contentType = 'continue';
-                     $paymentRequestData = $paymentService->generatePaymentParams($basketRepository->load(), $paymentKey);
-					 if(empty($paymentRequestData['customer']['first_name']) && empty($paymentRequestData['customer']['last_name'])) {
-							$content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
-							$contentType = 'errorCode';   
-                     }
-                     $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
+				$paymentRequestData = $paymentService->generatePaymentParams($basketRepository->load(), $paymentKey);
+				if(empty($paymentRequestData['customer']['first_name']) && empty($paymentRequestData['customer']['last_name'])) {
+					$content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
+					$contentType = 'errorCode';   
 				}
-				
+				if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_IDEAL'])) {
+					$content = '';
+                    $contentType = 'continue';
+				}
+				$sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
 				$event->setValue($content);
 				$event->setType($contentType);
 			}
