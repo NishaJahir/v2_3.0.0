@@ -19,6 +19,7 @@ use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Novalnet\Services\PaymentService;
+use Novalnet\Services\SettingsService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Plugin\Log\Loggable;
 
@@ -46,6 +47,11 @@ class PaymentController extends Controller
     private $paymentService;
     
     /**
+     * @var SettingsService
+    */
+    private $settingsService;
+    
+    /**
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorage;
@@ -56,11 +62,13 @@ class PaymentController extends Controller
      * @param Request $request
      * @param Response $response
      * @param PaymentService $paymentService
+     * @param SettingsService $settingsService
      * @param FrontendSessionStorageFactoryContract $sessionStorage
      */
     public function __construct(  Request $request,
                                   Response $response,
                                   PaymentService $paymentService,
+                                  SettingsService $settingsService,
                                   FrontendSessionStorageFactoryContract $sessionStorage
                                 )
     {
@@ -68,6 +76,7 @@ class PaymentController extends Controller
         $this->request         = $request;
         $this->response        = $response;
         $this->paymentService  = $paymentService;
+        $this->settingsService = $settingsService;
         $this->sessionStorage  = $sessionStorage;
     }
 
@@ -131,7 +140,7 @@ class PaymentController extends Controller
                 $this->getLogger(__METHOD__)->error('generated sas', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
                 if ($generatedChecksum !== $paymentResponseData['checksum']) {
                     $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
-                    $this->pushNotification($checksumInvalidMsg, 'error', 100);
+                    $this->paymentService->pushNotification($checksumInvalidMsg, 'error', 100);
                     return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
                 }
             }
@@ -144,7 +153,7 @@ class PaymentController extends Controller
             return $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::TXN_RESPONSE_URL, $privatekey);
             
         } else {
-            $this->pushNotification($paymentResponseData['status_text'], 'error', 100);
+            $this->paymentService->pushNotification($paymentResponseData['status_text'], 'error', 100);
             return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
         }                  
     }
