@@ -372,7 +372,7 @@ class PaymentService
             // Do redirect if the redirect URL is present
             if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
                 // Transaction secret used for the later checksum verification
-                $txnSecret = $this->sessionStorage->getPlugin()->setValue('txnSecret', $paymentResponseData['transaction']['txn_secret']);
+                $this->sessionStorage->getPlugin()->setValue('nnTxnSecret', $paymentResponseData['transaction']['txn_secret']);
                 header('Location: ' . $paymentResponseData['result']['redirect_url']);
 		exit;
             } else {
@@ -428,7 +428,7 @@ class PaymentService
         if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
             
             $txnSecret = $this->sessionStorage->getPlugin()->getValue('txnSecret');
-            $this->getLogger(__METHOD__)->error('secret', $txnSecret);
+	    $this->getLogger(__METHOD__)->error('secret there', $txnSecret);
             $this->getLogger(__METHOD__)->error('checksum fn', $paymentResponseData);
             $strRevPrivateKey = $this->paymentHelper->reverseString($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key'));
            
