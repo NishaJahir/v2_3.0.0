@@ -100,11 +100,11 @@ class PaymentController extends Controller
             }
             
             // Set the payment response in the session for the further processings
-            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
+            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentResponseData);
             
         } else {
             $this->paymentService->pushNotification($paymentResponseData['status_text'], 'error', 100);  
-            return $this->response->redirectTo(strtolower($paymentRequestData['lang']) . '/confirmation');
+            return $this->response->redirectTo($language . '/confirmation');
         }
        
         return $this->response->redirectTo($language . '/confirmation');
