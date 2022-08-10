@@ -91,7 +91,7 @@ class PaymentController extends Controller
             
             $this->getLogger(__METHOD__)->error('redirect response', $paymentResponseData);
             
-            $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $responseData['result']['status'] == 'SUCCESS';
+            $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
             
             if($isPaymentSuccess) {
                 $this->paymentService->pushNotification($paymentResponseData['result']['status_text'], 'success', 100);
