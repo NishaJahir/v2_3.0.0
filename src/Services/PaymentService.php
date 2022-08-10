@@ -374,6 +374,7 @@ class PaymentService
                 // Transaction secret used for the later checksum verification
                 $txnSecret = $this->sessionStorage->getPlugin()->setValue('txnSecret', $paymentResponseData['transaction']['txn_secret']);
                 header('Location: ' . $paymentResponseData['result']['redirect_url']);
+		exit;
             } else {
                 $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
             }
