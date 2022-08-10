@@ -76,8 +76,8 @@ class PaymentHelper
     public static function getPaymentMethods()
     {
         return [
-            NovalnetInvoicePaymentMethod::PAYMENT_KEY => NovalnetInvoicePaymentMethod::class,
             NovalnetCcPaymentMethod::PAYMENT_KEY => NovalnetCcPaymentMethod::class,
+            NovalnetInvoicePaymentMethod::PAYMENT_KEY => NovalnetInvoicePaymentMethod::class,
             NovalnetIdealPaymentMethod::PAYMENT_KEY => NovalnetIdealPaymentMethod::class,
         ];
     }
@@ -269,17 +269,15 @@ class PaymentHelper
             
             // Handle cURL error
             if (curl_errno($curl)) {
-               $errorText = curl_error($curl);
+               $this->getLogger(__METHOD__)->error('Novalnet::executeCurlError', curl_error($curl));
             }
             
             // Close cURL
             curl_close($curl);
             
             // Decoding the JSON string to array for further processing 
-            return [
-                'response' => json_decode($paymentResponse, true),
-                'error'    => $errorText
-            ];
+            return json_decode($paymentResponse, true);
+        
         } catch (\Exception $e) {
             $this->getLogger(__METHOD__)->error('Novalnet::executeCurlError', $e);
         }
