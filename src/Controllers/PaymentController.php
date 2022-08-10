@@ -20,6 +20,7 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 use Novalnet\Services\PaymentService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class PaymentController
@@ -28,6 +29,7 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
  */
 class PaymentController extends Controller
 {
+    use Loggable;
     /**
      * @var Request
      */
@@ -77,6 +79,7 @@ class PaymentController extends Controller
         
         // Get the initial payment call response
         $paymentResponseData = $this->request->all();
+        $this->getLogger(__METHOD__)->error('initial response', $paymentResponseData);
         // Get the customer order language
         $language = $this->sessionStorage->getLocaleSettings()->language;
         
@@ -85,6 +88,8 @@ class PaymentController extends Controller
             
             // Checksum validation and transaction status call to retrieve the full response
             $paymentResponseData = $this->paymentService->validateChecksumAndGetTxnStatus($paymentResponseData);
+            
+            $this->getLogger(__METHOD__)->error('redirect response', $paymentResponseData);
             
             $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $responseData['result']['status'] == 'SUCCESS';
             
