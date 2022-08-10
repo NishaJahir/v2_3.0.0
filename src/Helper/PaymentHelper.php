@@ -282,4 +282,23 @@ class PaymentHelper
             $this->getLogger(__METHOD__)->error('Novalnet::executeCurlError', $e);
         }
     }
+    
+    /**
+     * Reverse the given string
+     *
+     * @param string $str
+     * @return string
+     */
+    public function reverseString($str)
+    {
+        $string = '';
+        // Find string length
+        $len = strlen($str);
+        // Loop through it and print it reverse
+        for($i=$len-1;$i>=0;$i--)
+        {
+            $string .= $str[$i];
+        }
+        return $string;
+    }
 }
