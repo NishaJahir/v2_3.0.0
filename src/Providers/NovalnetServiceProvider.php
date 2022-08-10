@@ -26,7 +26,6 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\PaymentService;
-use Novalnet\Services\SettingsService;
 use Plenty\Modules\Wizard\Contracts\WizardContainerContract;
 use Novalnet\Assistants\NovalnetAssistant;
 use Novalnet\Methods\NovalnetPaymentAbstract;
@@ -65,14 +64,13 @@ class NovalnetServiceProvider extends ServiceProvider
                         BasketRepositoryContract $basketRepository,
                         PaymentMethodContainer $payContainer,
                         PaymentHelper $paymentHelper, 
-						PaymentService $paymentService,
-						SettingsService $settingsService,
+			PaymentService $paymentService,
                         FrontendSessionStorageFactoryContract $sessionStorage
                         )
     {
         $this->registerPaymentMethods($payContainer);
         
-        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $settingsService, $sessionStorage);
+        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $sessionStorage);
 
         $this->registerPaymentExecute($eventDispatcher, $paymentHelper, $paymentService, $sessionStorage);
         
@@ -108,7 +106,7 @@ class NovalnetServiceProvider extends ServiceProvider
                                               BasketRepositoryContract $basketRepository,
                                               PaymentHelper $paymentHelper,
                                               PaymentService $paymentService,
-											  FrontendSessionStorageFactoryContract $sessionStorage
+					      FrontendSessionStorageFactoryContract $sessionStorage
                                               )
     {
         // Listen for the event that gets the payment method content
@@ -125,7 +123,7 @@ class NovalnetServiceProvider extends ServiceProvider
 				}
 				if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_IDEAL'])) {
 					$content = '';
-                    $contentType = 'continue';
+                    			$contentType = 'continue';
 				}
 				$sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
 				$event->setValue($content);
