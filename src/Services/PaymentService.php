@@ -428,11 +428,12 @@ class PaymentService
         if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
             
             $txnSecret = $this->sessionStorage->getPlugin()->getValue('txnSecret');
+            $strRevPrivateKey = $this->paymentHelper->reverseString($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key'));
             
             // Condition to check whether the payment is redirect
             if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($txnSecret)) {
                                             
-                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . strrev($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key')));
+                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey));
                 
                 // If the checksum isn't matching, there could be a possible manipulation in the data received 
                 if ($generatedChecksum !== $paymentResponseData['checksum']) {
