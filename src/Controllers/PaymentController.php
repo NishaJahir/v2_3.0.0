@@ -84,7 +84,7 @@ class PaymentController extends Controller
         $language = $this->sessionStorage->getLocaleSettings()->language;
         
         // Checksum validation for redirects
-        if(!empty($responseData['tid'])) {
+        if(!empty($paymentResponseData['tid'])) {
             
             // Checksum validation and transaction status call to retrieve the full response
             $paymentResponseData = $this->paymentService->validateChecksumAndGetTxnStatus($paymentResponseData);
@@ -103,7 +103,7 @@ class PaymentController extends Controller
             $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
             
         } else {
-            $this->paymentService->pushNotification($responseData['status_text'], 'error', 100);  
+            $this->paymentService->pushNotification($paymentResponseData['status_text'], 'error', 100);  
             return $this->response->redirectTo(strtolower($paymentRequestData['lang']) . '/confirmation');
         }
        
