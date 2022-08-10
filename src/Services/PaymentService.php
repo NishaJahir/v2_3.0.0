@@ -416,41 +416,4 @@ class PaymentService
         $this->sessionStorage->getPlugin()->setValue('notifications', json_encode($notifications));
     }
     
-    /**
-     * Validate the checksum generated for redirection payments
-     *
-     * @param  array  $paymentResponseData
-     * 
-     * @return array
-     */
-    public function validateChecksumAndGetTxnStatus($paymentResponseData)
-    {
-        if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
-            
-            $txnSecret = $this->sessionStorage->getPlugin()->getValue('txnSecret');
-            $strRevPrivateKey = $this->paymentHelper->reverseString($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key'));
-            
-            // Condition to check whether the payment is redirect
-            if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($txnSecret)) {
-                                            
-                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
-                
-                // If the checksum isn't matching, there could be a possible manipulation in the data received 
-                if ($generatedChecksum !== $paymentResponseData['checksum']) {
-                    $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
-                    $this->pushNotification($checksumInvalidMsg, 'error', 100);
-                }
-            }
-                                          
-            $paymentRequestData = [];
-            $paymentRequestData['transaction']['tid'] = $paymentResponseData['tid'];
-            
-            $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
-                
-            return $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::TXN_RESPONSE_URL, $payment_access_key);
-            
-        } else {
-            $this->pushNotification($paymentResponseData['status_text'], 'error', 100);
-        }                  
-    } 
 }
