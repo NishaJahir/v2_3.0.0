@@ -433,7 +433,7 @@ class PaymentService
             // Condition to check whether the payment is redirect
             if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($txnSecret)) {
                                             
-                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey));
+                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
                 
                 // If the checksum isn't matching, there could be a possible manipulation in the data received 
                 if ($generatedChecksum !== $paymentResponseData['checksum']) {
