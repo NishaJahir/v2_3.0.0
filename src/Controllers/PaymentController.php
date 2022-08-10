@@ -130,6 +130,8 @@ class PaymentController extends Controller
         if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
             
             $txnSecret = $this->sessionStorage->getPlugin()->getValue('txnSecret');
+            $this->getLogger(__METHOD__)->error('secret', $txnSecret);
+            $this->getLogger(__METHOD__)->error('checksum fn', $paymentResponseData);
             $strRevPrivateKey = $this->paymentHelper->reverseString($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key'));
            
             // Condition to check whether the payment is redirect
@@ -138,7 +140,6 @@ class PaymentController extends Controller
                 $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
                 $this->getLogger(__METHOD__)->error('generated checksum', $generatedChecksum);
                 // If the checksum isn't matching, there could be a possible manipulation in the data received 
-                $this->getLogger(__METHOD__)->error('generated sas', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
                 if ($generatedChecksum !== $paymentResponseData['checksum']) {
                     $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
                     $this->paymentService->pushNotification($checksumInvalidMsg, 'error', 100);
