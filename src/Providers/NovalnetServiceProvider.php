@@ -158,7 +158,6 @@ class NovalnetServiceProvider extends ServiceProvider
                     $sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
                     $paymentResponseData = $paymentService->performServerCall();
                     if($paymentService->isRedirectPayment($paymentKey)) {
-                        $paymentResponseData = [];
                         if(!empty($paymentResponseData) && !empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
                             // Transaction secret used for the later checksum verification
                             $sessionStorage->getPlugin()->setValue('nnTxnSecret', $paymentResponseData['transaction']['txn_secret']);
