@@ -95,6 +95,12 @@ class PaymentController extends Controller
             // Checksum validation and transaction status call to retrieve the full response
             $paymentResponseData = $this->paymentService->validateChecksumAndGetTxnStatus($paymentResponseData);
             
+            // Checksum validation is failure return back to the customer to confirmation page with error message
+            if(!empty($paymentResponseData['nn_checksum_invalid'])) {
+                $this->paymentService->pushNotification($paymentResponseData['nn_checksum_invalid'], 'error', 100);
+                return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
+            }
+            
             $this->getLogger(__METHOD__)->error('final redirect response', $paymentResponseData);
             
             $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
@@ -115,4 +121,6 @@ class PaymentController extends Controller
        
         return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
     }
+    
+    
 }
