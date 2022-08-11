@@ -88,6 +88,8 @@ class PaymentController extends Controller
         
         // Get the initial payment call response
         $paymentResponseData = $this->request->all();
+        $nnTxnSecret = $this->sessionStorage->getPlugin()->getValue('nnTxnSecret');
+        $this->getLogger(__METHOD__)->error('controller secret', $nnTxnSecret);
         $this->getLogger(__METHOD__)->error('initial response', $paymentResponseData);
         
         // Checksum validation for redirects
