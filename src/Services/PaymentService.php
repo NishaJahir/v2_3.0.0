@@ -425,9 +425,9 @@ class PaymentService
             if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($nnTxnSecret)) {                            
                 $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $nnTxnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
                 // If the checksum isn't matching, there could be a possible manipulation in the data received 
-                if ($generatedChecksum !== $paymentResponseData['checksum']) {
-                    $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
-                    $this->pushNotification($checksumInvalidMsg, 'error', 100);
+                if ($generatedChecksum !== $paymentResponseData['checksum']) {                              
+                    $paymentResponseData['nn_checksum_invalid'] = $this->paymentHelper->getTranslatedText('checksum_error');
+                    return $paymentResponseData;
                 }
             }
                                           
@@ -437,7 +437,8 @@ class PaymentService
             $privatekey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
             return $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::TXN_RESPONSE_URL, $privatekey);
         } else {
-            $this->pushNotification($paymentResponseData['status_text'], 'error', 100);
+            $paymentResponseData['nn_checksum_invalid'] = $paymentResponseData['status_text'];
+            return $paymentResponseData;
         }                  
     }
 }
