@@ -159,7 +159,18 @@ class NovalnetServiceProvider extends ServiceProvider
                     $sessionStorage->getPlugin()->setValue('mop',$event->getMop());
                     $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
                     $sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
-                    $paymentService->performServerCall();
+		    $paymentResponseData = $paymentService->performServerCall();
+		    if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
+                // Transaction secret used for the later checksum verification
+                $sessionStorage->getPlugin()->setValue('response', $paymentResponseData);
+	        $event->setType('redirectUrl');
+                $event->setValue($paymentResponseData['result']['redirect_url']);
+            } else {
+               // Handle an error case and set the return type and value for the event.
+                  $event->setType('error');
+                  $event->setValue('The payment could not be executed!');
+            }
+		   
                 }
             });
     
