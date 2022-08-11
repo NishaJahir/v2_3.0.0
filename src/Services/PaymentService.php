@@ -366,21 +366,11 @@ class PaymentService
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
         $this->getLogger(__METHOD__)->error('response', $paymentResponseData);
-           $this->getLogger(__METHOD__)->error('payment key1', $paymentKey);
-        // if the payment method is redirect
-        if($this->isRedirectPayment($paymentKey)) {
-	    $this->getLogger(__METHOD__)->error('payment key', $paymentKey);
-	    $this->getLogger(__METHOD__)->error('res sas', $paymentResponseData);
-            // Do redirect if the redirect URL is present
-            if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
-                // Transaction secret used for the later checksum verification
-                $this->sessionStorage->getPlugin()->setValue('response', $paymentResponseData);
-                header('Location: ' . $paymentResponseData['result']['redirect_url']);
-		exit;
-            } else {
-                $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
-            }
-        }
+           
+	if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
+		return $paymentResponseData;
+	}
+        
         
         // Push notification to customer regarding the payment response
         if($isPaymentSuccess) {
