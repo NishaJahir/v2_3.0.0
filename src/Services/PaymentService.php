@@ -414,6 +414,7 @@ class PaymentService
      */
     public function validateChecksumAndGetTxnStatus($paymentResponseData)
     {
+        $paymentResponseData['status'] = 'FAILURE';
         if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
             
             $nnTxnSecret = $this->sessionStorage->getPlugin()->getValue('nnTxnSecret');
