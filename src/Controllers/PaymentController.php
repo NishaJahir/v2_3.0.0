@@ -101,8 +101,6 @@ class PaymentController extends Controller
                 return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
             }
             
-            $this->getLogger(__METHOD__)->error('final redirect response', $paymentResponseData);
-            
             $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
             
             if($isPaymentSuccess) {
