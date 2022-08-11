@@ -64,7 +64,7 @@ class NovalnetServiceProvider extends ServiceProvider
                         BasketRepositoryContract $basketRepository,
                         PaymentMethodContainer $payContainer,
                         PaymentHelper $paymentHelper, 
-			PaymentService $paymentService,
+                        PaymentService $paymentService,
                         FrontendSessionStorageFactoryContract $sessionStorage
                         )
     {
@@ -106,33 +106,30 @@ class NovalnetServiceProvider extends ServiceProvider
                                               BasketRepositoryContract $basketRepository,
                                               PaymentHelper $paymentHelper,
                                               PaymentService $paymentService,
-					      FrontendSessionStorageFactoryContract $sessionStorage
+                                              FrontendSessionStorageFactoryContract $sessionStorage
                                               )
     {
         // Listen for the event that gets the payment method content
         $eventDispatcher->listen(
             GetPaymentMethodContent::class, 
             function(GetPaymentMethodContent $event) use($basketRepository, $paymentHelper, $paymentService, $sessionStorage) {
-				
-			if($paymentHelper->getPaymentKeyByMop($event->getMop())) {
-				$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
-				$paymentRequestData = $paymentService->generatePaymentParams($basketRepository->load(), $paymentKey);
-				if(empty($paymentRequestData['customer']['first_name']) && empty($paymentRequestData['customer']['last_name'])) {
-					$content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
-					$contentType = 'errorCode';   
-				}
-				if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_IDEAL'])) {
-					$content = '';
-                    			$contentType = 'continue';
-				}
-				$sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
-				$event->setValue($content);
-				$event->setType($contentType);
-			}
-			
-                        
+                
+            if($paymentHelper->getPaymentKeyByMop($event->getMop())) {
+                $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
+                $paymentRequestData = $paymentService->generatePaymentParams($basketRepository->load(), $paymentKey);
+                if(empty($paymentRequestData['customer']['first_name']) && empty($paymentRequestData['customer']['last_name'])) {
+                    $content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
+                    $contentType = 'errorCode';   
+                }
+                if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_IDEAL'])) {
+                    $content = '';
+                    $contentType = 'continue';
+                }
+                $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
+                $event->setValue($content);
+                $event->setType($contentType);
+            }            
         });
-    
     }
     
      /**
@@ -144,14 +141,14 @@ class NovalnetServiceProvider extends ServiceProvider
      * @param FrontendSessionStorageFactoryContract $sessionStorage
      */
     protected function registerPaymentExecute(Dispatcher $eventDispatcher,
-                                               PaymentHelper $paymentHelper,
-                                               PaymentService $paymentService,
-                                               FrontendSessionStorageFactoryContract $sessionStorage
-                                              )
+                                              PaymentHelper $paymentHelper,
+                                              PaymentService $paymentService,
+                                              FrontendSessionStorageFactoryContract $sessionStorage
+                                             )
     {
         // Listen for the event that executes the payment
         $eventDispatcher->listen(
-			ExecutePayment::class,
+            ExecutePayment::class,
             function (ExecutePayment $event) use ($paymentHelper, $paymentService, $sessionStorage)
             {
                 if($paymentHelper->getPaymentKeyByMop($event->getMop())) {
@@ -159,20 +156,20 @@ class NovalnetServiceProvider extends ServiceProvider
                     $sessionStorage->getPlugin()->setValue('mop',$event->getMop());
                     $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
                     $sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
-		    $paymentResponseData = $paymentService->performServerCall();
-		    if (!empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
-                // Transaction secret used for the later checksum verification
-                $sessionStorage->getPlugin()->setValue('response', $paymentResponseData);
-	        $event->setType('redirectUrl');
-                $event->setValue($paymentResponseData['result']['redirect_url']);
-            } else {
-               // Handle an error case and set the return type and value for the event.
-                  $event->setType('error');
-                  $event->setValue('The payment could not be executed!');
-            }
-		   
+                    $paymentResponseData = $paymentService->performServerCall();
+                    if($paymentService->isRedirectPayment($paymentKey)) {
+                        if(!empty($paymentResponseData) && !empty($paymentResponseData['result']['redirect_url']) && !empty($paymentResponseData['transaction']['txn_secret'])) {
+                            // Transaction secret used for the later checksum verification
+                            $sessionStorage->getPlugin()->setValue('nnTxnSecret', $paymentResponseData['transaction']['txn_secret']);
+                            $event->setType('redirectUrl');
+                            $event->setValue($paymentResponseData['result']['redirect_url']);
+                        } else {
+                           // Handle an error case and set the return type and value for the event.
+                              $event->setType('error');
+                              $event->setValue('The payment could not be executed!');
+                        }
+                    }
                 }
             });
-    
     }
 }
