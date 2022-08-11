@@ -366,7 +366,7 @@ class PaymentService
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
         $this->getLogger(__METHOD__)->error('response', $paymentResponseData);
-        
+           $this->getLogger(__METHOD__)->error('payment key1', $paymentKey);
         // if the payment method is redirect
         if($this->isRedirectPayment($paymentKey)) {
 	    $this->getLogger(__METHOD__)->error('payment key', $paymentKey);
