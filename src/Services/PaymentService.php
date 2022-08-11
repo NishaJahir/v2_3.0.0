@@ -428,6 +428,8 @@ class PaymentService
         if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
             
             $txnSecret = $this->sessionStorage->getPlugin()->getValue('nnTxnSecret');
+	     $res = $this->sessionStorage->getPlugin()->getValue('response');
+        $this->getLogger(__METHOD__)->error('check res', $res);
 	    
             $strRevPrivateKey = $this->paymentHelper->reverseString($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key'));
            
