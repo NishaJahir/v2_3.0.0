@@ -196,11 +196,11 @@ class PaymentService
                                                'system_url' => $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl,
                                                'system_ip'  => $_SERVER['SERVER_ADDR']
                                              ];
-		
-		// Build the custom parameters
-		$paymentRequestData['custom'] = [
-										   'lang' => strtoupper($this->sessionStorage->getLocaleSettings()->language)
-										];
+        
+        // Build the custom parameters
+        $paymentRequestData['custom'] = [
+                                           'lang' => strtoupper($this->sessionStorage->getLocaleSettings()->language)
+                                        ];
         
         // Build additional specific payment method request parameters
         $this->getPaymentData($paymentRequestData, $paymentKey);
@@ -361,22 +361,21 @@ class PaymentService
         $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
         $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
         $paymentKey = $this->sessionStorage->getPlugin()->getValue('paymentkey');
-        $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
-        $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
+        $privateKey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
+        $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $privateKey);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
-           
-	if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
-		return $paymentResponseData;
-	}
         
-        
-        // Push notification to customer regarding the payment response
-        if($isPaymentSuccess) {
-            $this->pushNotification($paymentResponseData['result']['status_text'], 'success', 100);
+        // Do redirect if the redirect URL is present
+        if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
+            return $paymentResponseData;
         } else {
-            $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
+            // Push notification to customer regarding the payment response
+            if($isPaymentSuccess) {
+                $this->pushNotification($paymentResponseData['result']['status_text'], 'success', 100);
+            } else {
+                $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
+            }
         }
-        
         // Set the payment response in the session for the further processings
         $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
     }
@@ -405,7 +404,7 @@ class PaymentService
         $notifications[$type] = $notification;
         $this->sessionStorage->getPlugin()->setValue('notifications', json_encode($notifications));
     }
-	
+    
     /**
      * Validate the checksum generated for redirection payments
      *
@@ -417,21 +416,17 @@ class PaymentService
     {
         if ($paymentResponseData['status'] && $paymentResponseData['status'] == 'SUCCESS') {
             
-            $txnSecret = $this->sessionStorage->getPlugin()->getValue('nnTxnSecret');
-	     $res = $this->sessionStorage->getPlugin()->getValue('response');
-        $this->getLogger(__METHOD__)->error('check res', $res);
-	    
+            $nnTxnSecret = $this->sessionStorage->getPlugin()->getValue('nnTxnSecret');
+            $this->getLogger(__METHOD__)->error('secret value', $nnTxnSecret);
             $strRevPrivateKey = $this->paymentHelper->reverseString($this->settingsService->getNnPaymentSettingsValue('novalnet_private_key'));
            
             // Condition to check whether the payment is redirect
-            if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($txnSecret)) {                            
-                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $txnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
-                $this->getLogger(__METHOD__)->error('generated checksum', $generatedChecksum);
+            if (!empty($paymentResponseData['checksum']) && !empty($paymentResponseData['tid']) && !empty($nnTxnSecret)) {                            
+                $generatedChecksum = hash('sha256', $paymentResponseData['tid'] . $nnTxnSecret . $paymentResponseData['status'] . $strRevPrivateKey);
                 // If the checksum isn't matching, there could be a possible manipulation in the data received 
                 if ($generatedChecksum !== $paymentResponseData['checksum']) {
                     $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
                     $this->pushNotification($checksumInvalidMsg, 'error', 100);
-		    exit;
                 }
             }
                                           
@@ -439,13 +434,9 @@ class PaymentService
             $paymentRequestData['transaction']['tid'] = $paymentResponseData['tid'];
             
             $privatekey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
-                
             return $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::TXN_RESPONSE_URL, $privatekey);
-            
         } else {
             $this->pushNotification($paymentResponseData['status_text'], 'error', 100);
-	    exit;
         }                  
     }
-    
 }
