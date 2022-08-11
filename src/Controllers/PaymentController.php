@@ -138,7 +138,7 @@ class PaymentController extends Controller
                 // If the checksum isn't matching, there could be a possible manipulation in the data received 
                 if ($generatedChecksum !== $paymentResponseData['checksum']) {
                     $checksumInvalidMsg = $this->paymentHelper->getTranslatedText('checksum_error');                                  
-                    $this->pushNotification($checksumInvalidMsg, 'error', 100);
+                    $this->paymentService->pushNotification($checksumInvalidMsg, 'error', 100);
                     return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
                 }
             }
@@ -149,7 +149,7 @@ class PaymentController extends Controller
             $privatekey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
             return $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::TXN_RESPONSE_URL, $privatekey);
         } else {
-            $this->pushNotification($paymentResponseData['status_text'], 'error', 100);
+            $this->paymentService->pushNotification($paymentResponseData['status_text'], 'error', 100);
             return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
         }                  
     }
