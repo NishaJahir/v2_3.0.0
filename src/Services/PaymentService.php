@@ -361,11 +361,9 @@ class PaymentService
         $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
         $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
         $paymentKey = $this->sessionStorage->getPlugin()->getValue('paymentkey');
-        $this->getLogger(__METHOD__)->error('request', $paymentRequestData);
         $payment_access_key = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $payment_access_key);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
-        $this->getLogger(__METHOD__)->error('response', $paymentResponseData);
            
 	if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
 		return $paymentResponseData;
