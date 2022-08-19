@@ -24,6 +24,7 @@ use \Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Plugin\Translation\Translator;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -88,8 +89,10 @@ class PaymentHelper
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
+				PaymentRepositoryContract $paymentRepository,
                                 OrderRepositoryContract $orderRepository,
                                 PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
+				
                                )
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
