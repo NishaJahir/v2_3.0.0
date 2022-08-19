@@ -30,7 +30,6 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
-use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Log\Loggable;
 
 /**
