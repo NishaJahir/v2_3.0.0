@@ -28,6 +28,7 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -310,6 +311,7 @@ class PaymentHelper
      * Reverse the given string
      *
      * @param string $str
+     *
      * @return string
      */
     public function reverseString($str)
@@ -353,6 +355,25 @@ class PaymentHelper
         } catch (\Exception $e) {
 			$this->getLogger(__METHOD__)->error('createPlentyPaymentToNnOrder failed ' . $paymentResponseData['transaction']['order_no'], $e);
 		}
+    }
+	
+    /**
+     * Get the payment property object
+     *
+     * @param mixed $typeId
+     * @param mixed $value
+     *
+     * @return object
+     */
+    public function getPaymentProperty($typeId, $value)
+    {
+        /** @var PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp(\Plenty\Modules\Payment\Models\PaymentProperty::class);
+
+        $paymentProperty->typeId = $typeId;
+        $paymentProperty->value  = (string) $value;
+
+        return $paymentProperty;
     }
     
     /**
