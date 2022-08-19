@@ -24,6 +24,7 @@ use Plenty\Modules\Frontend\Services\AccountService;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Constants\NovalnetConstants;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
+use Novalnet\Services\TransactionService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -64,6 +65,11 @@ class PaymentService
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorage;
+	
+    /**
+     * @var TransactionService
+     */
+    private $transactionService;
     
     /**
      * @var redirectPayment
@@ -79,13 +85,15 @@ class PaymentService
      * @param AddressRepositoryContract $addressRepository
      * @param CountryRepositoryContract $countryRepository
      * @param FrontendSessionStorageFactoryContract $sessionStorage
+     * @param TransactionService $transactionService
      */
     public function __construct(SettingsService $settingsService,
                                 PaymentHelper $paymentHelper,
                                 WebstoreHelper $webstoreHelper,
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
-                                FrontendSessionStorageFactoryContract $sessionStorage
+                                FrontendSessionStorageFactoryContract $sessionStorage,
+				TransactionService $transactionService
                                )
     {
         $this->settingsService = $settingsService;
@@ -94,6 +102,7 @@ class PaymentService
         $this->addressRepository  = $addressRepository;
         $this->countryRepository  = $countryRepository;
         $this->sessionStorage  = $sessionStorage;
+	$this->transactionService = $transactionService;
         
     }
     
@@ -465,19 +474,19 @@ class PaymentService
 		
 		 $transactionData = [
 		    'order_no'         => $paymentResponseData['transaction']['order_no'],
-            'amount'           => $paymentResponseData['transaction']['amount'],
-            'callback_amount'  => $paymentResponseData['transaction']['amount'],
-            'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
-            'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
-            'payment_name'     => $paymentResponseData['payment_method'],
-            'additional_info'  => $additionalInfo ?? 0,
-        ];
+		    'amount'           => $paymentResponseData['transaction']['amount'],
+		    'callback_amount'  => $paymentResponseData['transaction']['amount'],
+		    'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
+		    'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
+		    'payment_name'     => $paymentResponseData['payment_method'],
+		    'additional_info'  => $additionalInfo ?? 0,
+		];
         
-        if($transactionData['payment_name'] == 'NOVALNET_INVOICE' || $paymentResponseData['result']['status'] != 'SUCCESS') {
-            $transactionData['callback_amount'] = 0;
-        }
-        
-        $this->transactionService->saveTransaction($transactionData);
+		if($transactionData['payment_name'] == 'NOVALNET_INVOICE' || $paymentResponseData['result']['status'] != 'SUCCESS') {
+		    $transactionData['callback_amount'] = 0;
+		}
+
+		$this->transactionService->saveTransaction($transactionData);
 	}
 	
 	public function additionalPaymentInfo($paymentResponseData)
@@ -487,7 +496,7 @@ class PaymentService
 		$additionalInfo = [
 							'currency' => $paymentResponseData['transaction']['currency'] ?? 0,
 							'test_mode' => !empty($paymentResponseData['transaction']['test_mode']) ? $this->paymentHelper->getTranslatedText('test_order',$lang) : 0,
-							'plugin_version' => $nnPaymentData['transaction']['system_version'] ?? 0,
+							'plugin_version' => $paymentResponseData['transaction']['system_version'] ?? 0,
 						  ];
 						  
 		if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'NOVALNET_INVOICE') {
