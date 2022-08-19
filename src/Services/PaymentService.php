@@ -375,6 +375,8 @@ class PaymentService
             } else {
                 $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
             }
+            // Handle the further process to the order based on the payment response
+            $this->HandlePaymentResponse();
         }
         // Set the payment response in the session for the further processings
         $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
@@ -439,4 +441,62 @@ class PaymentService
             return $paymentResponseData;
         }                  
     }
+    
+    public function HandlePaymentResponse()
+    {
+		$nnPaymentData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+		$this->sessionStorage->getPlugin()->setValue('nnPaymentData', null);
+		
+		$nnPaymentData['mop']            = $this->sessionStorage->getPlugin()->getValue('mop');
+        $nnPaymentData['payment_method'] = strtolower($this->paymentHelper->getPaymentKeyByMop($nnPaymentData['mop']));
+        
+        $this->getLogger(__METHOD__)->error('final process', $nnPaymentData);
+		
+		// Insert payment response into Novalnet table
+		$this->insertPaymentResponseIntoNnDb($nnPaymentData);
+		
+		// Create a plenty payment to the order
+		$this->paymentHelper->createPlentyPaymentToNnOrder($nnPaymentData);
+	}
+	
+	public function insertPaymentResponseIntoNnDb($paymentResponseData)
+	{
+		$additionalInfo = $this->additionalPaymentInfo($paymentResponseData);
+		
+		 $transactionData = [
+		    'order_no'         => $paymentResponseData['transaction']['order_no'],
+            'amount'           => $paymentResponseData['transaction']['amount'],
+            'callback_amount'  => $paymentResponseData['transaction']['amount'],
+            'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
+            'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
+            'payment_name'     => $paymentResponseData['payment_method'],
+            'additional_info'  => $additionalInfo ?? 0,
+        ];
+        
+        if($transactionData['payment_name'] == 'NOVALNET_INVOICE' || $paymentResponseData['result']['status'] != 'SUCCESS') {
+            $transactionData['callback_amount'] = 0;
+        }
+        
+        $this->transactionService->saveTransaction($transactionData);
+	}
+	
+	public function additionalPaymentInfo($paymentResponseData)
+	{
+		$lang = strtolower((string)$paymentResponseData['lang']);
+		
+		$additionalInfo = [
+							'currency' => $paymentResponseData['transaction']['currency'] ?? 0,
+							'test_mode' => !empty($paymentResponseData['transaction']['test_mode']) ? $this->paymentHelper->getTranslatedText('test_order',$lang) : 0,
+							'plugin_version' => $nnPaymentData['transaction']['system_version'] ?? 0,
+						  ];
+						  
+		if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'NOVALNET_INVOICE') {
+			$additionalInfo['account_holder'] = ['transaction']['bank_details']['account_holder'];
+			$additionalInfo['iban'] = ['transaction']['bank_details']['iban'];
+			$additionalInfo['bic'] = ['transaction']['bank_details']['bic'];
+			$additionalInfo['bank_name'] = ['transaction']['bank_details']['bank_name'];
+			$additionalInfo['bank_place'] = ['transaction']['bank_details']['bank_place'];
+		}
+		return json_encode($additionalInfo);
+	}
 }
