@@ -24,6 +24,10 @@ use \Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Plugin\Translation\Translator;
+use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Models\PaymentProperty;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -52,20 +56,39 @@ class PaymentHelper
     private $countryRepository;
     
     /**
+     *
+     * @var OrderRepositoryContract
+     */
+    private $orderRepository;
+    
+    /**
+     *
+     * @var PaymentOrderRelationRepositoryContract
+     */
+    private $paymentOrderRelationRepository;
+    
+    /**
      * Constructor.
      *
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
      * @param CountryRepositoryContract $countryRepository
+     * @param OrderRepositoryContract $orderRepository
+     * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
      */
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 AddressRepositoryContract $addressRepository,
-                                CountryRepositoryContract $countryRepository
+                                CountryRepositoryContract $countryRepository,
+                                OrderRepositoryContract $orderRepository,
+                                PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
                                )
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->addressRepository       = $addressRepository;
         $this->countryRepository       = $countryRepository;
+        $this->orderRepository         = $orderRepository;
+        $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
+        
     }
     
     /**
@@ -300,5 +323,59 @@ class PaymentHelper
             $string .= $str[$i];
         }
         return $string;
+    }
+    
+    public function createPlentyPaymentToNnOrder($paymentResponseData)
+    {
+        try {
+			/** @var Payment $payment */
+			$payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
+			
+			$payment->mopId           = (int) $paymentResponseData['mop'];
+			$payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+			$payment->status          = (in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD'])) ? Payment::STATUS_AWAITING_APPROVAL : ($paymentResponseData['result']['status'] == 'FAILURE' ? Payment::STATUS_CANCELED : Payment::STATUS_CAPTURED);
+			$payment->currency        = $paymentResponseData['transaction']['currency'];
+			$payment->amount          = in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD']) ? 0 : $paymentResponseData['transaction']['amount'];
+			
+			$txnStatus = $paymentResponseData['transaction']['status'] ?? $paymentResponseData['result']['status'];
+			
+			$paymentProperty     = [];
+			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $paymentResponseData['transaction']['tid']);
+			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paymentResponseData['transaction']['tid']);
+			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
+			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $txnStatus);
+			
+			$payment->properties = $paymentProperty;
+			// Create the payment
+			$paymentObj = $this->paymentRepository->createPayment($payment);
+            // Assign the created payment to the specified order
+			$this->assignPlentyPaymentToPlentyOrder($paymentObj, (int)$paymentResponseData['transaction']['order_no']);
+        } catch (\Exception $e) {
+			$this->getLogger(__METHOD__)->error('createPlentyPaymentToNnOrder failed ' . $paymentResponseData['transaction']['order_no'], $e);
+		}
+    }
+    
+    /**
+     * Assign the payment to an order in plentymarkets.
+     *
+     * @param Payment $payment
+     * @param int $orderId
+     */
+    public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
+    {
+        try {
+			/** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+			$authHelper = pluginApp(AuthHelper::class);
+			$authHelper->processUnguarded(function() use ($payment, $orderId) {
+				//unguarded
+				$order = $this->orderRepository->findById($orderId);
+				if (!is_null($order) && $order instanceof Order)
+				{
+					$this->paymentOrderRelationRepository->createOrderRelation($payment, $order);
+				}
+		    });
+        } catch (\Exception $e) {
+            $this->getLogger(__METHOD__)->error('Novalnet::assignPlentyPaymentToPlentyOrder ' . $orderId, $e);
+        }
     }
 }
