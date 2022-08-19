@@ -26,6 +26,7 @@ use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Plugin\Translation\Translator;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Models\PaymentProperty;
@@ -55,6 +56,12 @@ class PaymentHelper
      * @var CountryRepositoryContract
      */
     private $countryRepository;
+	 
+    /**
+     *
+     * @var PaymentRepositoryContract
+     */
+    private $paymentRepository;
     
     /**
      *
@@ -74,6 +81,7 @@ class PaymentHelper
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param AddressRepositoryContract $addressRepository
      * @param CountryRepositoryContract $countryRepository
+     * @param PaymentRepositoryContract $paymentRepository
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
      */
@@ -87,6 +95,7 @@ class PaymentHelper
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->addressRepository       = $addressRepository;
         $this->countryRepository       = $countryRepository;
+	$this->paymentRepository       = $paymentRepository;
         $this->orderRepository         = $orderRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         
@@ -350,7 +359,7 @@ class PaymentHelper
 			$payment->properties = $paymentProperty;
 			// Create the payment
 			$paymentObj = $this->paymentRepository->createPayment($payment);
-            // Assign the created payment to the specified order
+            		// Assign the created payment to the specified order
 			$this->assignPlentyPaymentToPlentyOrder($paymentObj, (int)$paymentResponseData['transaction']['order_no']);
         } catch (\Exception $e) {
 			$this->getLogger(__METHOD__)->error('createPlentyPaymentToNnOrder failed ' . $paymentResponseData['transaction']['order_no'], $e);
