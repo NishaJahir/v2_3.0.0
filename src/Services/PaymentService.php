@@ -374,6 +374,8 @@ class PaymentService
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $privateKey);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
         
+	
+	    
         // Do redirect if the redirect URL is present
         if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
             return $paymentResponseData;
@@ -384,11 +386,12 @@ class PaymentService
             } else {
                 $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
             }
+		
+	    // Set the payment response in the session for the further processings
+            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
             // Handle the further process to the order based on the payment response
             $this->HandlePaymentResponse();
         }
-        // Set the payment response in the session for the further processings
-        $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
     }
     
     /**
