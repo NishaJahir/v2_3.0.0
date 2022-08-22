@@ -386,11 +386,12 @@ class PaymentService
     public function performServerCall()
     {
         $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
-        $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
+        $paymentRequestData['paymentRequestData']['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
         $paymentKey = $this->sessionStorage->getPlugin()->getValue('paymentkey');
         $privateKey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
-    $paymentUrl = $this->isTransactionRequiresAuthorization($paymentKey);
-        $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $privateKey);
+        $this->getLogger(__METHOD__)->error('NN request', $paymentRequestData);
+        $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData['paymentRequestData'], $paymentRequestData['paymentRequestData']['paymentUrl'], $privateKey);
+         $this->getLogger(__METHOD__)->error('NN request', $paymentRequestData);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
         
     
