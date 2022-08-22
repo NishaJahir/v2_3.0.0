@@ -16,6 +16,7 @@
 namespace Novalnet\Services;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 use Novalnet\Models\TransactionLog;
 use Plenty\Plugin\Log\Loggable;
 
@@ -51,5 +52,20 @@ class TransactionService
         } catch (\Exception $e) {
             $this->getLogger(__METHOD__)->error('Callback table insert failed!.', $e);
         }
+    }
+    
+    /**
+     * Retrieve transaction log table data
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return array
+     */
+    public function getTransactionData($key, $value)
+    {
+        $database = pluginApp(DataBase::class);
+        $order    = $database->query(TransactionLog::class)->where($key, '=', $value)->get();
+        return $order;
     }
 }
