@@ -65,7 +65,7 @@ class PaymentService
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorage;
-	
+    
     /**
      * @var TransactionService
      */
@@ -93,7 +93,7 @@ class PaymentService
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
                                 FrontendSessionStorageFactoryContract $sessionStorage,
-				TransactionService $transactionService
+                TransactionService $transactionService
                                )
     {
         $this->settingsService = $settingsService;
@@ -102,7 +102,7 @@ class PaymentService
         $this->addressRepository  = $addressRepository;
         $this->countryRepository  = $countryRepository;
         $this->sessionStorage  = $sessionStorage;
-	$this->transactionService = $transactionService;
+    $this->transactionService = $transactionService;
         
     }
     
@@ -212,9 +212,12 @@ class PaymentService
                                         ];
         
         // Build additional specific payment method request parameters
-        $this->getPaymentData($paymentRequestData, $paymentKey);
-            
-        return $paymentRequestData;
+        $paymentUrl = $this->getPaymentData($paymentRequestData, $paymentKey);
+    
+    return [
+        'paymentRequestData' => $paymentRequestData,
+        'paymentUrl' => $paymentUrl
+    ];
     }
 
     /**
@@ -246,6 +249,19 @@ class PaymentService
     
     public function getPaymentData(&$paymentRequestData, $paymentKey)
     {
+        $paymentUrl = NovalnetConstants::PAYMENT_URL;
+    
+        // Sent the payment authorize call to Novalnet server if the authorization is enabled
+        if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_CC']) && !empty($this->settingsService->getNnPaymentSettingsValue('payment_action', strtolower($paymentKey)))) {
+            // Limit for the manual on-hold
+            $authorizeAmount = $this->settingsService->getNnPaymentSettingsValue('onhold_amount', strtolower($paymentKey));
+
+            // "Authorization" activated if the manual limit is configured and the order amount exceeds it 
+            if(!empty($authorizeAmount) && is_numeric($authorizeAmount) && $paymentRequestData['transaction']['amount'] > $authorizeAmount) {
+               $paymentUrl = NovalnetConstants::PAYMENT_AUTHORIZE_URL;
+            }
+        }
+        
         $paymentRequestData['transaction']['payment_type'] = $this->getNnPaymentType($paymentKey);
         if($paymentKey == 'NOVALNET_INVOICE') {
             $invoiceDueDate = $this->settingsService->getNnPaymentSettingsValue('due_date', strtolower($paymentKey));
@@ -257,6 +273,8 @@ class PaymentService
         if($paymentKey == 'NOVALNET_IDEAL') {
             $paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
         }
+        
+        return $paymentUrl;
     }
     
     public function getNnPaymentType($paymentKey)
@@ -371,11 +389,12 @@ class PaymentService
         $paymentRequestData['transaction']['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
         $paymentKey = $this->sessionStorage->getPlugin()->getValue('paymentkey');
         $privateKey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
+    $paymentUrl = $this->isTransactionRequiresAuthorization($paymentKey);
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, NovalnetConstants::PAYMENT_URL, $privateKey);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
         
-	
-	    
+    
+        
         // Do redirect if the redirect URL is present
         if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
             return $paymentResponseData;
@@ -386,13 +405,14 @@ class PaymentService
             } else {
                 $this->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);
             }
-		
-	    // Set the payment response in the session for the further processings
+        
+        // Set the payment response in the session for the further processings
             $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
             // Handle the further process to the order based on the payment response
             $this->HandlePaymentResponse();
         }
     }
+    
     
     /**
      * Push notification
@@ -456,59 +476,59 @@ class PaymentService
     
     public function HandlePaymentResponse()
     {
-		$nnPaymentData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
-		$this->sessionStorage->getPlugin()->setValue('nnPaymentData', null);
-		
-		$nnPaymentData['mop']            = $this->sessionStorage->getPlugin()->getValue('mop');
+        $nnPaymentData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+        $this->sessionStorage->getPlugin()->setValue('nnPaymentData', null);
+        
+        $nnPaymentData['mop']            = $this->sessionStorage->getPlugin()->getValue('mop');
         $nnPaymentData['payment_method'] = strtolower($this->paymentHelper->getPaymentKeyByMop($nnPaymentData['mop']));
         
         $this->getLogger(__METHOD__)->error('final process', $nnPaymentData);
-		
-		// Insert payment response into Novalnet table
-		$this->insertPaymentResponseIntoNnDb($nnPaymentData);
-		
-		// Create a plenty payment to the order
-		$this->paymentHelper->createPlentyPaymentToNnOrder($nnPaymentData);
-	}
-	
-	public function insertPaymentResponseIntoNnDb($paymentResponseData)
-	{
-		$additionalInfo = $this->additionalPaymentInfo($paymentResponseData);
-		
-		 $transactionData = [
-		    'order_no'         => $paymentResponseData['transaction']['order_no'],
-		    'amount'           => $paymentResponseData['transaction']['amount'],
-		    'callback_amount'  => $paymentResponseData['transaction']['amount'],
-		    'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
-		    'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
-		    'payment_name'     => $paymentResponseData['payment_method'],
-		    'additional_info'  => $additionalInfo ?? 0,
-		];
         
-		if($transactionData['payment_name'] == 'NOVALNET_INVOICE' || $paymentResponseData['result']['status'] != 'SUCCESS') {
-		    $transactionData['callback_amount'] = 0;
-		}
+        // Insert payment response into Novalnet table
+        $this->insertPaymentResponseIntoNnDb($nnPaymentData);
+        
+        // Create a plenty payment to the order
+        $this->paymentHelper->createPlentyPaymentToNnOrder($nnPaymentData);
+    }
+    
+    public function insertPaymentResponseIntoNnDb($paymentResponseData)
+    {
+        $additionalInfo = $this->additionalPaymentInfo($paymentResponseData);
+        
+         $transactionData = [
+            'order_no'         => $paymentResponseData['transaction']['order_no'],
+            'amount'           => $paymentResponseData['transaction']['amount'],
+            'callback_amount'  => $paymentResponseData['transaction']['amount'],
+            'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
+            'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
+            'payment_name'     => $paymentResponseData['payment_method'],
+            'additional_info'  => $additionalInfo ?? 0,
+        ];
+        
+        if($transactionData['payment_name'] == 'NOVALNET_INVOICE' || $paymentResponseData['result']['status'] != 'SUCCESS') {
+            $transactionData['callback_amount'] = 0;
+        }
 
-		$this->transactionService->saveTransaction($transactionData);
-	}
-	
-	public function additionalPaymentInfo($paymentResponseData)
-	{
-		$lang = strtolower((string)$paymentResponseData['lang']);
-		
-		$additionalInfo = [
-							'currency' => $paymentResponseData['transaction']['currency'] ?? 0,
-							'test_mode' => !empty($paymentResponseData['transaction']['test_mode']) ? $this->paymentHelper->getTranslatedText('test_order',$lang) : 0,
-							'plugin_version' => $paymentResponseData['transaction']['system_version'] ?? 0,
-						  ];
-						  
-		if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'NOVALNET_INVOICE') {
-			$additionalInfo['account_holder'] = ['transaction']['bank_details']['account_holder'];
-			$additionalInfo['iban'] = ['transaction']['bank_details']['iban'];
-			$additionalInfo['bic'] = ['transaction']['bank_details']['bic'];
-			$additionalInfo['bank_name'] = ['transaction']['bank_details']['bank_name'];
-			$additionalInfo['bank_place'] = ['transaction']['bank_details']['bank_place'];
-		}
-		return json_encode($additionalInfo);
-	}
+        $this->transactionService->saveTransaction($transactionData);
+    }
+    
+    public function additionalPaymentInfo($paymentResponseData)
+    {
+        $lang = strtolower((string)$paymentResponseData['lang']);
+        
+        $additionalInfo = [
+                            'currency' => $paymentResponseData['transaction']['currency'] ?? 0,
+                            'test_mode' => !empty($paymentResponseData['transaction']['test_mode']) ? $this->paymentHelper->getTranslatedText('test_order',$lang) : 0,
+                            'plugin_version' => $paymentResponseData['transaction']['system_version'] ?? 0,
+                          ];
+                          
+        if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'NOVALNET_INVOICE') {
+            $additionalInfo['account_holder'] = ['transaction']['bank_details']['account_holder'];
+            $additionalInfo['iban'] = ['transaction']['bank_details']['iban'];
+            $additionalInfo['bic'] = ['transaction']['bank_details']['bic'];
+            $additionalInfo['bank_name'] = ['transaction']['bank_details']['bank_name'];
+            $additionalInfo['bank_place'] = ['transaction']['bank_details']['bank_place'];
+        }
+        return json_encode($additionalInfo);
+    }
 }
