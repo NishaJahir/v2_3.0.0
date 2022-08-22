@@ -109,8 +109,12 @@ class PaymentController extends Controller
                 $this->paymentService->pushNotification($paymentResponseData['result']['status_text'], 'error', 100);    
             }
             
+            $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
+           
             // Set the payment response in the session for the further processings
-            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentResponseData);
+            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData['paymentRequestData'], $paymentResponseData));
+            // Handle the further process to the order based on the payment response
+            $this->paymentService->HandlePaymentResponse();
             
         } else {
             $this->paymentService->pushNotification($paymentResponseData['status_text'], 'error', 100);  
