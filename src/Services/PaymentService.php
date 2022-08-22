@@ -408,7 +408,7 @@ class PaymentService
             }
         
         // Set the payment response in the session for the further processings
-            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $paymentResponseData));
+            $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData['paymentRequestData'], $paymentResponseData));
             // Handle the further process to the order based on the payment response
             $this->HandlePaymentResponse();
         }
