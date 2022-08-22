@@ -410,4 +410,25 @@ class PaymentHelper
             $this->getLogger(__METHOD__)->error('Novalnet::assignPlentyPaymentToPlentyOrder ' . $orderId, $e);
         }
     }
+	
+    /**
+     * Retrieves the original end-customer address with and without proxy
+     *
+     * @return string
+     */
+    public function getRemoteAddress()
+    {
+        $ipKeys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
+
+        foreach ($ipKeys as $key)
+        {
+            if (array_key_exists($key, $_SERVER) === true)
+            {
+                foreach (explode(',', $_SERVER[$key]) as $ip)
+                {
+                    return $ip;
+                }
+            }
+        }
+    }
 }
