@@ -515,7 +515,7 @@ class PaymentService
     
     public function additionalPaymentInfo($paymentResponseData)
     {
-        $lang = strtolower((string)$paymentResponseData['lang']);
+        $lang = strtolower((string)$paymentResponseData['custom']['lang']);
         
         $additionalInfo = [
                             'currency' => $paymentResponseData['transaction']['currency'] ?? 0,
