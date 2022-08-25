@@ -15,9 +15,29 @@
 
 namespace Novalnet\Helper;
 
+use Novalnet\Methods\NovalnetSepaPaymentMethod;
 use Novalnet\Methods\NovalnetCcPaymentMethod;
+use Novalnet\Methods\NovalnetApplePayPaymentMethod;
 use Novalnet\Methods\NovalnetInvoicePaymentMethod;
+use Novalnet\Methods\NovalnetPrepaymentPaymentMethod;
+use Novalnet\Methods\NovalnetGuaranteedInvoicePaymentMethod;
+use Novalnet\Methods\NovalnetGuaranteedSepaPaymentMethod;
 use Novalnet\Methods\NovalnetIdealPaymentMethod;
+use Novalnet\Methods\NovalnetSofortPaymentMethod;
+use Novalnet\Methods\NovalnetGiropayPaymentMethod;
+use Novalnet\Methods\NovalnetCashpaymentPaymentMethod;
+use Novalnet\Methods\NovalnetPrzelewy24PaymentMethod;
+use Novalnet\Methods\NovalnetEpsPaymentMethod;
+use Novalnet\Methods\NovalnetPaypalPaymentMethod;
+use Novalnet\Methods\NovalnetPostfinanceCardPaymentMethod;
+use Novalnet\Methods\NovalnetPostfinanceEfinancePaymentMethod;
+use Novalnet\Methods\NovalnetBancontctPaymentMethod;
+use Novalnet\Methods\NovalnetMultibancoPaymentMethod;
+use Novalnet\Methods\NovalnetOnlineBankTransferPaymentMethod;
+use Novalnet\Methods\NovalnetAlipayPaymentMethod;
+use Novalnet\Methods\NovalnetWechatPayPaymentMethod;
+use Novalnet\Methods\NovalnetTrustlyPaymentMethod;
+use Novalnet\Methods\NovalnetGooglePayPaymentMethod;
 
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use \Plenty\Modules\Authorization\Services\AuthHelper;
@@ -56,7 +76,7 @@ class PaymentHelper
      * @var CountryRepositoryContract
      */
     private $countryRepository;
-	 
+     
     /**
      *
      * @var PaymentRepositoryContract
@@ -88,16 +108,15 @@ class PaymentHelper
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
-				PaymentRepositoryContract $paymentRepository,
+                                PaymentRepositoryContract $paymentRepository,
                                 OrderRepositoryContract $orderRepository,
                                 PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
-				
                                )
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->addressRepository       = $addressRepository;
         $this->countryRepository       = $countryRepository;
-	$this->paymentRepository       = $paymentRepository;
+        $this->paymentRepository       = $paymentRepository;
         $this->orderRepository         = $orderRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         
@@ -111,9 +130,29 @@ class PaymentHelper
     public static function getPaymentMethods()
     {
         return [
+            NovalnetSepaPaymentMethod::PAYMENT_KEY => NovalnetSepaPaymentMethod::class,
             NovalnetCcPaymentMethod::PAYMENT_KEY => NovalnetCcPaymentMethod::class,
+            NovalnetApplePayPaymentMethod::PAYMENT_KEY => NovalnetApplePayPaymentMethod::class,
             NovalnetInvoicePaymentMethod::PAYMENT_KEY => NovalnetInvoicePaymentMethod::class,
+            NovalnetPrepaymentPaymentMethod::PAYMENT_KEY => NovalnetPrepaymentPaymentMethod::class,
+            NovalnetGuaranteedInvoicePaymentMethod::PAYMENT_KEY => NovalnetGuaranteedInvoicePaymentMethod::class,
+            NovalnetGuaranteedSepaPaymentMethod::PAYMENT_KEY => NovalnetGuaranteedSepaPaymentMethod::class,
             NovalnetIdealPaymentMethod::PAYMENT_KEY => NovalnetIdealPaymentMethod::class,
+            NovalnetSofortPaymentMethod::PAYMENT_KEY => NovalnetSofortPaymentMethod::class,
+            NovalnetGiropayPaymentMethod::PAYMENT_KEY => NovalnetGiropayPaymentMethod::class,
+            NovalnetCashpaymentPaymentMethod::PAYMENT_KEY => NovalnetCashpaymentPaymentMethod::class,
+            NovalnetPrzelewy24PaymentMethod::PAYMENT_KEY => NovalnetPrzelewy24PaymentMethod::class,
+            NovalnetEpsPaymentMethod::PAYMENT_KEY => NovalnetEpsPaymentMethod::class,
+            NovalnetPaypalPaymentMethod::PAYMENT_KEY => NovalnetPaypalPaymentMethod::class,
+            NovalnetPostfinanceCardPaymentMethod::PAYMENT_KEY => NovalnetPostfinanceCardPaymentMethod::class,
+            NovalnetPostfinanceEfinancePaymentMethod::PAYMENT_KEY => NovalnetPostfinanceEfinancePaymentMethod::class,
+            NovalnetBancontctPaymentMethod::PAYMENT_KEY => NovalnetBancontctPaymentMethod::class,
+            NovalnetMultibancoPaymentMethod::PAYMENT_KEY => NovalnetMultibancoPaymentMethod::class,
+            NovalnetOnlineBankTransferPaymentMethod::PAYMENT_KEY => NovalnetOnlineBankTransferPaymentMethod::class,
+            NovalnetAlipayPaymentMethod::PAYMENT_KEY => NovalnetAlipayPaymentMethod::class,
+            NovalnetWechatPayPaymentMethod::PAYMENT_KEY => NovalnetWechatPayPaymentMethod::class,
+            NovalnetTrustlyPaymentMethod::PAYMENT_KEY => NovalnetTrustlyPaymentMethod::class,
+            NovalnetGooglePayPaymentMethod::PAYMENT_KEY => NovalnetGooglePayPaymentMethod::class
         ];
     }
     
@@ -174,9 +213,29 @@ class PaymentHelper
     public function getPaymentMethodsKey()
     {
         return [
+            NovalnetSepaPaymentMethod::PAYMENT_KEY,
             NovalnetCcPaymentMethod::PAYMENT_KEY,
+            NovalnetApplePayPaymentMethod::PAYMENT_KEY,
             NovalnetInvoicePaymentMethod::PAYMENT_KEY,
-            NovalnetIdealPaymentMethod::PAYMENT_KEY
+            NovalnetPrepaymentPaymentMethod::PAYMENT_KEY, 
+            NovalnetGuaranteedInvoicePaymentMethod::PAYMENT_KEY, 
+            NovalnetGuaranteedSepaPaymentMethod::PAYMENT_KEY, 
+            NovalnetIdealPaymentMethod::PAYMENT_KEY,
+            NovalnetSofortPaymentMethod::PAYMENT_KEY, 
+            NovalnetGiropayPaymentMethod::PAYMENT_KEY, 
+            NovalnetCashpaymentPaymentMethod::PAYMENT_KEY, 
+            NovalnetPrzelewy24PaymentMethod::PAYMENT_KEY, 
+            NovalnetEpsPaymentMethod::PAYMENT_KEY, 
+            NovalnetPaypalPaymentMethod::PAYMENT_KEY, 
+            NovalnetPostfinanceCardPaymentMethod::PAYMENT_KEY, 
+            NovalnetPostfinanceEfinancePaymentMethod::PAYMENT_KEY, 
+            NovalnetBancontctPaymentMethod::PAYMENT_KEY, 
+            NovalnetMultibancoPaymentMethod::PAYMENT_KEY, 
+            NovalnetOnlineBankTransferPaymentMethod::PAYMENT_KEY, 
+            NovalnetAlipayPaymentMethod::PAYMENT_KEY, 
+            NovalnetWechatPayPaymentMethod::PAYMENT_KEY, 
+            NovalnetTrustlyPaymentMethod::PAYMENT_KEY, 
+            NovalnetGooglePayPaymentMethod::PAYMENT_KEY
         ];
     }
     
@@ -251,11 +310,13 @@ class PaymentHelper
         }
     }
     
-    public function ConvertAmountToSmallerUnit($amount) {
+    public function ConvertAmountToSmallerUnit($amount) 
+    {
         return sprintf('%0.2f', $amount) * 100;
     }
     
-    public function dateFormatter($days) {
+    public function dateFormatter($days) 
+    {
         return date( 'Y-m-d', strtotime( date( 'y-m-d' ) . '+ ' . $days . ' days' ) );
     }
     
@@ -341,33 +402,33 @@ class PaymentHelper
     public function createPlentyPaymentToNnOrder($paymentResponseData)
     {
         try {
-			/** @var Payment $payment */
-			$payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
-			
-			$payment->mopId           = (int) $paymentResponseData['mop'];
-			$payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-			$payment->status          = (in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD']) && $paymentResponseData['transaction']['payment_type'] != 'INVOICE') ? Payment::STATUS_AWAITING_APPROVAL : ($paymentResponseData['result']['status'] == 'FAILURE' ? Payment::STATUS_CANCELED : Payment::STATUS_CAPTURED);
-			$payment->currency        = $paymentResponseData['transaction']['currency'];
-			$payment->amount          = in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD']) ? 0 : ($paymentResponseData['transaction']['amount'] / 100);
-			
-			$txnStatus = $paymentResponseData['transaction']['status'] ?? $paymentResponseData['result']['status'];
-			
-			$paymentProperty     = [];
-			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $paymentResponseData['transaction']['tid']);
-			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paymentResponseData['transaction']['tid']);
-			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
-			$paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $txnStatus);
-			
-			$payment->properties = $paymentProperty;
-			// Create the payment
-			$paymentObj = $this->paymentRepository->createPayment($payment);
-            		// Assign the created payment to the specified order
-			$this->assignPlentyPaymentToPlentyOrder($paymentObj, (int)$paymentResponseData['transaction']['order_no']);
+            /** @var Payment $payment */
+            $payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
+            
+            $payment->mopId           = (int) $paymentResponseData['mop'];
+            $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+            $payment->status          = (in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD']) && $paymentResponseData['transaction']['payment_type'] != 'INVOICE') ? Payment::STATUS_AWAITING_APPROVAL : ($paymentResponseData['result']['status'] == 'FAILURE' ? Payment::STATUS_CANCELED : Payment::STATUS_CAPTURED);
+            $payment->currency        = $paymentResponseData['transaction']['currency'];
+            $payment->amount          = in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD']) ? 0 : ($paymentResponseData['transaction']['amount'] / 100);
+            
+            $txnStatus = $paymentResponseData['transaction']['status'] ?? $paymentResponseData['result']['status'];
+            
+            $paymentProperty     = [];
+            $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $paymentResponseData['transaction']['tid']);
+            $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paymentResponseData['transaction']['tid']);
+            $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
+            $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $txnStatus);
+            
+            $payment->properties = $paymentProperty;
+            // Create the payment
+            $paymentObj = $this->paymentRepository->createPayment($payment);
+            // Assign the created payment to the specified order
+            $this->assignPlentyPaymentToPlentyOrder($paymentObj, (int)$paymentResponseData['transaction']['order_no']);
         } catch (\Exception $e) {
-			$this->getLogger(__METHOD__)->error('createPlentyPaymentToNnOrder failed ' . $paymentResponseData['transaction']['order_no'], $e);
-		}
+            $this->getLogger(__METHOD__)->error('createPlentyPaymentToNnOrder failed ' . $paymentResponseData['transaction']['order_no'], $e);
+        }
     }
-	
+    
     /**
      * Get the payment property object
      *
@@ -396,39 +457,18 @@ class PaymentHelper
     public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
     {
         try {
-			/** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
-			$authHelper = pluginApp(AuthHelper::class);
-			$authHelper->processUnguarded(function() use ($payment, $orderId) {
-				//unguarded
-				$order = $this->orderRepository->findById($orderId);
-				if (!is_null($order) && $order instanceof Order)
-				{
-					$this->paymentOrderRelationRepository->createOrderRelation($payment, $order);
-				}
-		    });
+            /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            $authHelper->processUnguarded(function() use ($payment, $orderId) {
+                //unguarded
+                $order = $this->orderRepository->findById($orderId);
+                if (!is_null($order) && $order instanceof Order)
+                {
+                    $this->paymentOrderRelationRepository->createOrderRelation($payment, $order);
+                }
+            });
         } catch (\Exception $e) {
             $this->getLogger(__METHOD__)->error('Novalnet::assignPlentyPaymentToPlentyOrder ' . $orderId, $e);
-        }
-    }
-	
-    /**
-     * Retrieves the original end-customer address with and without proxy
-     *
-     * @return string
-     */
-    public function getRemoteAddress()
-    {
-        $ipKeys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
-
-        foreach ($ipKeys as $key)
-        {
-            if (array_key_exists($key, $_SERVER) === true)
-            {
-                foreach (explode(',', $_SERVER[$key]) as $ip)
-                {
-                    return $ip;
-                }
-            }
         }
     }
 }
