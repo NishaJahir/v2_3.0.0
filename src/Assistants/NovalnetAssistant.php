@@ -286,7 +286,8 @@ class NovalnetAssistant extends WizardProvider
         $config = $this->createNovalnetCcPaymentConfiguration($config);
         // Load the Novalnet Invoice payment configuration
         $config = $this->createNovalnetInvoicePaymentConfiguration($config);
-        
+        // Load the On Hold configuration for redirection payments
+	$config = $this->createOnHoldConfigurationRedirection($config);
         
         return $config;
     }
@@ -432,6 +433,14 @@ class NovalnetAssistant extends WizardProvider
                            ]
         ];
         return $config;
+    }
+    
+    public function createOnHoldConfigurationRedirection($config)
+    {
+	 $onHoldSupportedRedirectionPayments = ['NOVALNET_PAYPAL', 'NOVALNET_APPLEPAY', 'NOVALNET_GOOGLEPAY'];   
+	 foreach($onHoldSupportedRedirectionPayments as $onHoldSupportedRedirectionPayment) {
+		$this->createOnHoldConfiguration($config, $onHoldSupportedRedirectionPayment);
+	 }
     }
      
     
