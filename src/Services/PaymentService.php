@@ -74,7 +74,7 @@ class PaymentService
     /**
      * @var redirectPayment
      */
-    private $redirectPayment = ['NOVALNET_IDEAL'];
+    private $redirectPayment = ['NOVALNET_APPLEPAY', 'NOVALNET_IDEAL', 'NOVALNET_SOFORT', 'NOVALNET_GIROPAY', 'NOVALNET_PRZELEWY24', 'NOVALNET_EPS', 'NOVALNET_PAYPAL', 'POSTFINANCE_CARD', 'POSTFINANCE_EFINANCE', 'NOVALNET_BANCONTACT', 'NOVALNET_ONLINE_BANK_TRANSFER', 'NOVALNET_ALIPAY', 'NOVALNET_WECHAT_PAY', 'NOVALNET_TRUSTLY', 'NOVALNET_GOOGLEPAY'];
     
     /**
      * Constructor.
@@ -93,7 +93,7 @@ class PaymentService
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
                                 FrontendSessionStorageFactoryContract $sessionStorage,
-                TransactionService $transactionService
+                                TransactionService $transactionService
                                )
     {
         $this->settingsService = $settingsService;
@@ -102,7 +102,7 @@ class PaymentService
         $this->addressRepository  = $addressRepository;
         $this->countryRepository  = $countryRepository;
         $this->sessionStorage  = $sessionStorage;
-    $this->transactionService = $transactionService;
+        $this->transactionService = $transactionService;
         
     }
     
@@ -280,8 +280,29 @@ class PaymentService
     public function getNnPaymentType($paymentKey)
     {
         $paymentMethodType = [
+            'NOVALNET_SEPA' => 'DIRECT_DEBIT_SEPA',
+            'NOVALNET_CC' => 'CREDITCARD',
+            'NOVALNET_APPLEPAY' => 'APPLEPAY',
             'NOVALNET_INVOICE' => 'INVOICE',
-            'NOVALNET_IDEAL' => 'IDEAL'
+            'NOVALNET_PREPAYMENT' => 'PREPAYMENT',
+            'NOVALNET_GUARANTEED_INVOICE' => 'GUARANTEED_INVOICE',
+            'NOVALNET_GUARANTEED_SEPA' => 'GUARANTEED_DIRECT_DEBIT_SEPA',
+            'NOVALNET_IDEAL' => 'IDEAL',
+            'NOVALNET_SOFORT' => 'ONLINE_TRANSFER',
+            'NOVALNET_GIROPAY' => 'GIROPAY',
+            'NOVALNET_CASHPAYMENT' => 'CASHPAYMENT',
+            'NOVALNET_PRZELEWY' => 'PRZELEWY24',
+            'NOVALNET_EPS' => 'EPS',
+            'NOVALNET_PAYPAL' => 'PAYPAL',
+            'NOVALNET_POSTFINANCE_CARD' => 'POSTFINANCE_CARD',
+            'NOVALNET_POSTFINANCE_EFINANCE' => 'POSTFINANCE',
+            'NOVALNET_BANCONTACT' => 'BANCONTACT',
+            'NOVALNET_MULTIBANCO' => 'MULTIBANCO',
+            'NOVALNET_ONLINE_BANK_TRANSFER' => 'ONLINE_BANK_TRANSFER',
+            'NOVALNET_ALIPAY' => 'ALIPAY',
+            'NOVALNET_WECHAT_PAY' => 'WECHATPAY',
+            'NOVALNET_TRUSTLY' => 'TRUSTLY',
+            'NOVALNET_GOOGLEPAY' => 'GOOGLEPAY'
         ];
         
         return $paymentMethodType[$paymentKey];
