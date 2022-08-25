@@ -24,7 +24,7 @@ use Novalnet\Helper\PaymentHelper;
  *
  * @package Novalnet\Migrations
  */
-class CreateNewPaymentMethods
+class CreateNewPaymentMethods123
 {
     /**
      * @var PaymentMethodRepositoryContract
