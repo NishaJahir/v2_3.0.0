@@ -270,7 +270,7 @@ class PaymentService
             }
         }
         
-        if($paymentKey == 'NOVALNET_IDEAL') {
+        if($this->isRedirectPayment($paymentKey)) {
             $paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
         }
         
