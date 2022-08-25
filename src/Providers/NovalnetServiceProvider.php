@@ -117,13 +117,14 @@ class NovalnetServiceProvider extends ServiceProvider
             if($paymentHelper->getPaymentKeyByMop($event->getMop())) {
                 $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
                 $paymentRequestData = $paymentService->generatePaymentParams($basketRepository->load(), $paymentKey);
-                if(empty($paymentRequestData['customer']['first_name']) && empty($paymentRequestData['customer']['last_name'])) {
+                if(empty($paymentRequestData['paymentRequestData']['customer']['first_name']) && empty($paymentRequestData['paymentRequestData']['customer']['last_name'])) {
                     $content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
                     $contentType = 'errorCode';   
-                }
-                if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_IDEAL'])) {
-                    $content = '';
-                    $contentType = 'continue';
+                } else {
+                    if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_PREPAYMENT', 'NOVALNET_CASHPAYMENT', 'NOVALNET_MULTIBANCO']) || $paymentService->isRedirectPayment($paymentKey)) {
+                        $content = '';
+                        $contentType = 'continue';
+                    }
                 }
                 $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
                 $event->setValue($content);
