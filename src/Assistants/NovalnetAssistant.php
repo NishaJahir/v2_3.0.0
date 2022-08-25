@@ -365,7 +365,6 @@ class NovalnetAssistant extends WizardProvider
     }
     
     public function createOnHoldConfiguration($config, $paymentMethodKey) {
-	    $this->getLogger(__METHOD__)->error('on hold key', $paymentMethodKey);
        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
            $paymentMethodKey. 'PaymentAction' => [
                'type' => 'select',
@@ -440,10 +439,8 @@ class NovalnetAssistant extends WizardProvider
     {
 	     $onHoldSupportedRedirectionPayments = ['novalnetPaypal', 'novalnetApplepay', 'novalnetGooglepay'];   
 	     foreach($onHoldSupportedRedirectionPayments as $onHoldSupportedRedirectionPayment) {
-		$this->createOnHoldConfiguration($config, $onHoldSupportedRedirectionPayment);
+		return $this->createOnHoldConfiguration($config, $onHoldSupportedRedirectionPayment);
 	     }
-
-	     return $config;
     }
      
     
