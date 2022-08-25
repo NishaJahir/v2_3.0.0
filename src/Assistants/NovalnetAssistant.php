@@ -439,8 +439,9 @@ class NovalnetAssistant extends WizardProvider
     {
 	     $onHoldSupportedRedirectionPayments = ['novalnetPaypal', 'novalnetApplepay', 'novalnetGooglepay'];   
 	     foreach($onHoldSupportedRedirectionPayments as $onHoldSupportedRedirectionPayment) {
-		return $this->createOnHoldConfiguration($config, $onHoldSupportedRedirectionPayment);
+		$config = $this->createOnHoldConfiguration($config, $onHoldSupportedRedirectionPayment);
 	     }
+	     return $config;
     }
      
     
