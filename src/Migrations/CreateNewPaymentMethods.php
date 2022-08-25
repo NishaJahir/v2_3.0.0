@@ -67,7 +67,7 @@ class CreateNewPaymentMethods
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_SOFORT', 'Novalnet Sofort');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GIROPAY', 'Novalnet giropay');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_CASHPAYMENT', 'Novalnet Barzahlen/viacash');
-        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PRZELEWY', 'Novalnet Przelewy24');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PRZELEWY24', 'Novalnet Przelewy24');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_EPS', 'Novalnet eps');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PAYPAL', 'Novalnet PayPal');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_POSTFINANCE_CARD', 'Novalnet PostFinance Card');
