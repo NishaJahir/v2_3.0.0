@@ -23,5 +23,5 @@ namespace Novalnet\Methods;
  */
 class NovalnetPrzelewy24PaymentMethod extends NovalnetPaymentAbstract
 {
-    const PAYMENT_KEY = 'NOVALNET_PRZELEWY';
+    const PAYMENT_KEY = 'NOVALNET_PRZELEWY24';
 }
