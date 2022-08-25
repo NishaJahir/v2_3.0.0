@@ -268,9 +268,9 @@ class NovalnetAssistant extends WizardProvider
                                 'type' => 'file',
                                 'options' => [
                                     'name' => 'NovalnetAssistant.novalnetPaymentLogoLabel',
-			            'showPreview' => true,
-			            'allowedExtensions' => ['svg', 'png', 'jpg', 'jpeg'],
-				    'allowFolders' => false
+                        'showPreview' => true,
+                        'allowedExtensions' => ['svg', 'png', 'jpg', 'jpeg'],
+                    'allowFolders' => false
                                 ]
                             ]
                            
@@ -279,7 +279,7 @@ class NovalnetAssistant extends WizardProvider
                  ]
           ];
           
-	   $config = $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey);
+       $config = $this->CreateOptionalPaymentDisplayConfiguration($config, $paymentMethodKey);
         }
         
         // Load the Novalnet Credit card payment configuration
@@ -287,7 +287,7 @@ class NovalnetAssistant extends WizardProvider
         // Load the Novalnet Invoice payment configuration
         $config = $this->createNovalnetInvoicePaymentConfiguration($config);
         // Load the On Hold configuration for redirection payments
-	$config = $this->createOnHoldConfigurationRedirection($config);
+    $config = $this->createOnHoldConfigurationRedirection($config);
         
         return $config;
     }
@@ -340,31 +340,32 @@ class NovalnetAssistant extends WizardProvider
                            ]
                        ]
         ];
-	    
-	$config = $this->createOnHoldConfiguration($config, 'novalnetCc');
-	    
+        
+    $config = $this->createOnHoldConfiguration($config, 'novalnetCc');
+        
         return $config;
     }
     
     public function createNovalnetInvoicePaymentConfiguration($config)
     {
-	$config['steps']['novalnetInvoice']['sections'][]['form'] = [
-		'novalnetInvoiceDuedate' => [
-		   'type' => 'text',
-		   'options' => [
-		       'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
-		       'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
-		   ]
-	       ]
-		
-	];
+    $config['steps']['novalnetInvoice']['sections'][]['form'] = [
+        'novalnetInvoiceDuedate' => [
+           'type' => 'text',
+           'options' => [
+               'name' => 'NovalnetAssistant.novalnetInvoiceDuedateLabel',
+               'tooltip' => 'NovalnetAssistant.novalnetInvoiceDuedateTooltip'
+           ]
+           ]
+        
+    ];
        $config = $this->createOnHoldConfiguration($config, 'novalnetInvoice');
-	    
-	return $config;
-		
+        
+    return $config;
+        
     }
-	
+    
     public function createOnHoldConfiguration($config, $paymentMethodKey) {
+	    $this->getLogger(__METHOD__)->error('on hold key', $paymentMethodKey);
        $config['steps'][$paymentMethodKey]['sections'][]['form'] = [
            $paymentMethodKey. 'PaymentAction' => [
                'type' => 'select',
@@ -400,11 +401,11 @@ class NovalnetAssistant extends WizardProvider
     {
         $cardTypes = ['Visa', 'MasterCard', 'AmericanExpress' , 'Mastero', 'Cartesi', 'UnionPay', 'Discover', 'DinersClub', 'Jcb', 'CarteBleue'];
         $allowedCreditCardTypes = [];
-	foreach($cardTypes as $cardTypeIndex => $cardType) {
-		    $allowedCreditCardTypes[] = [
-			'caption' => 'NovalnetAssistant.novalnetCc'. $cardType .'Label',
-			'value' => $cardType
-		    ];
+    foreach($cardTypes as $cardTypeIndex => $cardType) {
+            $allowedCreditCardTypes[] = [
+            'caption' => 'NovalnetAssistant.novalnetCc'. $cardType .'Label',
+            'value' => $cardType
+            ];
         }
     }
     
@@ -437,12 +438,12 @@ class NovalnetAssistant extends WizardProvider
     
     public function createOnHoldConfigurationRedirection($config)
     {
-	 $onHoldSupportedRedirectionPayments = ['NOVALNET_PAYPAL', 'NOVALNET_APPLEPAY', 'NOVALNET_GOOGLEPAY'];   
-	 foreach($onHoldSupportedRedirectionPayments as $onHoldSupportedRedirectionPayment) {
+	     $onHoldSupportedRedirectionPayments = ['NOVALNET_PAYPAL', 'NOVALNET_APPLEPAY', 'NOVALNET_GOOGLEPAY'];   
+	     foreach($onHoldSupportedRedirectionPayments as $onHoldSupportedRedirectionPayment) {
 		$this->createOnHoldConfiguration($config, $onHoldSupportedRedirectionPayment);
-	 }
-	    
-	 return $config;
+	     }
+
+	     return $config;
     }
      
     
