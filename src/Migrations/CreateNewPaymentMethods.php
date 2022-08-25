@@ -56,9 +56,27 @@ class CreateNewPaymentMethods
      */
     public function run()
     {
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_SEPA', 'Novalnet Direct Debit SEPA');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_CC', 'Novalnet Credit/Debit Cards');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_APPLEPAY', 'Novalnet ApplePay');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_INVOICE', 'Novalnet Invoice');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PREPAYMENT', 'Novalnet Prepayment');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_IDEAL', 'Novalnet iDEAL');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_SOFORT', 'Novalnet Sofort');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GIROPAY', 'Novalnet giropay');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_CASHPAYMENT', 'Novalnet Barzahlen/viacash');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PRZELEWY', 'Novalnet Przelewy24');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_EPS', 'Novalnet eps');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PAYPAL', 'Novalnet PayPal');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_POSTFINANCE_CARD', 'Novalnet PostFinance Card');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_POSTFINANCE_EFINANCE', 'Novalnet PostFinance E-Finance');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_BANCONTACT', 'Novalnet Bancontact');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_MULTIBANCO', 'Novalnet Multibanco');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_ONLINE_BANK_TRANSFER', 'Novalnet Online bank transfer');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_ALIPAY', 'Novalnet Alipay');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_WECHAT_PAY', 'Novalnet WeChat Pay');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_TRUSTLY', 'Novalnet Trustly');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GOOGLEPAY', 'Novalnet Google Pay');
     }
 
 
@@ -78,7 +96,7 @@ class CreateNewPaymentMethods
                                 'name'       => $name
                                ];
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
-        } elseif ($payment_data[1] == $paymentKey && !in_array ($payment_data[2], ['Novalnet Credit/Debit Cards', 'Novalnet Invoice', 'Novalnet iDEAL']) ) {
+        } elseif ($payment_data[1] == $paymentKey && !in_array ($payment_data[2], ['Novalnet Direct Debit SEPA', 'Novalnet Credit/Debit Cards', 'Novalnet Invoice', 'Novalnet Prepayment', 'Novalnet iDEAL', 'Novalnet Sofort', 'Novalnet giropay', 'Novalnet PayPal', 'Novalnet Przelewy24', 'Novalnet eps', 'Novalnet Barzahlen/viacash']) ) {
           $paymentMethodData = ['pluginKey'  => 'plenty_novalnet',
                                 'paymentKey' => $paymentKey,
                                 'name'       => $name,
