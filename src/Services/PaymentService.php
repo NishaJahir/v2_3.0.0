@@ -553,4 +553,94 @@ class PaymentService
         }
         return json_encode($additionalInfo);
     }
+    
+    public function isGuaranteePaymentToBeDisplayed(Basket $basket, $paymentKey)
+    {
+        try {
+            if(!is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {
+                // Check if the guaranteed payment method is enabled
+                if($this->settingsService->getNnPaymentSettingsValue('payment_active', $paymentKey) == true) {
+                    // If the guaranteed conditions are met, display the guaranteed payments
+                    if ($this->isGuaranteedPaymentAllowed($basket, $paymentName)) {
+                        return 'guarantee';
+                    }
+                    
+                    // Further we check if the normal payment method can be enabled if the condition not met 
+                    if ($this->settingsService->getNnPaymentSettingsValue('force', $paymentKey) == true) {
+                        return 'normal';
+                    }
+
+                    // If none matches, error message displayed 
+                    return 'error'; 
+                }
+                // If payment guarantee is not enabled, we show default one 
+                return 'normal';
+            }
+            // If payment guarantee is not enabled, we show default one 
+            return 'normal';
+        } catch(\Exception $e) {
+            $this->getLogger(__METHOD__)->error('Novalnet::isGuaranteePaymentToBeDisplayedFailed', $e);
+        }
+    }
+    
+    public function isGuaranteedPaymentAllowed($basket, $paymentKey)
+    {
+        // Get the customer billing and shipping details
+        $billingAddressId = $basket->customerInvoiceAddressId;
+        $shippingAddressId = $basket->customerShippingAddressId;
+        $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
+        $shippingAddress = $billingAddress;
+        if(!empty($shippingAddressId)) {
+            $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $shippingAddressId);
+        }
+        
+        // First, we check the billing and shipping addresses are matched
+        $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
+        
+        if($billingShippingDetails['billing'] != $billingShippingDetails['shipping']) {
+            return false;
+        }
+        
+        // Second, we check the customer from the guaranteed payments supported countries
+        if(!in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && !in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) {
+            return false;
+        }
+        
+        // Third, we check if the supported currency is selected
+        if($basket->currency != 'EUR') {
+            return false;
+        }
+        
+        // Finally, we check if the minimum order amount configured to process the payment method. By default, the minimum order amount is 999 cents
+        $configuredMinimumGuaranteedAmount = $this->settingsService->getNnPaymentSettingsValue('minimum_guaranteed_amount', $paymentKey);
+        
+        $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
+        
+        /** @var \Plenty\Modules\Frontend\Services\VatService $vatService */
+        $vatService = pluginApp(\Plenty\Modules\Frontend\Services\VatService::class);
+
+        //we have to manipulate the basket because its stupid and doesnt know if its netto or gross
+        if(!count($vatService->getCurrentTotalVats())) {
+            $basket->itemSum = $basket->itemSumNet;
+            $basket->shippingAmount = $basket->shippingAmountNet;
+            $basket->basketAmount = $basket->basketAmountNet;
+        }
+        
+        if(!empty($minimumGuaranteedAmount) &&  $minimumGuaranteedAmount > $basket->basketAmount) {
+            return false;
+        }
+        
+        // If all the guaranteed payment conditions are met, allowed to process the payment method
+        return true;
+    }
+    
+    /**
+     * Returning the list of the European Union countries for checking the country code of Guaranteed customer 
+     *     
+     * @return array
+     */
+    public function getEuropeanRegionCountryCodes()
+    {
+        return ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'UK', 'CH'];
+    }
 }
