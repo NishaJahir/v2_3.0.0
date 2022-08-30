@@ -471,4 +471,10 @@ class PaymentHelper
             $this->getLogger(__METHOD__)->error('Novalnet::assignPlentyPaymentToPlentyOrder ' . $orderId, $e);
         }
     }
+    
+    public function logger($k, $v)
+    {
+        $this->getLogger(__METHOD__)->error($k, $v);
+    }
+    
 }
