@@ -18,6 +18,7 @@ namespace Novalnet\Providers;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Novalnet\Helper\PaymentHelper;
 
 /**
  * Class NovalnetGooglePayButtonDataProvider
@@ -37,7 +38,9 @@ class NovalnetGooglePayButtonDataProvider
     public function call(Twig $twig, BasketRepositoryContract $basketRepository, $arg)
     {
         $basket = $basketRepository->load();
+        $paymentHelper = pluginApp(PaymentHelper::class);
         
+        $paymentHelper->logger('bas', $basket);
        return $twig->render('Novalnet::NovalnetGooglePayButton', ['basketDetails' => $basket]);
     }
 }
