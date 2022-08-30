@@ -286,9 +286,11 @@ class NovalnetAssistant extends WizardProvider
         $config = $this->createNovalnetCcPaymentConfiguration($config);
         // Load the Novalnet Invoice payment configuration
         $config = $this->createNovalnetInvoicePaymentConfiguration($config);
-        // Load the On Hold configuration for redirection payments
-    $config = $this->createOnHoldConfigurationRedirection($config);
-        
+        // Load the Novalnet On Hold configuration for redirection payments
+        $config = $this->createOnHoldConfigurationRedirection($config);
+        // Load the Novalnet Guaranteed payments configuration
+	$config = $this->createGuaranteedPaymentConfiguration($config);
+	    
         return $config;
     }
     
@@ -444,5 +446,32 @@ class NovalnetAssistant extends WizardProvider
 	     return $config;
     }
      
-    
+    public function createGuaranteedPaymentConfiguration($config)
+    {
+	$nnGuaranteedPayments = ['novalnetGuaranteedInvoice', 'novalnetGuaranteedSepa'];
+	foreach($nnGuaranteedPayments as $nnGuaranteedPayment) {
+		$config['steps'][$nnGuaranteedPayment]['sections'][]['form'] = [
+			$nnGuaranteedPayment. 'force' => [
+			   'type' => 'checkbox',
+			   'options' => [
+				   'name' => 'NovalnetAssistant.novalnetGuaranteedForceLabel'
+			   ]
+			],
+			$nnGuaranteedPayment. 'allow_b2b_customer' => [
+			   'type' => 'checkbox',
+			   'options' => [
+				   'name' => 'NovalnetAssistant.novalnetAllowB2bCustomerLabel'
+			   ]
+			],
+			$nnGuaranteedPayment. 'minimum_guaranteed_amount' => [
+			   'type' => 'text',
+			   'options' => [
+				   'name' => 'NovalnetAssistant.novalnetGuaranteedMinimumAmountLabel',
+				   'pattern'  => '^[1-9]\d*$'
+			   ]
+			]
+		];
+	}
+	return $config;
+    }
 }
