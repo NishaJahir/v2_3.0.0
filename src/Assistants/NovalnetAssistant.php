@@ -471,7 +471,9 @@ class NovalnetAssistant extends WizardProvider
 			   ]
 			]
 		];
+	  $config = $this->createOnHoldConfiguration($config, $nnGuaranteedPayment);
 	}
+	    
 	return $config;
     }
 }
