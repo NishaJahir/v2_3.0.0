@@ -558,6 +558,8 @@ class PaymentService
     {
         try {
             if(!is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {
+                
+                $this->getLogger(__METHOD__)->error('isGuaranteePaymentToBeDisplayed', $paymentKey);
                 // Check if the guaranteed payment method is enabled
                 if($this->settingsService->getNnPaymentSettingsValue('payment_active', $paymentKey) == true) {
                     // If the guaranteed conditions are met, display the guaranteed payments
@@ -581,10 +583,12 @@ class PaymentService
         } catch(\Exception $e) {
             $this->getLogger(__METHOD__)->error('Novalnet::isGuaranteePaymentToBeDisplayedFailed', $e);
         }
+        $this->getLogger(__METHOD__)->error('isGuaranteePaymentToBeDisplayedcatch', 'here');
     }
     
-    public function isGuaranteedPaymentAllowed($basket, $paymentKey)
+    public function isGuaranteedPaymentAllowed(Basket $basket, $paymentKey)
     {
+        $this->getLogger(__METHOD__)->error('isGuaranteedPaymentAllowed', $basket);
         // Get the customer billing and shipping details
         $billingAddressId = $basket->customerInvoiceAddressId;
         $shippingAddressId = $basket->customerShippingAddressId;
