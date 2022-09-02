@@ -561,7 +561,7 @@ class PaymentService
                 // Check if the guaranteed payment method is enabled
                 if($this->settingsService->getNnPaymentSettingsValue('payment_active', $paymentKey) == true) {
                     // If the guaranteed conditions are met, display the guaranteed payments
-                    if ($this->isGuaranteedPaymentAllowed($basket, $paymentName)) {
+                    if ($this->isGuaranteedPaymentAllowed($basket, $paymentKey)) {
                         return 'guarantee';
                     }
                     
