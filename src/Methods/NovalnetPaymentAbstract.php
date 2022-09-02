@@ -97,14 +97,20 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
         if($isPaymentActive == true && in_array($this::PAYMENT_KEY, ['NOVALNET_INVOICE', 'NOVALNET_SEPA', 'NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
             if($this::PAYMENT_KEY == 'NOVALNET_INVOICE') {
                 $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
+                $this->getLogger(__METHOD__)->error('NIG', $guaranteedStatus);
                 $isPaymentActive = ($guaranteedStatus == 'normal') ? true : false;
+                $this->getLogger(__METHOD__)->error('NI', $isPaymentActive);
             } elseif($this::PAYMENT_KEY == 'NOVALNET_SEPA') {
                 $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_sepa');
+                $this->getLogger(__METHOD__)->error('NSG', $guaranteedStatus);
                 $isPaymentActive = ($guaranteedStatus == 'normal') ? true : false;
+                $this->getLogger(__METHOD__)->error('NS', $isPaymentActive);
             } else {
                 $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, strtolower($this::PAYMENT_KEY));
+                $this->getLogger(__METHOD__)->error('NG', $guaranteedStatus);
                 if($guaranteedStatus != 'guarantee' && in_array($this::PAYMENT_KEY, ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
                     $isPaymentActive = false;
+                    $this->getLogger(__METHOD__)->error('NSGG', $isPaymentActive);
                 }
             }
         }
