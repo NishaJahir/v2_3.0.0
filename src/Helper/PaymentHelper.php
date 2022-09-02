@@ -472,6 +472,37 @@ class PaymentHelper
         }
     }
     
+    public function getNnPaymentKey($paymentType)
+    {
+        $paymentMethodKey = [
+            'DIRECT_DEBIT_SEPA' => 'NOVALNET_SEPA',
+            'CREDITCARD' => 'NOVALNET_CC',
+            'APPLEPAY' => 'NOVALNET_APPLEPAY',
+            'INVOICE' => 'NOVALNET_INVOICE',
+            'PREPAYMENT' => 'NOVALNET_PREPAYMENT',
+            'GUARANTEED_INVOICE' => 'NOVALNET_GUARANTEED_INVOICE',
+            'GUARANTEED_DIRECT_DEBIT_SEPA' => 'NOVALNET_GUARANTEED_SEPA',
+            'IDEAL' => 'NOVALNET_IDEAL',
+            'ONLINE_TRANSFER' => 'NOVALNET_SOFORT',
+            'GIROPAY' => 'NOVALNET_GIROPAY',
+            'CASHPAYMENT' => 'NOVALNET_CASHPAYMENT',
+            'PRZELEWY24' => 'NOVALNET_PRZELEWY',
+            'EPS' => 'NOVALNET_EPS',
+            'PAYPAL' => 'NOVALNET_PAYPAL',
+            'POSTFINANCE_CARD' => 'NOVALNET_POSTFINANCE_CARD',
+            'POSTFINANCE' => 'NOVALNET_POSTFINANCE_EFINANCE',
+            'BANCONTACT' => 'NOVALNET_BANCONTACT',
+            'MULTIBANCO' => 'NOVALNET_MULTIBANCO',
+            'ONLINE_BANK_TRANSFER' => 'NOVALNET_ONLINE_BANK_TRANSFER',
+            'ALIPAY' => 'NOVALNET_ALIPAY',
+            'WECHATPAY' => 'NOVALNET_WECHAT_PAY',
+            'TRUSTLY' => 'NOVALNET_TRUSTLY',
+            'GOOGLEPAY' => 'NOVALNET_GOOGLEPAY'
+        ];
+        
+        return $paymentMethodKey[$paymentType];
+    }
+    
     public function logger($k, $v)
     {
         $this->getLogger(__METHOD__)->error($k, $v);
