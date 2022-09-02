@@ -457,13 +457,13 @@ class NovalnetAssistant extends WizardProvider
 				   'name' => 'NovalnetAssistant.novalnetGuaranteedForceLabel'
 			   ]
 			],
-			$nnGuaranteedPayment. 'allow_b2b_customer' => [
+			$nnGuaranteedPayment. 'allowB2bCustomer' => [
 			   'type' => 'checkbox',
 			   'options' => [
 				   'name' => 'NovalnetAssistant.novalnetAllowB2bCustomerLabel'
 			   ]
 			],
-			$nnGuaranteedPayment. 'minimum_guaranteed_amount' => [
+			$nnGuaranteedPayment. 'minimumGuaranteedAmount' => [
 			   'type' => 'text',
 			   'options' => [
 				   'name' => 'NovalnetAssistant.novalnetGuaranteedMinimumAmountLabel',
