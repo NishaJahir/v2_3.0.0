@@ -92,9 +92,6 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
     public function isActive(): bool
     {
         $isPaymentActive = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
-        
-        $sas = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
-        $this->getLogger(__METHOD__)->error('Nis', $sas);
 
         if($isPaymentActive) {
             // Check if the payment allowed for mentioned countries
