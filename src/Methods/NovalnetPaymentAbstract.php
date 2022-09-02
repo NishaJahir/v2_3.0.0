@@ -91,46 +91,46 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
      */
     public function isActive(): bool
     {
-        $is_payment_active = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
+        $isPaymentActive = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
         
         // Hide the normal Invoice and SEPA payments if the Guaranteed payments  conditions are met
-        if($is_payment_active == true && in_array($this::PAYMENT_KEY, ['NOVALNET_INVOICE', 'NOVALNET_SEPA', 'NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
+        if($isPaymentActive == true && in_array($this::PAYMENT_KEY, ['NOVALNET_INVOICE', 'NOVALNET_SEPA', 'NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
             if($this::PAYMENT_KEY == 'NOVALNET_INVOICE') {
                 $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
-                $is_payment_active = ($guaranteedStatus == 'normal') ? true : false;
+                $isPaymentActive = ($guaranteedStatus == 'normal') ? true : false;
             } elseif($this::PAYMENT_KEY == 'NOVALNET_SEPA') {
                 $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_sepa');
-                $is_payment_active = ($guaranteedStatus == 'normal') ? true : false;
+                $isPaymentActive = ($guaranteedStatus == 'normal') ? true : false;
             } else {
                 $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, strtolower($this::PAYMENT_KEY));
                 if($guaranteedStatus != 'guarantee' && in_array($this::PAYMENT_KEY, ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
-                    $is_payment_active = false;
+                    $isPaymentActive = false;
                 }
             }
         }
         
-        if($is_payment_active) {
+        if($isPaymentActive) {
             // Check if the payment allowed for mentioned countries
-            $activate_payment_allowed_country = true;
-            if ($allowed_country = $this->settingsService->getNnPaymentSettingsValue('allowed_country', strtolower($this::PAYMENT_KEY))) {
-                $activate_payment_allowed_country  = $this->paymentService->allowedCountries($this->basketRepository, $allowed_country);
+            $activatePaymentAllowedCountry = true;
+            if ($allowedCountry = $this->settingsService->getNnPaymentSettingsValue('allowed_country', strtolower($this::PAYMENT_KEY))) {
+                $activatePaymentAllowedCountry  = $this->paymentService->allowedCountries($this->basketRepository, $allowedCountry);
             }
             
             // Check if the Minimum order amount value met to payment display condition
-            $activate_payment_minimum_amount = true;
-            $minimum_amount = trim($this->settingsService->getNnPaymentSettingsValue('minimum_order_amount', strtolower($this::PAYMENT_KEY)));
-            if (!empty($minimum_amount) && is_numeric($minimum_amount)) {
-                $activate_payment_minimum_amount = $this->paymentService->getMinBasketAmount($this->basketRepository, $minimum_amount);
+            $activatePaymentMinimumAmount = true;
+            $minimumAmount = trim($this->settingsService->getNnPaymentSettingsValue('minimum_order_amount', strtolower($this::PAYMENT_KEY)));
+            if (!empty($minimumAmount) && is_numeric($minimumAmount)) {
+                $activatePaymentMinimumAmount = $this->paymentService->getMinBasketAmount($this->basketRepository, $minimumAmount);
             }
             
             // Check if the Maximum order amount value met to payment display condition
-            $activate_payment_maximum_amount = true;
-            $maximum_amount = trim($this->settingsService->getNnPaymentSettingsValue('maximum_order_amount', strtolower($this::PAYMENT_KEY)));
-            if (!empty($maximum_amount) && is_numeric($maximum_amount)) {
-                $activate_payment_maximum_amount = $this->paymentService->getMaxBasketAmount($this->basketRepository, $maximum_amount);
+            $activatePaymentMaximumAmount = true;
+            $maximumAmount = trim($this->settingsService->getNnPaymentSettingsValue('maximum_order_amount', strtolower($this::PAYMENT_KEY)));
+            if (!empty($maximumAmount) && is_numeric($maximumAmount)) {
+                $activatePaymentMaximumAmount = $this->paymentService->getMaxBasketAmount($this->basketRepository, $maximumAmount);
             }
             
-            return (bool) ($this->paymentService->isMerchantConfigurationValid() && $activate_payment_allowed_country && $activate_payment_minimum_amount && $activate_payment_maximum_amount);
+            return (bool) ($this->paymentService->isMerchantConfigurationValid() && $activatePaymentAllowedCountry && $activatePaymentMinimumAmount && $activatePaymentMaximumAmount);
         }
             return false;
     }
