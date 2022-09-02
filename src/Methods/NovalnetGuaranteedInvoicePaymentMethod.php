@@ -15,6 +15,9 @@
 
 namespace Novalnet\Methods;
 
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Basket\Models\Basket;
+use Novalnet\Services\PaymentService;
 
 /**
  * Class NovalnetGuaranteedInvoicePaymentMethod
@@ -24,6 +27,16 @@ namespace Novalnet\Methods;
 class NovalnetGuaranteedInvoicePaymentMethod extends NovalnetPaymentAbstract
 {
     const PAYMENT_KEY = 'NOVALNET_GUARANTEED_INVOICE';
+    
+     /** 
+     * @var BasketRepositoryContract 
+     */
+    private $basketRepository;
+    
+    /**
+     * @var PaymentService
+     */
+    private $paymentService;
     
     public function __construct(BasketRepositoryContract $basketRepository,
                                 PaymentService $paymentService
