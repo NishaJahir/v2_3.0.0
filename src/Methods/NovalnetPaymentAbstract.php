@@ -93,16 +93,22 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
     {
         $is_payment_active = $this->settingsService->getNnPaymentSettingsValue('payment_active', strtolower($this::PAYMENT_KEY));
         
-        if(in_array($this::PAYMENT_KEY, ['NOVALNET_INVOICE', 'NOVALNET_SEPA', 'NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
-            $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, strtolower($this::PAYMENT_KEY));
-            if($guaranteedStatus == 'guarantee' && $this::PAYMENT_KEY == 'NOVALNET_GUARANTEED_INVOICE') {
-                
-            }
-            
-            if($guaranteedStatus == 'guarantee') {
-                
+        // Hide the normal Invoice and SEPA payments if the Guaranteed payments  conditions are met
+        if($is_payment_active == true && in_array($this::PAYMENT_KEY, ['NOVALNET_INVOICE', 'NOVALNET_SEPA', 'NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
+            if($this::PAYMENT_KEY == 'NOVALNET_INVOICE') {
+                $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
+                $is_payment_active = ($guaranteedStatus == 'normal') ? true : false;
+            } elseif($this::PAYMENT_KEY == 'NOVALNET_SEPA') {
+                $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_sepa');
+                $is_payment_active = ($guaranteedStatus == 'normal') ? true : false;
+            } else {
+                $guaranteedStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, strtolower($this::PAYMENT_KEY));
+                if($guaranteedStatus != 'guarantee' && in_array($this::PAYMENT_KEY, ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
+                    $is_payment_active = false;
+                }
             }
         }
+        
         if($is_payment_active) {
             // Check if the payment allowed for mentioned countries
             $activate_payment_allowed_country = true;
