@@ -409,7 +409,7 @@ class PaymentHelper
             $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
             $payment->status          = (in_array($paymentResponseData['transaction']['status'], ['PENDING', 'ON_HOLD']) && $paymentResponseData['transaction']['payment_type'] != 'INVOICE') ? Payment::STATUS_AWAITING_APPROVAL : ($paymentResponseData['result']['status'] == 'FAILURE' ? Payment::STATUS_CANCELED : Payment::STATUS_CAPTURED);
             $payment->currency        = $paymentResponseData['transaction']['currency'];
-            $payment->amount          = $paymentResponseData['transaction']['status'] == 'SUCCESS' ? ($paymentResponseData['transaction']['amount'] / 100) : 0;
+            $payment->amount          = $paymentResponseData['transaction']['status'] == 'CONFIRMED' ? ($paymentResponseData['transaction']['amount'] / 100) : 0;
             
             $txnStatus = $paymentResponseData['transaction']['status'] ?? $paymentResponseData['result']['status'];
             
