@@ -62,7 +62,7 @@ class CreateNewPaymentMethods123
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_INVOICE', 'Novalnet Invoice');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_PREPAYMENT', 'Novalnet Prepayment');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GUARANTEED_INVOICE', 'Novalnet Invoice with payment guarantee');
-        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GUARANTEED_SEPA', 'Direct debit SEPA with payment guarantee');
+        $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GUARANTEED_SEPA', 'Novalnet Direct debit SEPA with payment guarantee');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_IDEAL', 'Novalnet iDEAL');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_SOFORT', 'Novalnet Sofort');
         $this->createNovalnetPaymentMethodByPaymentKey('NOVALNET_GIROPAY', 'Novalnet giropay');
