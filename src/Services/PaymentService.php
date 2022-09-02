@@ -560,24 +560,28 @@ class PaymentService
             if(!is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {
                 // Check if the guaranteed payment method is enabled
                 if($this->settingsService->getNnPaymentSettingsValue('payment_active', $paymentKey) == true) {
-                    $this->getLogger(__METHOD__)->error('cal', $paymentKey);
+                    
                     // Get the customer billing and shipping details
                     $billingAddressId = $basket->customerInvoiceAddressId;
+                    $this->getLogger(__METHOD__)->error('1', $billingAddressId);
                     $shippingAddressId = $basket->customerShippingAddressId;
+                    $this->getLogger(__METHOD__)->error('2', $shippingAddressId);
                     $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
+                    $this->getLogger(__METHOD__)->error('3', $billingAddress);
                     $shippingAddress = $billingAddress;
+                    $this->getLogger(__METHOD__)->error('4', $shippingAddress);
                     if(!empty($shippingAddressId)) {
                         $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $shippingAddressId);
                     }
-
+                    $this->getLogger(__METHOD__)->error('5', $paymentKey);
                     // Get the billing and shipping details
                     $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
 
                     // Set the minimum guaranteed amount
                     $configuredMinimumGuaranteedAmount = $this->settingsService->getNnPaymentSettingsValue('minimum_guaranteed_amount', $paymentKey);
-
+$this->getLogger(__METHOD__)->error('7', $configuredMinimumGuaranteedAmount);
                     $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
-
+$this->getLogger(__METHOD__)->error('8', $minimumGuaranteedAmount);
                     /** @var \Plenty\Modules\Frontend\Services\VatService $vatService */
                     $vatService = pluginApp(\Plenty\Modules\Frontend\Services\VatService::class);
 
@@ -587,7 +591,7 @@ class PaymentService
                         $basket->shippingAmount = $basket->shippingAmountNet;
                         $basket->basketAmount = $basket->basketAmountNet;
                     }
-
+$this->getLogger(__METHOD__)->error('6', $basket->basketAmount);
                     // First, we check the billing and shipping addresses are matched
                     // Second, we check the customer from the guaranteed payments supported countries
                     // Third, we check if the supported currency is selected
@@ -602,18 +606,20 @@ class PaymentService
                         // If the guaranteed conditions are met, display the guaranteed payments
                         return 'guarantee';
                     }
-
+$this->getLogger(__METHOD__)->error('9', $paymentKey);
                     // Further we check if the normal payment method can be enabled if the condition not met 
                     if ($this->settingsService->getNnPaymentSettingsValue('force', $paymentKey) == true) {
                         return 'normal';
                     }
-
+$this->getLogger(__METHOD__)->error('10', $paymentKey);
                     // If none matches, error message displayed 
                     return 'error'; 
                 }
+                $this->getLogger(__METHOD__)->error('11', $paymentKey);
                 // If payment guarantee is not enabled, we show default one 
                 return 'normal';
             }
+            $this->getLogger(__METHOD__)->error('12', $paymentKey);
             // If payment guarantee is not enabled, we show default one 
             return 'normal';
         } catch(\Exception $e) {
