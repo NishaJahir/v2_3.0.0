@@ -18,6 +18,7 @@ namespace Novalnet\Methods;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Novalnet\Services\PaymentService;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class NovalnetGuaranteedInvoicePaymentMethod
@@ -26,6 +27,8 @@ use Novalnet\Services\PaymentService;
  */
 class NovalnetGuaranteedInvoicePaymentMethod extends NovalnetPaymentAbstract
 {
+    use Loggable;
+    
     const PAYMENT_KEY = 'NOVALNET_GUARANTEED_INVOICE';
     
      /** 
