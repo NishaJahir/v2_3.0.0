@@ -564,14 +564,14 @@ class PaymentService
                     // Get the customer billing and shipping details
                     $billingAddressId = $basket->customerInvoiceAddressId;
                     $this->getLogger(__METHOD__)->error('1', $billingAddressId);
-                    $shippingAddressId = $basket->customerShippingAddressId;
-                    $this->getLogger(__METHOD__)->error('2', $shippingAddressId);
+                    
+                    
                     $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
                     $this->getLogger(__METHOD__)->error('3', $billingAddress);
                     $shippingAddress = $billingAddress;
                     $this->getLogger(__METHOD__)->error('4', $shippingAddress);
-                    if(!empty($shippingAddressId)) {
-                        $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $shippingAddressId);
+                    if(!empty($basket->customerShippingAddressId)) {
+                        $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerShippingAddressId);
                     }
                     $this->getLogger(__METHOD__)->error('5', $paymentKey);
                     // Get the billing and shipping details
