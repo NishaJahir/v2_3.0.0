@@ -68,6 +68,13 @@ class NovalnetAssistantSettingsHandler implements WizardSettingsHandler
 					$novalnetSettings[$paymentMethodKey]['payment_action'] = $data[$paymentKey. 'PaymentAction'] ?? '';
 					$novalnetSettings[$paymentMethodKey]['onhold_amount'] = $data[$paymentKey. 'OnHold'] ?? '';
 					break;
+				case 'novalnet_guaranteed_invoice':
+				case 'novalnet_guaranteed_sepa':
+					$novalnetSettings[$paymentMethodKey]['force'] = $data[$paymentKey. 'force'] ?? '';
+					$novalnetSettings[$paymentMethodKey]['allow_b2b_customer'] = $data[$paymentKey. 'allowB2bCustomer'] ?? '';
+					$novalnetSettings[$paymentMethodKey]['minimum_guaranteed_amount'] = $data[$paymentKey. 'minimumGuaranteedAmount'] ?? '';
+					$novalnetSettings[$paymentMethodKey]['payment_action'] = $data[$paymentKey. 'PaymentAction'] ?? '';
+					$novalnetSettings[$paymentMethodKey]['onhold_amount'] = $data[$paymentKey. 'OnHold'] ?? '';
 			}
 		}
         
