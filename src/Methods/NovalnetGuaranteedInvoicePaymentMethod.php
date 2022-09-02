@@ -24,4 +24,21 @@ namespace Novalnet\Methods;
 class NovalnetGuaranteedInvoicePaymentMethod extends NovalnetPaymentAbstract
 {
     const PAYMENT_KEY = 'NOVALNET_GUARANTEED_INVOICE';
+    
+    public function __construct(BasketRepositoryContract $basketRepository,
+                                PaymentService $paymentService
+                                
+                               )
+    {
+        $this->basketRepository = $basketRepository->load();
+        
+        $this->paymentService  = $paymentService;
+        
+    }
+    
+    public function isActive(): bool
+    {
+        $s =  $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
+        $this->getLogger(__METHOD__)->error('active789', $s);
+    }
 }
