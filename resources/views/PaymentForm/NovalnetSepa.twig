@@ -1,0 +1,34 @@
+{# Load the css and Js #}
+
+<link rel="stylesheet" href="{{plugin_path('Novalnet')}}/css/novalnet_ui.css">
+<script type="text/javascript" src="https://cdn.novalnet.de/js/v2/NovalnetUtility.min.js"></script>
+<script src="{{ plugin_path('Novalnet') }}/js/novalnet_sepa.js"></script>
+
+{# Direct Debit SEPA payment form #}
+
+<form method="post" id="novalnet_form" name="novalnet_form" action="{{nnPaymentProcessUrl}}">
+
+	{# Modal box for Direct Debit SEPA payment form #}
+	<div class="modal fade" id="novalnetSepa" tabindex="-1" role="dialog"  aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title">{{paymentName}}</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  
+		  <div class="modal-body">
+			...
+		  </div>
+		  
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-danger" data-dismiss="modal" onClick="window.location.reload();">Close <i class="fa fa-close"></i></button>
+			<button type="submit" class="btn btn-primary" id="novalnet_form_btn">{{trans("Novalnet::Customize.template_submit_button_text")}} <i class="fa fa-check"></i></button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+</form>
