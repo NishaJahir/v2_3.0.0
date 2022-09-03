@@ -599,9 +599,7 @@ class PaymentService
                         (!in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && 
                         !in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) && 
                         $basket->currency == 'EUR' && 
-                        (!empty($minimumGuaranteedAmount) &&  $minimumGuaranteedAmount > $basket->basketAmount)) 
-
-                    {
+                        (!empty($minimumGuaranteedAmount) &&  $minimumGuaranteedAmount > $basket->basketAmount)) {
                         // If the guaranteed conditions are met, display the guaranteed payments
                         return 'guarantee';
                     }
