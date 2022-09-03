@@ -472,6 +472,21 @@ class PaymentHelper
         }
     }
     
+    /**
+    * Get the customized translated text for the Novalnet key
+    *
+    * @param string $key
+    * @param string $lang
+    *
+    * @return string
+    */
+    public function getCustomizedTranslatedText($key, $lang = null)
+    {
+        $translator = pluginApp(Translator::class);
+
+        return $lang == null ? $translator->trans("Novalnet::Customize.$key") : $translator->trans("Novalnet::Customize.$key",[], $lang);
+    }
+    
     public function getNnPaymentKey($paymentType)
     {
         $paymentMethodKey = [
@@ -502,6 +517,8 @@ class PaymentHelper
         
         return $paymentMethodKey[$paymentType];
     }
+    
+    
     
     public function logger($k, $v)
     {
