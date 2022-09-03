@@ -31,6 +31,7 @@ use Novalnet\Assistants\NovalnetAssistant;
 use Novalnet\Methods\NovalnetPaymentAbstract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Novalnet\Constants\NovalnetConstants;
+use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -59,18 +60,20 @@ class NovalnetServiceProvider extends ServiceProvider
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param FrontendSessionStorageFactoryContract $sessionStorage
+     * @param Twig $twig
      */
     public function boot(Dispatcher $eventDispatcher,
                         BasketRepositoryContract $basketRepository,
                         PaymentMethodContainer $payContainer,
                         PaymentHelper $paymentHelper, 
                         PaymentService $paymentService,
-                        FrontendSessionStorageFactoryContract $sessionStorage
+                        FrontendSessionStorageFactoryContract $sessionStorage,
+			Twig $twig,
                         )
     {
         $this->registerPaymentMethods($payContainer);
         
-        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $sessionStorage);
+        $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $sessionStorage, $twig);
 
         $this->registerPaymentExecute($eventDispatcher, $paymentHelper, $paymentService, $sessionStorage);
         
@@ -101,12 +104,15 @@ class NovalnetServiceProvider extends ServiceProvider
      * @param BasketRepositoryContract $basketRepository
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
+     * @param FrontendSessionStorageFactoryContract $sessionStorage
+     * @param Twig $twig
      */
     protected function registerPaymentRendering(Dispatcher $eventDispatcher,
                                               BasketRepositoryContract $basketRepository,
                                               PaymentHelper $paymentHelper,
                                               PaymentService $paymentService,
-                                              FrontendSessionStorageFactoryContract $sessionStorage
+                                              FrontendSessionStorageFactoryContract $sessionStorage,
+					      Twig $twig
                                               )
     {
         // Listen for the event that gets the payment method content
@@ -125,13 +131,13 @@ class NovalnetServiceProvider extends ServiceProvider
                         $content = '';
                         $contentType = 'continue';
                     } elseif($paymentKey == 'NOVALNET_SEPA') {
-						$content = $twig->render('Novalnet::PaymentForm.NovalnetSepa', [
-															'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl(),
-															'paymentMopKey' =>  $paymentKey,
-															'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)), 
-															]);
-						$contentType = 'htmlContent';
-					}
+			$content = $twig->render('Novalnet::PaymentForm.NovalnetSepa', [
+								'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl(),
+								'paymentMopKey' =>  $paymentKey,
+								'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)), 
+								]);
+			$contentType = 'htmlContent';
+	            }
                 }
                 $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
                 $event->setValue($content);
