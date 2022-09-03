@@ -55,6 +55,7 @@ class NovalnetGuaranteedInvoicePaymentMethod extends NovalnetPaymentAbstract
     public function isActive(): bool
     {
         $s =  $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
-        $this->getLogger(__METHOD__)->error('active789', $s);
+        $this->getLogger(__METHOD__)->error('Today', $s);
+        return true;
     }
 }
