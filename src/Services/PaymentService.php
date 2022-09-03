@@ -565,7 +565,7 @@ class PaymentService
                     
                     // Get the customer billing and shipping details
                     if(!empty($basket->customerInvoiceAddressId)) {
-                    $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
+                    $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerInvoiceAddressId);
                     $shippingAddress = $billingAddress;
                     }
 
