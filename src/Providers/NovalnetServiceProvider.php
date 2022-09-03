@@ -124,7 +124,14 @@ class NovalnetServiceProvider extends ServiceProvider
                     if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_PREPAYMENT', 'NOVALNET_CASHPAYMENT', 'NOVALNET_MULTIBANCO']) || $paymentService->isRedirectPayment($paymentKey)) {
                         $content = '';
                         $contentType = 'continue';
-                    }
+                    } elseif($paymentKey == 'NOVALNET_SEPA') {
+						$content = $twig->render('Novalnet::PaymentForm.NovalnetSepa', [
+															'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl(),
+															'paymentMopKey' =>  $paymentKey,
+															'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)), 
+															]);
+						$contentType = 'htmlContent';
+					}
                 }
                 $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
                 $event->setValue($content);
