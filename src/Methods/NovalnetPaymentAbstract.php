@@ -99,17 +99,7 @@ abstract class NovalnetPaymentAbstract extends PaymentMethodBaseService
             $this->getLogger(__METHOD__)->error('NI', $guaranteeStatus);
         }
         
-        if($this::PAYMENT_KEY == 'NOVALNET_SEPA') {
-            $guaranteeStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_sepa');
-            $isPaymentActive = ($guaranteeStatus == 'normal') ? true : false;
-            $this->getLogger(__METHOD__)->error('NS', $guaranteeStatus);
-        }
         
-        if(in_array($this::PAYMENT_KEY, ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) {
-            $guaranteeStatus = $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, strtolower($this::PAYMENT_KEY));
-            $isPaymentActive = ($guaranteeStatus == 'guarantee') ? true : false;
-            $this->getLogger(__METHOD__)->error('NG', $guaranteeStatus);
-        }
 
         if($isPaymentActive) {
             // Check if the payment allowed for mentioned countries
