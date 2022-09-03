@@ -578,7 +578,7 @@ class PaymentService
 
                     return 'guarantee';
                         
-                    }
+                  
 
                     // Further we check if the normal payment method can be enabled if the condition not met 
                     if ($this->settingsService->getNnPaymentSettingsValue('force', $paymentKey) == true) {
