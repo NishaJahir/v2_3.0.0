@@ -569,51 +569,15 @@ class PaymentService
                     $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
 
                     $shippingAddress = $billingAddress;
-$this->getLogger(__METHOD__)->error('bill', $billingAddress);
+$this->getLogger(__METHOD__)->error('bill123', $billingAddress);
                     if(!empty($basket->customerShippingAddressId)) {
                         $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerShippingAddressId);
                     }
-$this->getLogger(__METHOD__)->error('ship', $shippingAddress);
+$this->getLogger(__METHOD__)->error('ship123', $shippingAddress);
                     // Get the billing and shipping details
                     $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
-
-                    // Set the minimum guaranteed amount
-                    $configuredMinimumGuaranteedAmount = $this->settingsService->getNnPaymentSettingsValue('minimum_guaranteed_amount', $paymentKey);
-
-                    $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
-
-                    /** @var \Plenty\Modules\Frontend\Services\VatService $vatService */
-                    $vatService = pluginApp(\Plenty\Modules\Frontend\Services\VatService::class);
-
-                    //we have to manipulate the basket because its stupid and doesnt know if its netto or gross
-                    if(!count($vatService->getCurrentTotalVats())) {
-                        $basket->itemSum = $basket->itemSumNet;
-                        $basket->shippingAmount = $basket->shippingAmountNet;
-                        $basket->basketAmount = $basket->basketAmountNet;
-                    }
-$this->getLogger(__METHOD__)->error('VAT', $basket->basketAmount);
-                    // First, we check the billing and shipping addresses are matched
-                    // Second, we check the customer from the guaranteed payments supported countries
-                    // Third, we check if the supported currency is selected
-                    // Finally, we check if the minimum order amount configured to process the payment method. By default, the minimum order amount is 999 cents
-                    if( $billingShippingDetails['billing'] === $billingShippingDetails['shipping'] && 
-                        (!in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && 
-                        !in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) && 
-                        $basket->currency == 'EUR' && 
-                        (!empty($minimumGuaranteedAmount) &&  (int) $minimumGuaranteedAmount > (int) $basket->basketAmount)) 
-
-                    {
-                        // If the guaranteed conditions are met, display the guaranteed payments
-                        return 'guarantee';
-                    }
                     
-                    // Further we check if the normal payment method can be enabled if the condition not met 
-                    if ($this->settingsService->getNnPaymentSettingsValue('force', $paymentKey) == true) {
-                        return 'normal';
-                    }
-                    
-                    // If none matches, error message displayed 
-                    return 'error'; 
+                    return 'guarantee';
                 }
                 
                 // If payment guarantee is not enabled, we show default one 
