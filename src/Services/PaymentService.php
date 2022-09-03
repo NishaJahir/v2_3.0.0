@@ -569,8 +569,14 @@ class PaymentService
                     $shippingAddress = $billingAddress;
                     }
 
+                    if(!empty($basket->customerShippingAddressId)) {
+                        $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerShippingAddressId);
+                    }
+$this->getLogger(__METHOD__)->error('cal S', $shippingAddress);
+                    // Get the billing and shipping details
+                    $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
                     
-$this->getLogger(__METHOD__)->error('call youB', $billingAddress);
+$this->getLogger(__METHOD__)->error('billingShippingDetails', $billingShippingDetails);
                     return 'guarantee';
                 }
                 
