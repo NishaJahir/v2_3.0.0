@@ -562,6 +562,15 @@ class PaymentService
             if(!is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {
                 // Check if the guaranteed payment method is enabled
                 if($this->settingsService->getNnPaymentSettingsValue('payment_active', $paymentKey) == true) {
+                    
+                    // Get the customer billing and shipping details
+                    if(!empty($basket->customerInvoiceAddressId)) {
+                    $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
+                    $shippingAddress = $billingAddress;
+                    }
+
+                    
+$this->getLogger(__METHOD__)->error('call youB', $billingAddress);
                     return 'guarantee';
                 }
                 
