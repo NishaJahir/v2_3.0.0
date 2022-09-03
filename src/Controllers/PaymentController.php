@@ -21,6 +21,7 @@ use Plenty\Plugin\Http\Response;
 use Novalnet\Services\PaymentService;
 use Novalnet\Services\SettingsService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -55,6 +56,11 @@ class PaymentController extends Controller
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorage;
+    
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepository;
 
     /**
      * PaymentController constructor.
@@ -64,12 +70,14 @@ class PaymentController extends Controller
      * @param PaymentService $paymentService
      * @param SettingsService $settingsService
      * @param FrontendSessionStorageFactoryContract $sessionStorage
+     * @param BasketRepositoryContract $basketRepository
      */
     public function __construct(  Request $request,
                                   Response $response,
                                   PaymentService $paymentService,
                                   SettingsService $settingsService,
-                                  FrontendSessionStorageFactoryContract $sessionStorage
+                                  FrontendSessionStorageFactoryContract $sessionStorage,
+                                  BasketRepositoryContract $basketRepository
                                 )
     {
 
@@ -78,6 +86,7 @@ class PaymentController extends Controller
         $this->paymentService  = $paymentService;
         $this->settingsService = $settingsService;
         $this->sessionStorage  = $sessionStorage;
+        $this->basketRepository = $basketRepository;
     }
 
     /**
@@ -124,5 +133,27 @@ class PaymentController extends Controller
         return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/confirmation');
     }
     
-    
+    /**
+     * Process the Form payment
+     *
+     */
+    public function processPayment()
+    {
+		// Get the payment form post data
+        $paymentRequestPostData = $this->request->all();
+        
+        // Get the payment request params
+        $paymentRequestData = $this->paymentService->generatePaymentParams($this->basketRepository->load(), $paymentRequestPostData['nn_payment_key']);
+        
+        // Setting up the account data to the server for SEPA processing
+        $paymentRequestData['transaction']['payment_data'] = [
+                                                                'account_holder' => $paymentRequestData['paymentRequestData']['customer']['first_name'] .' '. $paymentRequestData['paymentRequestData']['customer']['last_name'],
+                                                                'iban'           => $paymentRequestPostData['nn_sepa_iban']
+                                                             ];
+        // Set the payment requests in the session for the further processings
+        $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
+        
+        // Call the shop executePayment function
+        return $this->response->redirectTo($this->sessionStorage->getLocaleSettings()->language . '/place-order');
+	}
 }
