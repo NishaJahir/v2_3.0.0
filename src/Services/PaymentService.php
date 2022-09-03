@@ -687,4 +687,14 @@ $this->getLogger(__METHOD__)->error('10', $paymentKey);
     {
         return ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'UK', 'CH'];
     }
+    
+    /**
+    * Get the direct payment process controller URL to be handled
+    *
+    * @return string
+    */
+    public function getProcessPaymentUrl()
+    {
+        return $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl . '/' . $this->sessionStorage->getLocaleSettings()->language . '/payment/novalnet/processPayment/';
+    }
 }
