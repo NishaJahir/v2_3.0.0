@@ -68,7 +68,7 @@ class NovalnetServiceProvider extends ServiceProvider
                         PaymentHelper $paymentHelper, 
                         PaymentService $paymentService,
                         FrontendSessionStorageFactoryContract $sessionStorage,
-			Twig $twig,
+			Twig $twig
                         )
     {
         $this->registerPaymentMethods($payContainer);
