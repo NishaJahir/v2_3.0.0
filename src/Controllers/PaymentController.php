@@ -146,7 +146,7 @@ class PaymentController extends Controller
         $paymentRequestData = $this->paymentService->generatePaymentParams($this->basketRepository->load(), $paymentRequestPostData['nn_payment_key']);
         
         // Setting up the account data to the server for SEPA processing
-        $paymentRequestData['transaction']['payment_data'] = [
+        $paymentRequestData['paymentRequestData']['transaction']['payment_data'] = [
                                                                 'account_holder' => $paymentRequestData['paymentRequestData']['customer']['first_name'] .' '. $paymentRequestData['paymentRequestData']['customer']['last_name'],
                                                                 'iban'           => $paymentRequestPostData['nn_sepa_iban']
                                                              ];
