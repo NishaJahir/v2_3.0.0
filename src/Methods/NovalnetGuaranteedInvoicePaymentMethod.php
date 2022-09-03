@@ -15,11 +15,6 @@
 
 namespace Novalnet\Methods;
 
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Basket\Models\Basket;
-use Novalnet\Services\PaymentService;
-use Plenty\Plugin\Log\Loggable;
-
 /**
  * Class NovalnetGuaranteedInvoicePaymentMethod
  *
@@ -27,35 +22,5 @@ use Plenty\Plugin\Log\Loggable;
  */
 class NovalnetGuaranteedInvoicePaymentMethod extends NovalnetPaymentAbstract
 {
-    use Loggable;
-    
     const PAYMENT_KEY = 'NOVALNET_GUARANTEED_INVOICE';
-    
-     /** 
-     * @var BasketRepositoryContract 
-     */
-    private $basketRepository;
-    
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
-    
-    public function __construct(BasketRepositoryContract $basketRepository,
-                                PaymentService $paymentService
-                                
-                               )
-    {
-        $this->basketRepository = $basketRepository->load();
-        
-        $this->paymentService  = $paymentService;
-        
-    }
-    
-    public function isActive(): bool
-    {
-        $s =  $this->paymentService->isGuaranteePaymentToBeDisplayed($this->basketRepository, 'novalnet_guaranteed_invoice');
-        $this->getLogger(__METHOD__)->error('Today', $s);
-        return true;
-    }
 }
