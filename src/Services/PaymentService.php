@@ -562,35 +562,15 @@ class PaymentService
             if(!is_null($basket) && $basket instanceof Basket && !empty($basket->customerInvoiceAddressId)) {
                 // Check if the guaranteed payment method is enabled
                 if($this->settingsService->getNnPaymentSettingsValue('payment_active', $paymentKey) == true) {
-                    
-                    // Get the customer billing and shipping details
-                    $billingAddressId = $basket->customerInvoiceAddressId;
-                    
-                    $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $billingAddressId);
-
-                    $shippingAddress = $billingAddress;
-$this->getLogger(__METHOD__)->error('bill123', $billingAddress);
-                    if(!empty($basket->customerShippingAddressId)) {
-                        $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerShippingAddressId);
-                    }
-$this->getLogger(__METHOD__)->error('ship123', $shippingAddress);
-                    // Get the billing and shipping details
-                    $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
-                    
                     return 'guarantee';
                 }
                 
-                // If payment guarantee is not enabled, we show default one 
-                return 'normal';
             }
-
-            // If payment guarantee is not enabled, we show default one 
-            return 'normal';
         } catch(\Exception $e) {
             $this->getLogger(__METHOD__)->error('Novalnet::isGuaranteePaymentToBeDisplayedFailed', $e);
-            return 'normal';
+           
         }
-        return 'normal';
+      
     }
     
     /**
