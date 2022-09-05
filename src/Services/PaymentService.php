@@ -584,6 +584,9 @@ class PaymentService
                     // Get the basket total amount
                     $basketAmount = !empty($basket->basketAmount) ? $this->paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount) : 0;
                     
+                    $this->getLogger(__METHOD__)->error('ba amount', $basketAmount);
+                    $this->getLogger(__METHOD__)->error('ba min amount', $minimumGuaranteedAmount);
+                    
                     // First, we check the billing and shipping addresses are matched
                     // Second, we check the customer from the guaranteed payments supported countries
                     // Third, we check if the supported currency is selected
