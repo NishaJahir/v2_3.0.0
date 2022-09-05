@@ -581,9 +581,18 @@ class PaymentService
 
                     $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
                     
-
-                       return 'guarantee';  
-                  
+                    // First, we check the billing and shipping addresses are matched
+                    // Second, we check the customer from the guaranteed payments supported countries
+                    // Third, we check if the supported currency is selected
+                    // Finally, we check if the minimum order amount configured to process the payment method. By default, the minimum order amount is 999 cents
+                    if( $billingShippingDetails['billing'] == $billingShippingDetails['shipping'] && 
+                        (!in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && 
+                        !in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) && 
+                        $basket->currency == 'EUR' && 
+                        (!empty($minimumGuaranteedAmount) &&  (int) $minimumGuaranteedAmount > (int) $basket->basketAmount)) {
+                        // If the guaranteed conditions are met, display the guaranteed payments
+                        return 'guarantee';
+                    }
 
                     // Further we check if the normal payment method can be enabled if the condition not met 
                     if ($this->settingsService->getNnPaymentSettingsValue('force', $paymentKey) == true) {
