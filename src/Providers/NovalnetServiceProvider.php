@@ -137,7 +137,14 @@ class NovalnetServiceProvider extends ServiceProvider
 								'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)), 
 								]);
 			$contentType = 'htmlContent';
-	            }
+	            } elseif($paymentKey == 'NOVALNET_GUARANTEED_INVOICE') {
+			$content = $twig->render('Novalnet::PaymentForm.NovalnetGuaranteedInvoice', [
+								    'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl(),
+								    'paymentMopKey' =>  $paymentKey,
+								    'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)),
+								    ]);
+                        $contentType = 'htmlContent';
+		   }
                 }
                 $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
                 $event->setValue($content);
