@@ -584,16 +584,13 @@ class PaymentService
                     // Get the basket total amount
                     $basketAmount = !empty($basket->basketAmount) ? $this->paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount) : 0;
                     
-                    $this->getLogger(__METHOD__)->error('ba amount', $basketAmount);
-                    $this->getLogger(__METHOD__)->error('ba min amount', $minimumGuaranteedAmount);
-                    
                     // First, we check the billing and shipping addresses are matched
                     // Second, we check the customer from the guaranteed payments supported countries
                     // Third, we check if the supported currency is selected
                     // Finally, we check if the minimum order amount configured to process the payment method. By default, the minimum order amount is 999 cents
                     if( $billingShippingDetails['billing'] == $billingShippingDetails['shipping'] && 
-                        (!in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && 
-                        !in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) && 
+                        (in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && 
+                        in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) && 
                         (!empty($basket->currency) && $basket->currency == 'EUR') && 
                         (!empty($minimumGuaranteedAmount) &&  (int) $minimumGuaranteedAmount <= (int) $basketAmount)) {
                         // If the guaranteed conditions are met, display the guaranteed payments
