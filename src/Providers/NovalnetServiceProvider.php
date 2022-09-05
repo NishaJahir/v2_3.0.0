@@ -127,7 +127,7 @@ class NovalnetServiceProvider extends ServiceProvider
                     $content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
                     $contentType = 'errorCode';   
                 } else {
-		    $showBirthday = (isset($paymentRequestData['paymentRequestData']['customer']['birth_date']) &&  (time() < strtotime('+18 years', strtotime($paymentRequestData['paymentRequestData']['customer']['birth_date'])))) ? true : false;
+		    $showBirthday = (!isset($paymentRequestData['paymentRequestData']['customer']['birth_date']) ||  (time() < strtotime('+18 years', strtotime($paymentRequestData['paymentRequestData']['customer']['birth_date'])))) ? true : false;
 			
                     if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_PREPAYMENT', 'NOVALNET_CASHPAYMENT', 'NOVALNET_MULTIBANCO']) || $paymentService->isRedirectPayment($paymentKey)  || $showBirthday == false) {
                         $content = '';
