@@ -581,6 +581,9 @@ class PaymentService
 
                     $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
                     
+                    // Get the basket total amount
+                    $basketAmount = !empty($basket->basketAmount) ? $this->paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount) : 0;
+                    
                     // First, we check the billing and shipping addresses are matched
                     // Second, we check the customer from the guaranteed payments supported countries
                     // Third, we check if the supported currency is selected
@@ -588,8 +591,8 @@ class PaymentService
                     if( $billingShippingDetails['billing'] == $billingShippingDetails['shipping'] && 
                         (!in_array($billingShippingDetails['billing']['country_code'], ['AT', 'DE', 'CH']) || ($this->settingsService->getNnPaymentSettingsValue('allow_b2b_customer', $paymentKey) && 
                         !in_array($billingShippingDetails['billing']['country_code'], $this->getEuropeanRegionCountryCodes()))) && 
-                        $basket->currency == 'EUR' && 
-                        (!empty($minimumGuaranteedAmount) &&  (int) $minimumGuaranteedAmount > (int) $basket->basketAmount)) {
+                        (!empty($basket->currency) && $basket->currency == 'EUR') && 
+                        (!empty($minimumGuaranteedAmount) &&  (int) $minimumGuaranteedAmount <= (int) $basketAmount)) {
                         // If the guaranteed conditions are met, display the guaranteed payments
                         return 'guarantee';
                     }
