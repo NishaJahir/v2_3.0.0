@@ -127,7 +127,9 @@ class NovalnetServiceProvider extends ServiceProvider
                     $content = $paymentHelper->getTranslatedText('nn_first_last_name_error');
                     $contentType = 'errorCode';   
                 } else {
-                    if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_PREPAYMENT', 'NOVALNET_CASHPAYMENT', 'NOVALNET_MULTIBANCO']) || $paymentService->isRedirectPayment($paymentKey)) {
+		    $showBirthday = (isset($paymentRequestData['paymentRequestData']['customer']['birth_date']) &&  (time() < strtotime('+18 years', strtotime($paymentRequestData['paymentRequestData']['customer']['birth_date'])))) ? true : false;
+			
+                    if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_PREPAYMENT', 'NOVALNET_CASHPAYMENT', 'NOVALNET_MULTIBANCO']) || $paymentService->isRedirectPayment($paymentKey)  || $showBirthday == false) {
                         $content = '';
                         $contentType = 'continue';
                     } elseif($paymentKey == 'NOVALNET_SEPA') {
@@ -137,7 +139,7 @@ class NovalnetServiceProvider extends ServiceProvider
 								'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)), 
 								]);
 			$contentType = 'htmlContent';
-	            } elseif($paymentKey == 'NOVALNET_GUARANTEED_INVOICE') {
+	            } elseif($paymentKey == 'NOVALNET_GUARANTEED_INVOICE' && $showBirthday == true) {
 			$content = $twig->render('Novalnet::PaymentForm.NovalnetGuaranteedInvoice', [
 								    'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl(),
 								    'paymentMopKey' =>  $paymentKey,
