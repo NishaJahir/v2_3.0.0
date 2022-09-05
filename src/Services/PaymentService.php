@@ -195,6 +195,10 @@ class PaymentService
             $paymentRequestData['customer']['shipping']['state'] = $shippingAddress->state;
         }
         
+        if(empty($billingAddress->companyName) && !empty($billingAddress->birthday) && in_array($paymentKey, ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) { // check if birthday field is given in the billing address
+			$paymentRequestData['customer']['birth_date'] = $billingAddress->birthday;
+		}
+        
         // Building the transaction Data
         $paymentRequestData['transaction'] = [
                                                'test_mode' => ($testModeKey == true) ? 1 : 0,
