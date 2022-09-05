@@ -576,20 +576,7 @@ class PaymentService
                     // Get the billing and shipping details
                     $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
                     
-                    // Set the minimum guaranteed amount
-                    $configuredMinimumGuaranteedAmount = $this->settingsService->getNnPaymentSettingsValue('minimum_guaranteed_amount', $paymentKey);
-
-                    $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
                     
-                    /** @var \Plenty\Modules\Frontend\Services\VatService $vatService */
-                    $vatService = pluginApp(\Plenty\Modules\Frontend\Services\VatService::class);
-
-                    //we have to manipulate the basket because its stupid and doesnt know if its netto or gross
-                    if(!count($vatService->getCurrentTotalVats())) {
-                        $basket->itemSum = $basket->itemSumNet;
-                        $basket->shippingAmount = $basket->shippingAmountNet;
-                        $basket->basketAmount = $basket->basketAmountNet;
-                    }
                     
                     
                        return 'guarantee';  
