@@ -35,29 +35,22 @@
 		
 		<div class="row">
 			<div class="col-sm-4">
-				<div class="input-unit">
-					<input type="tel" name="nn_guarantee_date" id="nn_guarantee_date" maxlength="2" placeholder="{{trans("Novalnet::PaymentMethod.day")}}" autocomplete="off">
-				</div>
+				<input type="tel" name="nn_guarantee_date" id="nn_guarantee_date" maxlength="2" placeholder="{{trans("Novalnet::PaymentMethod.day")}}" autocomplete="off" class="form-control">
 			</div>
      
 			<div class="col-sm-4">
-				<div class="input-unit">
-				   <select id="nn_guarantee_month" type="text" name="nn_guarantee_month" placeholder="{{trans("Novalnet::PaymentMethod.month")}}" class="form-control">
+				 <select id="nn_guarantee_month" type="text" name="nn_guarantee_month" placeholder="{{trans("Novalnet::PaymentMethod.month")}}" class="form-control">
 				   <option value="0">{{trans("Novalnet::PaymentMethod.monthOption")}}</option>
 					{% for i in 1..12 %}
 						<option value="{{i}}">{{ trans("Novalnet::PaymentMethod.month#{i}") }}</option>
 					{% endfor %}
-					   
-				   </select>
-			   </div>
+				  </select>
 			 </div>
     
 			<div class="col-sm-4 autocomplete">
-				<div class="input-unit">
-					<input type="text" name="nn_guarantee_year" id="nn_guarantee_year" maxlength="4" placeholder="{{trans("Novalnet::PaymentMethod.year")}}" autocomplete="off">
-				</div>
+				<input type="text" name="nn_guarantee_year" id="nn_guarantee_year" maxlength="4" placeholder="{{trans("Novalnet::PaymentMethod.year")}}" autocomplete="off" class="form-control">
 			</div>
-        </div> 
+           	</div> 
 	</div>
 	
 	<div class="modal-footer">
