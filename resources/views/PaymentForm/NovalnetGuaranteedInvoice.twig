@@ -39,7 +39,7 @@
 			</div>
      
 			<div class="col-sm-4">
-				 <select id="nn_guarantee_month" type="text" name="nn_guarantee_month" placeholder="{{trans("Novalnet::PaymentMethod.month")}}" class="form-control">
+				 <select id="nn_guarantee_month" type="text" name="nn_guarantee_month" class="form-control">
 				   <option value="0">{{trans("Novalnet::PaymentMethod.monthOption")}}</option>
 					{% for i in 1..12 %}
 						<option value="{{i}}">{{ trans("Novalnet::PaymentMethod.month#{i}") }}</option>
