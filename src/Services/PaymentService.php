@@ -576,7 +576,10 @@ class PaymentService
                     // Get the billing and shipping details
                     $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
                     
-                    
+                    // Set the minimum guaranteed amount
+                    $configuredMinimumGuaranteedAmount = $this->settingsService->getNnPaymentSettingsValue('minimum_guaranteed_amount', $paymentKey);
+
+                    $minimumGuaranteedAmount = !empty($configuredMinimumGuaranteedAmount) ? $configuredMinimumGuaranteedAmount : 999;
                     
                     
                        return 'guarantee';  
