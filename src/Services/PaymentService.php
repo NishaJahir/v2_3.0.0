@@ -590,9 +590,17 @@ class PaymentService
                         $basket->shippingAmount = $basket->shippingAmountNet;
                         $basket->basketAmount = $basket->basketAmountNet;
                     }
+                    
+                    // First, we check the billing and shipping addresses are matched
+                    // Second, we check the customer from the guaranteed payments supported countries
+                    // Third, we check if the supported currency is selected
+                    // Finally, we check if the minimum order amount configured to process the payment method. By default, the minimum order amount is 999 cents
+                    if( $billingShippingDetails['billing'] === $billingShippingDetails['shipping'] && $basket->currency == 'EUR' ) {
 
-                    return 'guarantee';
+                        return 'guarantee';
                         
+                    }
+                       return 'guarantee';  
                   
 
                     // Further we check if the normal payment method can be enabled if the condition not met 
