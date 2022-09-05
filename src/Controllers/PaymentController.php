@@ -150,7 +150,13 @@ class PaymentController extends Controller
                                                                 'account_holder' => $paymentRequestData['paymentRequestData']['customer']['first_name'] .' '. $paymentRequestData['paymentRequestData']['customer']['last_name'],
                                                                 'iban'           => $paymentRequestPostData['nn_sepa_iban']
                                                              ];
-        // Set the payment requests in the session for the further processings
+       
+	// Setting up the birthday for guaranteed payments
+        if(in_array($paymentRequestPostData['nn_payment_key'], ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA']) && !empty($paymentRequestPostData['nn_show_dob'])) {
+		$paymentRequestData['paymentRequestData']['customer']['birth_date'] = sprintf('%4d-%02d-%02d', $paymentRequestPostData['nn_guarantee_year'], $paymentRequestPostData['nn_guarantee_month'], $paymentRequestPostData['nn_guarantee_date']);
+	}
+	    
+	// Set the payment requests in the session for the further processings
         $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
         
         // Call the shop executePayment function
