@@ -48,7 +48,7 @@ class NovalnetOrderConfirmationDataProvider
                 // Check it is Novalnet Payment method order
                 if($paymentHelper->getPaymentKeyByMop($payment->mopId)) {
                     // Get Novalnet transaction details from the Novalnet database table
-                    $nnDbTxDetails = $paymentService->getDatabaseValues($orderId);
+                    $nnDbTxDetails = $paymentService->getDatabaseValues($order['id']);
                     $paymentHelper->logger('nnDbTxDetails', $nnDbTxDetails);
                 }
             }
