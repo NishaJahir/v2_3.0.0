@@ -196,8 +196,8 @@ class PaymentService
         }
         
         if(empty($billingAddress->companyName) && !empty($billingAddress->birthday) && in_array($paymentKey, ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA'])) { // check if birthday field is given in the billing address
-			$paymentRequestData['customer']['birth_date'] = $billingAddress->birthday;
-		}
+            $paymentRequestData['customer']['birth_date'] = $billingAddress->birthday;
+        }
         
         // Building the transaction Data
         $paymentRequestData['transaction'] = [
@@ -637,5 +637,91 @@ class PaymentService
     public function getProcessPaymentUrl()
     {
         return $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl . '/' . $this->sessionStorage->getLocaleSettings()->language . '/payment/novalnet/processPayment/';
+    }
+    
+    /**
+     * Collecting the Credit Card for the initial authentication call to PSP
+     *
+     * @param object $basket
+     * @param string $paymentKey
+     * @param int $orderAmount
+     * 
+     * @return string
+     */
+    public function getCreditCardAuthenticationCallData(Basket $basket, $paymentKey) 
+    {
+        
+        // Get the customer billing and shipping details
+        if(!empty($basket->customerInvoiceAddressId)) {
+           $billingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerInvoiceAddressId);
+           $shippingAddress = $billingAddress; 
+        }
+        
+        if(!empty($basket->customerShippingAddressId)) {
+            $shippingAddress = $this->paymentHelper->getCustomerBillingOrShippingAddress((int) $basket->customerShippingAddressId);
+        }
+        
+        // Get the customer name if the salutation as Person
+        $customerName = $this->getCustomerName($billingAddress);
+        
+        /** @var \Plenty\Modules\Frontend\Services\VatService $vatService */
+        $vatService = pluginApp(\Plenty\Modules\Frontend\Services\VatService::class);
+        
+        //we have to manipulate the basket because its stupid and doesnt know if its netto or gross
+        if(!count($vatService->getCurrentTotalVats())) {
+            $basket->itemSum = $basket->itemSumNet;
+            $basket->shippingAmount = $basket->shippingAmountNet;
+            $basket->basketAmount = $basket->basketAmountNet;
+        }
+        
+        $ccFormRequestParameters = [
+            'client_key' => trim($this->settingsService->getNnPaymentSettingsValue('novalnet_client_key')),
+            'enforce_3d' => (int)($this->settingsService->getNnPaymentSettingsValue('enforce', $paymentKey) == 'true'),
+            'test_mode'  => (int)($this->settingsService->getNnPaymentSettingsValue('test_mode', $paymentKey) == 'true'),
+            'first_name' => $billingAddress->firstName ?? $customerName['firstName'],
+            'last_name'  => $billingAddress->lastName ?? $customerName['lastName'],
+            'email'      => $billingAddress->email,
+            'street'     => $billingAddress->street,
+            'house_no'   => $billingAddress->houseNumber,
+            'city'       => $billingAddress->town,
+            'zip'        => $billingAddress->postalCode,
+            'country_code' => $this->countryRepository->findIsoCode($billingAddress->countryId, 'iso_code_2'),
+            'amount'     => $this->paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount),
+            'currency'   => $basket->currency,
+            'lang'       => strtoupper($this->sessionStorage->getLocaleSettings()->language)
+        ];
+        
+        // Obtain the required billing and shipping details from the customer address object        
+        $billingShippingDetails = $this->paymentHelper->getRequiredBillingShippingDetails($billingAddress, $shippingAddress);
+        
+        if ($billingShippingDetails['billing'] == $billingShippingDetails['shipping']) {
+            $ccFormRequestParameters['same_as_billing'] = 1;
+        }
+        
+        return json_encode($ccFormRequestParameters);
+    }
+    
+    /**
+     * Retrieves Credit Card form style set in payment configuration and texts present in language files
+     *
+     * @return string
+     */
+    public function getCcFormFields()
+    {
+        $ccformFields = [];
+
+        $styleConfiguration = array('standard_style_label', 'standard_style_field', 'standard_style_css');
+
+        foreach ($styleConfiguration as $value) {
+            $ccformFields[$value] = trim($this->config->get('Novalnet.' . $value));
+            $ccformFields[$value] = trim($this->settingsService->getNnPaymentSettingsValue($value, 'novalnet_cc'));
+        }
+
+        $textFields = array( 'template_novalnet_cc_holder_Label', 'template_novalnet_cc_holder_input', 'template_novalnet_cc_number_label', 'template_novalnet_cc_number_input', 'template_novalnet_cc_expirydate_label', 'template_novalnet_cc_expirydate_input', 'template_novalnet_cc_cvc_label', 'template_novalnet_cc_cvc_input', 'template_novalnet_cc_error' );
+
+        foreach ($textFields as $value) {
+            $ccformFields[$value] = $this->paymentHelper->getCustomizedTranslatedText($value);
+        }
+        return json_encode($ccformFields);
     }
 }
