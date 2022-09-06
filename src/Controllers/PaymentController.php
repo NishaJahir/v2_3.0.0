@@ -153,10 +153,23 @@ class PaymentController extends Controller
                                                              ];
 	}
 	    
-	// Setting up the birthday for guaranteed payments
+        // Setting up the birthday for guaranteed payments
         if(in_array($paymentRequestPostData['nn_payment_key'], ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA']) && !empty($paymentRequestPostData['nn_show_dob'])) {
 		$paymentRequestData['paymentRequestData']['customer']['birth_date'] = sprintf('%4d-%02d-%02d', $paymentRequestPostData['nn_guarantee_year'], $paymentRequestPostData['nn_guarantee_month'], $paymentRequestPostData['nn_guarantee_date']);
 	}
+	    
+	 // Setting up the alternative card data to the server for card processing
+        if($paymentRequestPostData['nn_payment_key'] == 'NOVALNET_CC') {
+            $paymentRequestData['paymentRequestData']['transaction']['payment_data'] = [
+                                                                    'pan_hash'   => $paymentRequestPostData['nn_pan_hash'],
+                                                                    'unique_id'  => $paymentRequestPostData['nn_unique_id']
+                                                                 ];
+            // Set the Do redirect value into session for the redirection                                                     
+            $this->sessionStorage->getPlugin()->setValue('nnDoRedirect', $paymentRequestPostData['nn_cc3d_redirect']);
+            if(!empty($paymentRequestPostData['nn_cc3d_redirect'])) {
+                $paymentRequestData['paymentRequestData']['transaction']['return_url'] = $this->paymentService->getReturnPageUrl();
+            }
+        }
 	    
 	// Set the payment requests in the session for the further processings
         $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
