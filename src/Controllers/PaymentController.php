@@ -145,12 +145,14 @@ class PaymentController extends Controller
         // Get the payment request params
         $paymentRequestData = $this->paymentService->generatePaymentParams($this->basketRepository->load(), $paymentRequestPostData['nn_payment_key']);
         
-        // Setting up the account data to the server for SEPA processing
-        $paymentRequestData['paymentRequestData']['transaction']['payment_data'] = [
+	 // Setting up the account data to the server for SEPA processing
+	if(in_array($paymentRequestPostData['nn_payment_key'], ['NOVALNET_SEPA', 'NOVALNET_GUARANTEED_SEPA'])) {
+        	$paymentRequestData['paymentRequestData']['transaction']['payment_data'] = [
                                                                 'account_holder' => $paymentRequestData['paymentRequestData']['customer']['first_name'] .' '. $paymentRequestData['paymentRequestData']['customer']['last_name'],
                                                                 'iban'           => $paymentRequestPostData['nn_sepa_iban']
                                                              ];
-       
+	}
+	    
 	// Setting up the birthday for guaranteed payments
         if(in_array($paymentRequestPostData['nn_payment_key'], ['NOVALNET_GUARANTEED_INVOICE', 'NOVALNET_GUARANTEED_SEPA']) && !empty($paymentRequestPostData['nn_show_dob'])) {
 		$paymentRequestData['paymentRequestData']['customer']['birth_date'] = sprintf('%4d-%02d-%02d', $paymentRequestPostData['nn_guarantee_year'], $paymentRequestPostData['nn_guarantee_month'], $paymentRequestPostData['nn_guarantee_date']);
