@@ -423,13 +423,13 @@ class PaymentService
         $privateKey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
         $this->getLogger(__METHOD__)->error('NN request', $paymentRequestData);
         $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData['paymentRequestData'], $paymentRequestData['paymentUrl'], $privateKey);
-         $this->getLogger(__METHOD__)->error('NN request', $paymentRequestData);
+         $this->getLogger(__METHOD__)->error('NN response', $paymentResponseData);
         $isPaymentSuccess = isset($paymentResponseData['result']['status']) && $paymentResponseData['result']['status'] == 'SUCCESS';
-        
-    
+        $nnDoRedirect = $this->sessionStorage->getPlugin()->getValue('nnDoRedirect');
+        $this->getLogger(__METHOD__)->error('NN do redirect', $nnDoRedirect);
         
         // Do redirect if the redirect URL is present
-        if($isPaymentSuccess && $this->isRedirectPayment($paymentKey)) {
+        if($isPaymentSuccess && ($this->isRedirectPayment($paymentKey) || !empty($nnDoRedirect))) {
             return $paymentResponseData;
         } else {
             // Push notification to customer regarding the payment response
