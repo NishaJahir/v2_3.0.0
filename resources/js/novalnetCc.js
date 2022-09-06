@@ -1,11 +1,6 @@
 jQuery(document).ready(function () {
-     if(typeof(window.NovalnetUtility) === 'undefined') {
-           setTimeout(function(){
-               loadNovalnetCcIframe();
-          },1000);
-          } else {
-             loadNovalnetCcIframe();
-          }
+        loadNovalnetCcIframe();
+     
         jQuery('#nn_cc_form').submit( function (e) {
                 jQuery('#novalnet_form_btn').attr('disabled',true);
                
@@ -61,13 +56,13 @@ function loadNovalnetCcIframe()
           id: "nn_iframe",
 
           // Display the normal cc form
-          inline: '0',
+          inline: (ccFormDetails.inline_form !== undefined) ? ccFormDetails.inline_form : 0,
          
           // Adjust the creditcard style and text 
           style: {
-            container: (ccCustomFields.novalnet_cc_standard_style_css !== undefined) ? ccCustomFields.novalnet_cc_standard_style_css : '',
-            input: (ccCustomFields.novalnet_cc_standard_style_field !== undefined) ? ccCustomFields.novalnet_cc_standard_style_field : '' ,
-            label: (ccCustomFields.novalnet_cc_standard_style_label !== undefined) ? ccCustomFields.novalnet_cc_standard_style_label : '' ,
+            container: (ccCustomFields.standard_style_css !== undefined) ? ccCustomFields.standard_style_css : '',
+            input: (ccCustomFields.standard_style_field !== undefined) ? ccCustomFields.standard_style_field : '' ,
+            label: (ccCustomFields.standard_style_label !== undefined) ? ccCustomFields.standard_style_label : '' ,
           },
           
           text: {
@@ -115,8 +110,8 @@ function loadNovalnetCcIframe()
         transaction: {
           amount: (ccFormDetails.amount !== undefined) ? ccFormDetails.amount : '',
           currency: (ccFormDetails.currency !== undefined) ? ccFormDetails.currency : '',
-          test_mode: (ccFormDetails.test_mode !== undefined) ? ccFormDetails.test_mode : '0',
-          enforce_3d: (ccFormDetails.enforce_3d !== undefined) ? ccFormDetails.enforce_3d : '0',
+          test_mode: (ccFormDetails.test_mode !== undefined) ? ccFormDetails.test_mode : 0,
+          enforce_3d: (ccFormDetails.enforce_3d !== undefined) ? ccFormDetails.enforce_3d : 0,
         },
           
        // Add custom data
