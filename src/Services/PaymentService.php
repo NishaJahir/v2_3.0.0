@@ -734,4 +734,39 @@ class PaymentService
         }
         return json_encode($ccformFields);
     }
+    
+    /**
+     * Get database values
+     *
+     * @param int $orderId
+     *
+     * @return array
+     */
+    public function getDatabaseValues($orderId) {
+        
+        $database = pluginApp(DataBase::class);
+        // Get transaction details from the Novalnet database table
+        $transactionDetails = $database->query(TransactionLog::class)->where('orderNo', '=', $orderId)->get();
+        if(!empty($transactionDetails)) {
+            foreach($transactionDetails as $transactionDetail) {
+                 $endTransactionDetail = $transactionDetail; // Set the end of the transaction details
+            }
+            //Typecasting object to array
+            $nnTransactionDetail = (array) $endTransactionDetail;
+            $nnTransactionDetail['order_no'] = $nnTransactionDetail['orderNo'];
+            $nnTransactionDetail['amount'] = $nnTransactionDetail['amount'] / 100;
+            if(!empty($nnTransactionDetail['additionalInfo'])) {
+               //Decoding the json as array
+                $nnTransactionDetail['additionalInfo'] = json_decode($nnTransactionDetail['additionalInfo'], true);
+                //Merging the array
+                $nnTransactionDetail = array_merge($nnTransactionDetail, $nnTransactionDetail['additionalInfo']);
+                //Unsetting the redundant key
+                unset($nnTransactionDetail['additionalInfo']); 
+            } else {
+                unset($nnTransactionDetail['additionalInfo']);   
+            }
+            return $nnTransactionDetail;
+        }
+        return [];
+    }
 }
