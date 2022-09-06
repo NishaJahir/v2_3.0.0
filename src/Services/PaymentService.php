@@ -253,7 +253,7 @@ class PaymentService
     
     public function getPaymentData(&$paymentRequestData, $paymentKey)
     {
-        $paymentUrl = NovalnetConstants::PAYMENT_URL;
+        $paymentUrl = ($paymentKey == 'NOVALNET_APPLEPAY') ? NovalnetConstants::PAYGATE_URL : NovalnetConstants::PAYMENT_URL;
     
         // Sent the payment authorize call to Novalnet server if the authorization is enabled
         if(in_array($paymentKey, ['NOVALNET_INVOICE', 'NOVALNET_CC']) && !empty($this->settingsService->getNnPaymentSettingsValue('payment_action', strtolower($paymentKey)))) {
@@ -283,6 +283,11 @@ class PaymentService
         
         if($this->isRedirectPayment($paymentKey)) {
             $paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
+        }
+        
+        if($paymentKey == 'NOVALNET_APPLEPAY') {
+            $paymentRequestData['hosted_page']['hide_blocks'] = ['ADDRESS_FORM', 'SHOP_INFO', 'LANGUAGE_MENU', 'TARIFF'];
+            $paymentRequestData['hosted_page']['display_payments'] = ['APPLEPAY'];
         }
         
         return $paymentUrl;
