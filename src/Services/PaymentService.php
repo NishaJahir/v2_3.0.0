@@ -714,7 +714,6 @@ class PaymentService
         $styleConfiguration = array('standard_style_label', 'standard_style_field', 'standard_style_css');
 
         foreach ($styleConfiguration as $value) {
-            $ccformFields[$value] = trim($this->config->get('Novalnet.' . $value));
             $ccformFields[$value] = trim($this->settingsService->getNnPaymentSettingsValue($value, 'novalnet_cc'));
         }
 
