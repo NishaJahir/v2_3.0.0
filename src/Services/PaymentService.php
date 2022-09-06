@@ -335,7 +335,7 @@ class PaymentService
      *
      * @return string
      */
-    private function getReturnPageUrl()
+    public function getReturnPageUrl()
     {   
         return $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl . '/' . $this->sessionStorage->getLocaleSettings()->language . '/payment/novalnet/paymentResponse/';
     }
