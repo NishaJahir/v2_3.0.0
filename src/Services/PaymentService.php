@@ -276,6 +276,11 @@ class PaymentService
             }
         }
         
+        // Send enforce cc value to Novalnet server
+        if($paymentKey == 'NOVALNET_CC' && $this->settingsService->getNnPaymentSettingsValue('enforce', $paymentKey) == true) {
+             $paymentRequestData['transaction']['payment_data']['enforce_3d'] = 1;
+        }
+        
         if($this->isRedirectPayment($paymentKey)) {
             $paymentRequestData['transaction']['return_url'] = $this->getReturnPageUrl();
         }
@@ -676,9 +681,9 @@ class PaymentService
         
         $ccFormRequestParameters = [
             'client_key' => trim($this->settingsService->getNnPaymentSettingsValue('novalnet_client_key')),
-            'inline_form' => (int)($this->settingsService->getNnPaymentSettingsValue('inline_form', $paymentKey) == 'true'),
-            'enforce_3d' => (int)($this->settingsService->getNnPaymentSettingsValue('enforce', $paymentKey) == 'true'),
-            'test_mode'  => (int)($this->settingsService->getNnPaymentSettingsValue('test_mode', $paymentKey) == 'true'),
+            'inline_form' => (int)($this->settingsService->getNnPaymentSettingsValue('inline_form', $paymentKey) == true),
+            'enforce_3d' => (int)($this->settingsService->getNnPaymentSettingsValue('enforce', $paymentKey) == true),
+            'test_mode'  => (int)($this->settingsService->getNnPaymentSettingsValue('test_mode', $paymentKey) == true),
             'first_name' => $billingAddress->firstName ?? $customerName['firstName'],
             'last_name'  => $billingAddress->lastName ?? $customerName['lastName'],
             'email'      => $billingAddress->email,
