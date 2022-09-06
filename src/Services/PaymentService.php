@@ -676,7 +676,7 @@ class PaymentService
         
         $ccFormRequestParameters = [
             'client_key' => trim($this->settingsService->getNnPaymentSettingsValue('novalnet_client_key')),
-            'inline_form' => (int)($this->settingsService->getNnPaymentSettingsValue('inline_form', $paymentKey) == 'true')
+            'inline_form' => (int)($this->settingsService->getNnPaymentSettingsValue('inline_form', $paymentKey) == 'true'),
             'enforce_3d' => (int)($this->settingsService->getNnPaymentSettingsValue('enforce', $paymentKey) == 'true'),
             'test_mode'  => (int)($this->settingsService->getNnPaymentSettingsValue('test_mode', $paymentKey) == 'true'),
             'first_name' => $billingAddress->firstName ?? $customerName['firstName'],
