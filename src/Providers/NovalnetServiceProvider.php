@@ -148,6 +148,15 @@ class NovalnetServiceProvider extends ServiceProvider
                                                 'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)),
                                                 ]);
                         $contentType = 'htmlContent';
+                    } elseif($paymentKey == 'NOVALNET_CC') {
+                        $content = $twig->render('Novalnet::PaymentForm.NovalnetCc', [
+                                                'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl(),
+                                                'paymentMopKey' =>  $paymentKey,
+                                                'paymentName' => $paymentHelper->getCustomizedTranslatedText('template_' . strtolower($paymentKey)),
+                                                'ccFormDetails' => $paymentService->getCreditCardAuthenticationCallData($basketRepository->load(), strtolower($paymentKey)) ?? '',
+                                                'ccCustomFields' => $paymentService->getCcFormFields() ?? ''
+                                                ]);
+                        $contentType = 'htmlContent';
                     }
                 }
                 $sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
