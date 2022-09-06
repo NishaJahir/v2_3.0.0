@@ -16,6 +16,7 @@
 namespace Novalnet\Providers;
 
 use Plenty\Plugin\Templates\Twig;
+use Novalnet\Helper\PaymentHelper;
 
 /**
  * Class NovalnetOrderConfirmationDataProvider
@@ -34,9 +35,15 @@ class NovalnetOrderConfirmationDataProvider
      */
     public function call(Twig $twig, $arg)
     {
-       return 'TEST';
+        $order = $arg[0];
+        $paymentHelper = pluginApp(PaymentHelper::class);
+        if(!empty($order['id'])) {
+            // Check it is Novalnet Payment method order
+            if($paymentHelper->getPaymentKeyByMop($payment->mopId)) {
+                // Get Novalnet transaction details from the Novalnet database table
+                $nnDbTxDetails = $paymentService->getDatabaseValues($orderId);
+                $paymentHelper->logger('nnDbTxDetails', $nnDbTxDetails);
+            }
+        }
     }
 }
-
-    
-
