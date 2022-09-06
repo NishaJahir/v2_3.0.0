@@ -561,11 +561,12 @@ class PaymentService
                           ];
                           
         if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'NOVALNET_INVOICE') {
-            $additionalInfo['account_holder'] = ['transaction']['bank_details']['account_holder'];
-            $additionalInfo['iban'] = ['transaction']['bank_details']['iban'];
-            $additionalInfo['bic'] = ['transaction']['bank_details']['bic'];
-            $additionalInfo['bank_name'] = ['transaction']['bank_details']['bank_name'];
-            $additionalInfo['bank_place'] = ['transaction']['bank_details']['bank_place'];
+            $additionalInfo['invoice_account_holder'] = $paymentResponseData['transaction']['bank_details']['account_holder'];
+            $additionalInfo['invoice_iban'] = $paymentResponseData['transaction']['bank_details']['iban'];
+            $additionalInfo['invoice_bic'] = $paymentResponseData['transaction']['bank_details']['bic'];
+            $additionalInfo['invoice_bankname'] = $paymentResponseData['transaction']['bank_details']['bank_name'];
+            $additionalInfo['invoice_bankplace'] = $paymentResponseData['transaction']['bank_details']['bank_place'];
+            $additionalInfo['due_date'] = $paymentResponseData['transaction']['due_date'];
         }
         return json_encode($additionalInfo);
     }
