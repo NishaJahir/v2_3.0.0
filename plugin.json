@@ -49,6 +49,11 @@
           "key"         : "Novalnet\\Providers\\NovalnetGooglePayButtonDataProvider",
           "name"        : "Novalnet Google Pay button",
           "description" : "Display the Google Pay Button"
+        },
+        {
+          "key"         : "Novalnet\\Providers\\DataProvider\\NovalnetPaymentMethodReinitializePaymentScript",
+          "name"        : "Novalnet Initiate Payment Script",
+          "description" : "A script for displaying the pay now Button"
         }
     ]
 }
