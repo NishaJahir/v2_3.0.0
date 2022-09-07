@@ -801,12 +801,12 @@ class PaymentService
         }
         
         // Display the text if the transaction was made with Guaranteed payments
-        if(in_array($transactionData['paymentName'], ['novalnet_guaranteed_invoice', 'novalnet_guaranteed_sepa']) || in_array($transactionData['payment_id'], ['40','41'])) {
+        if(in_array($transactionData['paymentName'], ['novalnet_guaranteed_invoice', 'novalnet_guaranteed_sepa']) || in_array($db_details['payment_id'], ['40','41'])) {
             $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('guarantee_text');
             if($transactionData['paymentName'] == 'novalnet_guaranteed_invoice' && $transactionData['tx_status'] == 'PENDING') {
-                $transactionComments .= PHP_EOL . $paymentHelper->getTranslatedText('guarantee_invoice_pending_payment_text');
+                $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('guarantee_invoice_pending_payment_text');
             } elseif($transactionData['paymentName'] == 'novalnet_guaranteed_sepa' && $transactionData['tx_status'] == 'PENDING') {
-                $transactionComments .= PHP_EOL . $paymentHelper->getTranslatedText('guarantee_sepa_pending_payment_text');
+                $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('guarantee_sepa_pending_payment_text');
             }
         }
         
@@ -854,6 +854,7 @@ class PaymentService
     
     public function getBankDetailsInformation($transactionData)
     {
+        $invoiceComments = '';
         // If the transaction is in On-Hold not displaying the due date
         if($transactionData['tx_status'] != 'ON_HOLD') {
             $invoiceComments .= PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('transfer_amount_duedate_text'), $transactionData['amount'], $transactionData['currency'], date('Y/m/d', (int)strtotime($transactionData['due_date'])));
@@ -876,8 +877,8 @@ class PaymentService
     
     public function getStoreInformation($transactionData)
     {        
-        $cashpaymentComments  = PHP_EOL . $this->getTranslatedText('cashpayment_expire_date') . $transactionData['cp_due_date'];
-        $cashpaymentComments .= PHP_EOL . $this->getTranslatedText('cashpayment_stores_near_you');
+        $cashpaymentComments  = PHP_EOL . $this->paymentHelper->getTranslatedText('cashpayment_expire_date') . $transactionData['cp_due_date'];
+        $cashpaymentComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('cashpayment_stores_near_you');
         
         // We loop in each of them to print those store details 
         for ($storePos = 1; $storePos <= count( $transactionData['store_details']); $storePos++) {
