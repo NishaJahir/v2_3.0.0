@@ -573,7 +573,7 @@ class PaymentService
             $additionalInfo['invoice_ref'] = $paymentResponseData['transaction']['invoice_ref'];
         }
         
-        if(($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_cashpayment') {
+        if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_cashpayment') {
             $additionalInfo['store_details'] = $paymentResponseData['transaction']['nearest_stores'];
         }
            
