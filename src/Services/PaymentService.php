@@ -572,6 +572,11 @@ class PaymentService
             $additionalInfo['due_date'] = $paymentResponseData['transaction']['due_date'];
             $additionalInfo['invoice_ref'] = $paymentResponseData['transaction']['invoice_ref'];
         }
+        
+        if(($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_cashpayment') {
+            $additionalInfo['store_details'] = $paymentResponseData['transaction']['nearest_stores'];
+        }
+           
         return json_encode($additionalInfo);
     }
     
