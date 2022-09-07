@@ -801,7 +801,7 @@ class PaymentService
         }
         
         // Display the text if the transaction was made with Guaranteed payments
-        if(in_array($transactionData['paymentName'], ['novalnet_guaranteed_invoice', 'novalnet_guaranteed_sepa']) || in_array($db_details['payment_id'], ['40','41'])) {
+        if(in_array($transactionData['paymentName'], ['novalnet_guaranteed_invoice', 'novalnet_guaranteed_sepa']) || in_array($transactionData['payment_id'], ['40','41'])) {
             $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('guarantee_text');
             if($transactionData['paymentName'] == 'novalnet_guaranteed_invoice' && $transactionData['tx_status'] == 'PENDING') {
                 $transactionComments .= PHP_EOL . $paymentHelper->getTranslatedText('guarantee_invoice_pending_payment_text');
