@@ -575,6 +575,12 @@ class PaymentService
         
         if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_cashpayment') {
             $additionalInfo['store_details'] = $paymentResponseData['transaction']['nearest_stores'];
+            $additionalInfo['cp_due_date'] = $paymentResponseData['transaction']['due_date'];
+        }
+        
+        if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_multibanco') {
+            $additionalInfo['partner_payment_reference'] = $paymentResponseData['transaction']['partner_payment_reference'];
+            $additionalInfo['service_supplier_id'] = $paymentResponseData['transaction']['service_supplier_id'];
         }
            
         return json_encode($additionalInfo);
@@ -778,5 +784,126 @@ class PaymentService
             return $nnTransactionDetail;
         }
         return [];
+    }
+    
+    public function formTransactionComments($transactionData)
+    {
+        $transactionComments = '';
+        
+        // Display the Novalnet transaction Id
+        if(!empty($transactionData['tid'])) {
+            $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('nn_tid') . $transactionData['tid'];
+        }
+        
+        // Display the text if the transaction processed in test mode
+        if(!empty($transactionData['test_mode'])) {
+            $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('test_order');
+        }
+        
+        // Display the text if the transaction was made with Guaranteed payments
+        if(in_array($transactionData['paymentName'], ['novalnet_guaranteed_invoice', 'novalnet_guaranteed_sepa']) || in_array($db_details['payment_id'], ['40','41'])) {
+            $transactionComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('guarantee_text');
+            if($transactionData['paymentName'] == 'novalnet_guaranteed_invoice' && $transactionData['tx_status'] == 'PENDING') {
+                $transactionComments .= PHP_EOL . $paymentHelper->getTranslatedText('guarantee_invoice_pending_payment_text');
+            } elseif($transactionData['paymentName'] == 'novalnet_guaranteed_sepa' && $transactionData['tx_status'] == 'PENDING') {
+                $transactionComments .= PHP_EOL . $paymentHelper->getTranslatedText('guarantee_sepa_pending_payment_text');
+            }
+        }
+        
+        // Form the bank details for invoice payments
+        if(in_array($transactionData['paymentName'], ['novalnet_invoice', 'novalnet_prepayment', 'novalnet_guaranteed_invoice'])) {
+            $transactionComments .= PHP_EOL . $this->getBankDetailsInformation($transactionData);
+        }
+        
+        // Form the cashpayment comments
+        if($transactionData['paymentName'] == 'novalnet_cashpayment') {
+            if(!empty($transactionData['cashpayment_comments'])) {
+                $transactionComments .= PHP_EOL . $transactionData['cashpayment_comments'];
+            } else {
+                $transactionComments .= PHP_EOL . $this->getStoreInformation($transactionData);
+            }
+        }
+        
+        // Form the Multibanco payment reference 
+        if($transactionData['paymentName'] == 'novalnet_multibanco') {
+            $transactionComments .= PHP_EOL . $this->getMultibancoReferenceInformation($transactionData);
+        }
+    }
+    
+    public function getTxStatusAsString($txStatus, $nnPaymentTypeId)
+    {
+        if(is_numeric($txStatus)) {
+            if(in_array($txStatus, [85, 91, 98, 99])) {
+                return 'ON_HOLD';
+            } elseif(in_array($txStatus, [75, 86, 90])) {
+                return 'PENDING';
+            } elseif($txStatus == 100) {
+                if(in_array($nnPaymentTypeId, [27, 59])) {
+                    return 'PENDING';
+                } else {
+                    return 'CONFIRMED';
+                }
+            } elseif($txStatus == 103) {
+                return 'DEACTIVATED';
+            } else {
+                return 'FAILURE';
+            }
+        }
+        return $txStatus;
+    }
+    
+    public function getBankDetailsInformation($transactionData)
+    {
+        // If the transaction is in On-Hold not displaying the due date
+        if($transactionData['tx_status'] != 'ON_HOLD') {
+            $invoiceComments .= PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('transfer_amount_duedate_text'), $transactionData['amount'], $transactionData['currency'], date('Y/m/d', (int)strtotime($transactionData['due_date'])));
+        } else {
+            $invoiceComments .= PHP_EOL . PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('transfer_amount_text'), $transactionData['amount'], $transactionData['currency']);    
+        }
+        
+        $invoiceComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('account_holder_novalnet') . $transactionData['invoice_account_holder'];
+        $invoiceComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('iban') . $transactionData['invoice_iban'];
+        $invoiceComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('bic') . $transactionData['invoice_bic'];
+        $invoiceComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('bank') . $transactionData['invoice_bankname']. ' ' . $transactionData['invoice_bankplace'];
+        
+        // Adding the payment reference details 
+        $invoiceComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('any_one_reference_text');
+        $invoiceComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('payment_reference1'). 'TID '. $transactionData['tid'] . PHP_EOL . $this->paymentHelper->getTranslatedText('payment_reference2') . $transactionData['invoice_ref'] . PHP_EOL;
+
+        return $invoiceComments;
+    }
+    
+    
+    public function getStoreInformation($transactionData)
+    {        
+        $cashpaymentComments  = PHP_EOL . $this->getTranslatedText('cashpayment_expire_date') . $transactionData['cp_due_date'];
+        $cashpaymentComments .= PHP_EOL . $this->getTranslatedText('cashpayment_stores_near_you');
+        
+        // We loop in each of them to print those store details 
+        for ($storePos = 1; $storePos <= count( $transactionData['store_details']); $storePos++) {
+            $cashpaymentComments .= PHP_EOL .  $transactionData['store_details'][$storePos]['store_name'];
+            $cashpaymentComments .= PHP_EOL . utf8_encode( $transactionData['store_details'][$storePos]['street']);
+            $cashpaymentComments .= PHP_EOL .  $transactionData['store_details'][$storePos]['city'];
+            $cashpaymentComments .= PHP_EOL .  $transactionData['store_details'][$storePos]['zip'];
+            $cashpaymentComments .= PHP_EOL .  $transactionData['store_details'][$storePos]['country_code'];
+            $cashpaymentComments .= PHP_EOL;
+        }
+        
+        return $cashpaymentComments;
+    }
+    
+    /**
+     * Build Multibanco transaction comments
+     *
+     * @param array $transactionData
+     * @return string
+     */
+    public function getMultibancoReferenceInformation($transactionData)
+    {
+        $multibancoComments  = PHP_EOL . sprintf($this->paymentHelper->getTranslatedText('multibanco_reference_text'), $transactionData['amount'], $transactionData['currency'] );
+        $multibancoComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('multibanco_reference_one') . $transactionData['partner_payment_ref'];
+        $multibancoComments .= PHP_EOL . $this->paymentHelper->getTranslatedText('multibanco_reference_two') . $transactionData['service_supplier_id'];
+        
+        return $multibancoComments;
     }
 }
