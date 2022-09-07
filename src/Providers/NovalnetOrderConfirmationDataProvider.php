@@ -52,13 +52,13 @@ class NovalnetOrderConfirmationDataProvider
                     // Load the order property and get the required details
                     $orderProperties = $payment->properties;
                     foreach($orderProperties as $orderProperty) {
-                        if ($property->typeId == 21) { // Loads the bank details from the payment object for previous payment plugin versions
+                        if ($orderProperty->typeId == 21) { // Loads the bank details from the payment object for previous payment plugin versions
                             $invoiceDetails = $orderProperty->value;
                         }
-                        if ($property->typeId == 30) { // Load the transaction status
+                        if ($orderProperty->typeId == 30) { // Load the transaction status
                             $txStatus = $orderProperty->value;
                         }
-                        if ($property->typeId == 22) { // Loads the cashpayment comments from the payment object for previous payment plugin versions
+                        if ($orderProperty->typeId == 22) { // Loads the cashpayment comments from the payment object for previous payment plugin versions
                             $cashpaymentComments = $orderProperty->value;
                         }
                     }
