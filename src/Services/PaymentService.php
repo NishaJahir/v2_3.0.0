@@ -525,6 +525,13 @@ class PaymentService
         
         $this->getLogger(__METHOD__)->error('final process', $nnPaymentData);
         
+        // Set the cashpayment token to session      
+        if($nnPaymentData['payment_method'] == 'novalnet_cashpayment' && !empty($nnPaymentData['transaction']['checkout_token']) && $nnPaymentData['transaction']['status'] == 'PENDING')
+        {
+            $this->sessionStorage->getPlugin()->setValue('novalnetCheckoutToken', $nnPaymentData['transaction']['checkout_token']);
+            $this->sessionStorage->getPlugin()->setValue('novalnetCheckoutUrl', $nnPaymentData['transaction']['checkout_js']);        
+        }
+        
         // Insert payment response into Novalnet table
         $this->insertPaymentResponseIntoNnDb($nnPaymentData);
         
