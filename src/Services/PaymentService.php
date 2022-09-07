@@ -563,7 +563,7 @@ class PaymentService
                             'plugin_version' => $paymentResponseData['transaction']['system_version'] ?? NovalnetConstants::PLUGIN_VERSION,
                           ];
                           
-        if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'NOVALNET_INVOICE') {
+        if($paymentResponseData['result']['status'] == 'SUCCESS' && (in_array($paymentResponseData['payment_method'], ['novalnet_invoice', 'novalnet_prepayment']))) {
             $additionalInfo['invoice_account_holder'] = $paymentResponseData['transaction']['bank_details']['account_holder'];
             $additionalInfo['invoice_iban'] = $paymentResponseData['transaction']['bank_details']['iban'];
             $additionalInfo['invoice_bic'] = $paymentResponseData['transaction']['bank_details']['bic'];
