@@ -570,6 +570,7 @@ class PaymentService
             $additionalInfo['invoice_bankname'] = $paymentResponseData['transaction']['bank_details']['bank_name'];
             $additionalInfo['invoice_bankplace'] = $paymentResponseData['transaction']['bank_details']['bank_place'];
             $additionalInfo['due_date'] = $paymentResponseData['transaction']['due_date'];
+            $additionalInfo['invoice_ref'] = $paymentResponseData['transaction']['invoice_ref'];
         }
         return json_encode($additionalInfo);
     }
