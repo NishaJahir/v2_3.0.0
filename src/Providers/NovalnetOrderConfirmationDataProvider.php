@@ -86,6 +86,6 @@ class NovalnetOrderConfirmationDataProvider
         $transactionComment = str_replace(PHP_EOL, '<br>', $transactionComment);
         
         // Render the transaction comments
-        return $twig->render('Novalnet::NovalnetOrderHistory', ['transactionComments' => html_entity_decode($transactionComment)]);
+        return $twig->render('Novalnet::NovalnetOrderHistory', ['novalanetTxDetailsLable' => $paymentHelper->getTranslatedText('novalnet_details'), 'transactionComments' => html_entity_decode($transactionComment)]);
     }
 }
