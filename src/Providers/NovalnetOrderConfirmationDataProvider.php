@@ -41,7 +41,7 @@ class NovalnetOrderConfirmationDataProvider
         $order = $arg[0];
         $paymentHelper = pluginApp(PaymentHelper::class);
         $paymentService = pluginApp(PaymentService::class);
-        $transactionComment = '';
+        $transactionComment = $cashpaymentToken = $cashpaymentUrl = '';
         if(!empty($order['id'])) {
             // Loads the payments for an order
             $payments = $paymentRepositoryContract->getPaymentsByOrderId($order['id']);
@@ -61,6 +61,13 @@ class NovalnetOrderConfirmationDataProvider
                         if ($orderProperty->typeId == 22) { // Loads the cashpayment comments from the payment object for previous payment plugin versions
                             $cashpaymentComments = $orderProperty->value;
                         }
+                    }
+                    
+                    // Get the cashpayment token and checkout URL
+                    if ($payment->method['paymentKey'] == 'NOVALNET_CASHPAYMENT')
+                    {
+                        $cashpaymentToken = html_entity_decode((string)$sessionStorage->getPlugin()->getValue('novalnetCheckoutToken'));
+                        $cashpaymentUrl = html_entity_decode((string)$sessionStorage->getPlugin()->getValue('novalnetCheckoutUrl'));
                     }
                     
                     // Get Novalnet transaction details from the Novalnet database table
@@ -86,6 +93,6 @@ class NovalnetOrderConfirmationDataProvider
         $transactionComment = str_replace(PHP_EOL, '<br>', $transactionComment);
         
         // Render the transaction comments
-        return $twig->render('Novalnet::NovalnetOrderHistory', ['transactionComments' => html_entity_decode($transactionComment)]);
+        return $twig->render('Novalnet::NovalnetOrderHistory', ['transactionComments' => html_entity_decode($transactionComment), 'cashpaymentToken' => $cashpaymentToken, 'cashpaymentUrl' => $cashpaymentUrl]);
     }
 }
