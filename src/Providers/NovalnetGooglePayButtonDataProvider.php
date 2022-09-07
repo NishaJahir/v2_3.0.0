@@ -19,6 +19,8 @@ use Plenty\Plugin\Templates\Twig;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Novalnet\Helper\PaymentHelper;
+use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
+use Plenty\Modules\Listing\ShippingProfile\Contracts\ShippingProfileRepositoryContract;
 
 /**
  * Class NovalnetGooglePayButtonDataProvider
@@ -35,12 +37,19 @@ class NovalnetGooglePayButtonDataProvider
      * 
      * @return string
      */
-    public function call(Twig $twig, BasketRepositoryContract $basketRepository, $arg)
+    public function call(Twig $twig, 
+                         BasketRepositoryContract $basketRepository, 
+                         AfterBasketItemAdd $basketItem, 
+                         ShippingProfileRepositoryContract $shippingProfile,
+                         $arg)
     {
         $basket = $basketRepository->load();
         $paymentHelper = pluginApp(PaymentHelper::class);
         
         $paymentHelper->logger('bas', $basket);
+        $paymentHelper->logger('basket Item', $basketItem->getBasketItem());
+        
+        
        return $twig->render('Novalnet::NovalnetGooglePayButton', ['basketDetails' => $basket]);
     }
 }
