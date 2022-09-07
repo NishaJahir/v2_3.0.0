@@ -828,6 +828,8 @@ class PaymentService
         if($transactionData['paymentName'] == 'novalnet_multibanco') {
             $transactionComments .= PHP_EOL . $this->getMultibancoReferenceInformation($transactionData);
         }
+        
+        return $transactionComments;
     }
     
     public function getTxStatusAsString($txStatus, $nnPaymentTypeId)
