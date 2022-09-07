@@ -19,6 +19,7 @@ use Plenty\Plugin\Templates\Twig;
 use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\PaymentService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 
 /**
  * Class NovalnetOrderConfirmationDataProvider
@@ -41,7 +42,11 @@ class NovalnetOrderConfirmationDataProvider
         $order = $arg[0];
         $paymentHelper = pluginApp(PaymentHelper::class);
         $paymentService = pluginApp(PaymentService::class);
+        $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
+        
+        // Define the variables
         $transactionComment = $cashpaymentToken = $cashpaymentUrl = '';
+        
         if(!empty($order['id'])) {
             // Loads the payments for an order
             $payments = $paymentRepositoryContract->getPaymentsByOrderId($order['id']);
