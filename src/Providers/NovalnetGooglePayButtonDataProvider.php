@@ -55,8 +55,11 @@ class NovalnetGooglePayButtonDataProvider
         
         
         $basketitemDetails = $basketItem->all();
-        $paymentHelper->logger('shipping profile', $shippingProfileRepository->get($basketitemDetails[1]->shippingProfileId));
-        $paymentHelper->logger('shipping ID', $basketitemDetails[1]->shippingProfileId);
+        foreach($basketitemDetails as $basketItem) {
+            $paymentHelper->logger('basketItem', $basketItem);
+            $paymentHelper->logger('shipping ID', $basketitemDetails[1]->shippingProfileId);
+            $paymentHelper->logger('shipping profile', $shippingProfileRepository->get($basketitemDetails[1]->shippingProfileId));
+        }
         
         
        return $twig->render('Novalnet::NovalnetGooglePayButton', ['basketDetails' => $basket]);
