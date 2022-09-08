@@ -20,10 +20,8 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Novalnet\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
-use Plenty\Modules\Listing\ShippingProfile\Contracts\ShippingProfileRepositoryContract;
-use Plenty\Modules\Listing\ShippingProfile\Events\ShippingProfileEvent;
-use Plenty\Modules\Listing\ShippingProfile\Models\ShippingProfile;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Novalnet\Services\PaymentService;
 
 /**
  * Class NovalnetGooglePayButtonDataProvider
@@ -36,35 +34,28 @@ class NovalnetGooglePayButtonDataProvider
      * Setup the Novalnet transaction comments for the requested order
      *
      * @param Twig $twig
+     * @param BasketRepositoryContract $basketRepository
+     * @param BasketItemRepositoryContract $basketItem
      * @param Arguments $arg
      * 
      * @return string
      */
     public function call(Twig $twig, 
                          BasketRepositoryContract $basketRepository, 
-                         BasketItemRepositoryContract $basketItem, 
-                         ShippingProfileRepositoryContract $shippingProfileRepository,
-                         ShippingProfile $shippingProfile,
-                         
+                         BasketItemRepositoryContract $basketItem,
                          $arg)
     {
         $basket = $basketRepository->load();
         $paymentHelper = pluginApp(PaymentHelper::class);
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
+        $paymentService = pluginApp(PaymentService::class);
+        
+        // Get the order total basket amount
         $orderAmount = $paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount);
+        // Gte the order language
         $orderLang = strtoupper($sessionStorage->getLocaleSettings()->language);
-        $paymentHelper->logger('bas', $basket);
-        $paymentHelper->logger('basket Item123', $basketItem->all());
         
-        
-        
-        $basketitemDetails = $basketItem->all();
-        
-        foreach($basketitemDetails as $basketItem) {
-           
-        }
-        
-        
-       return $twig->render('Novalnet::NovalnetGooglePayButton', ['countryCode' => 'DE', 'orderTotalAmount' => $orderAmount, 'orderLang' => $orderLang, 'orderCurrency' => $basket->currency]);
+        // Render the Google Pay button
+       return $twig->render('Novalnet::NovalnetGooglePayButton', ['countryCode' => 'DE', 'orderTotalAmount' => $orderAmount, 'orderLang' => $orderLang, 'orderCurrency' => $basket->currency, 'nnPaymentProcessUrl' => $paymentService->getProcessPaymentUrl()]);
     }
 }
