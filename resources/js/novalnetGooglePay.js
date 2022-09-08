@@ -3,7 +3,7 @@ try {
 	var NovalnetPaymentInstance = NovalnetPayment();
 	var googlepayNovalnetPaymentObj = NovalnetPaymentInstance.createPaymentObject();
 	var requestData = {
-		clientKey: my_ajax_object.client_key,
+		clientKey: '0f84e6cf6fe1b93f1db8198aa2eae719',
 		paymentIntent: {
 			merchant: {
 				countryCode : String('#nn_google_pay').attr('data-country')
