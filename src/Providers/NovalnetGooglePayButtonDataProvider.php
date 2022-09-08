@@ -55,10 +55,9 @@ class NovalnetGooglePayButtonDataProvider
         
         
         $basketitemDetails = $basketItem->all();
+        
         foreach($basketitemDetails as $basketItem) {
-            $paymentHelper->logger('basketItem', $basketItem);
-            $paymentHelper->logger('shipping ID12', $basketItem->shippingProfileId);
-            $paymentHelper->logger('shipping profile12', $shippingProfileRepository->get($basketItem->shippingProfileId));
+           
         }
         
         
