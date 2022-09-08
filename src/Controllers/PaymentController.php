@@ -141,7 +141,7 @@ class PaymentController extends Controller
     {
 		// Get the payment form post data
         $paymentRequestPostData = $this->request->all();
-        
+        $this->getLogger(__METHOD__)->error('posting', $paymentRequestPostData);
         // Get the payment request params
         $paymentRequestData = $this->paymentService->generatePaymentParams($this->basketRepository->load(), $paymentRequestPostData['nn_payment_key']);
         
