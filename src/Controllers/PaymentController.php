@@ -171,6 +171,13 @@ class PaymentController extends Controller
             }
         }
 	    
+	// Setting up the wallet token for the Google pay payment
+	if($paymentRequestPostData['nn_payment_key'] == 'NOVALNET_GOOGLEPAY') {  
+	    $paymentRequestData['paymentRequestData']['transaction']['payment_data'] = [
+                                                                    'wallet_token'  => $paymentRequestPostData['nn_google_pay_token']
+                                                                 ];
+	}
+	    
 	// Set the payment requests in the session for the further processings
         $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $paymentRequestData);
         
