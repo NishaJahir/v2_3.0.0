@@ -1,5 +1,6 @@
 <script type="text/javascript" src="https://cdn.novalnet.de/js/v3/payment.js"></script>
 <script src="{{ plugin_path('Novalnet') }}/js/novalnetGooglePay.js"></script>
 
-<div id="nn_google_pay" data-country="{{countryCode}}" data-total-amount="{{orderTotalAmount}}" data-order-lang="{{orderLang}}" data-currency="{{orderCurrency}}"></div>
-
+<form method="post" id="nn_google_pay_form" name="nn_google_pay_form" action="{{nnPaymentProcessUrl}}">
+  <div id="nn_google_pay" data-country="{{countryCode}}" data-total-amount="{{orderTotalAmount}}" data-order-lang="{{orderLang}}" data-currency="{{orderCurrency}}"></div>
+</form>
