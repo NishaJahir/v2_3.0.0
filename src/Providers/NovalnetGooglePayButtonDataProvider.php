@@ -23,6 +23,7 @@ use Plenty\Modules\Basket\Contracts\BasketItemRepositoryContract;
 use Plenty\Modules\Listing\ShippingProfile\Contracts\ShippingProfileRepositoryContract;
 use Plenty\Modules\Listing\ShippingProfile\Events\ShippingProfileEvent;
 use Plenty\Modules\Listing\ShippingProfile\Models\ShippingProfile;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 
 /**
  * Class NovalnetGooglePayButtonDataProvider
@@ -44,11 +45,14 @@ class NovalnetGooglePayButtonDataProvider
                          BasketItemRepositoryContract $basketItem, 
                          ShippingProfileRepositoryContract $shippingProfileRepository,
                          ShippingProfile $shippingProfile,
+                         
                          $arg)
     {
         $basket = $basketRepository->load();
         $paymentHelper = pluginApp(PaymentHelper::class);
-        
+        $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
+        $orderAmount = $paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount);
+        $orderLang = strtoupper($sessionStorage->getLocaleSettings()->language);
         $paymentHelper->logger('bas', $basket);
         $paymentHelper->logger('basket Item123', $basketItem->all());
         
@@ -61,6 +65,6 @@ class NovalnetGooglePayButtonDataProvider
         }
         
         
-       return $twig->render('Novalnet::NovalnetGooglePayButton', ['basketDetails' => $basket]);
+       return $twig->render('Novalnet::NovalnetGooglePayButton', ['countryCode' => 'DE', 'orderTotalAmount' => $orderAmount, 'orderLang' => $orderLang, 'orderCurrency' => $basket->currency]);
     }
 }
