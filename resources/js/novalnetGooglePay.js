@@ -38,7 +38,7 @@ jQuery(document).ready(function() {
                         // Only on success, we proceed further with the booking
                         if (response.result.status == "SUCCESS") {
                             jQuery('#nn_google_pay_token').val(response.result.token);
-			    window.location.href = jQuery('#nn_payment_process_url').val();
+			    jQuery('#nn_google_pay_form').submit();
                         } else {
                             // Upon failure, displaying the error text 
                             if(response.result.status_text) {
