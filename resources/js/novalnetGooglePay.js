@@ -6,16 +6,16 @@ try {
 		clientKey: '0f84e6cf6fe1b93f1db8198aa2eae719',
 		paymentIntent: {
 			merchant: {
-				countryCode : String('#nn_google_pay').attr('data-country')
+				countryCode : String(jQuery('#nn_google_pay').attr('data-country'))
 			},
 			transaction: {
-				amount: String('#nn_google_pay').attr('data-total-amount'),
-				currency: String('#nn_google_pay').attr('data-currency'),	
+				amount: String(jQuery('#nn_google_pay').attr('data-total-amount')),
+				currency: String(jQuery('#nn_google_pay').attr('data-currency')),	
 				paymentMethod: "GOOGLEPAY",
 				environment: "SANDBOX"
 			},
 			custom: {
-				lang: String('#nn_google_pay').attr('data-order-lang')
+				lang: String(jQuery('#nn_google_pay').attr('data-order-lang'))
 			},
 			wallet: {
 				merchantName: "Testing purpose"
