@@ -60,4 +60,4 @@ try {
 	// Handling the errors from the payment intent setup
 	console.log(e.message);
 }
-)};
+});
