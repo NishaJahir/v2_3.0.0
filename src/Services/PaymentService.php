@@ -539,21 +539,26 @@ class PaymentService
         $this->paymentHelper->createPlentyPaymentToNnOrder($nnPaymentData);
     }
     
-    public function insertPaymentResponseIntoNnDb($paymentResponseData, $refundOrderTotalAmount = 0, $creditOrderTotalAmount = 0)
+    public function insertPaymentResponseIntoNnDb($paymentResponseData, $parentTid = 0, $refundOrderTotalAmount = 0, $creditOrderTotalAmount = 0)
     {
-        $additionalInfo = $this->additionalPaymentInfo($paymentResponseData, $refundOrderTotalAmount, $creditOrderTotalAmount);
+        $additionalInfo = $this->additionalPaymentInfo($paymentResponseData);
         
         // Set the order total amount for Refund and Credit followups
         if(!empty($refundOrderTotalAmount) || !empty($creditOrderTotalAmount)) {
             $orderTotalAmount = $refundOrderTotalAmount ?? $creditOrderTotalAmount;
         }
+       
+        // Assign the payment method
+        if(empty($paymentResponseData['payment_method'])) {
+            $paymentResponseData['payment_method'] = $this->paymentHelper->getNnPaymentKey($paymentResponseData['transaction']['payment_type']); 
+        }
         
          $transactionData = [
             'order_no'         => $paymentResponseData['transaction']['order_no'],
             'amount'           => $orderTotalAmount ?? $paymentResponseData['transaction']['amount'],
-            'callback_amount'  => $paymentResponseData['transaction']['amount'],
-            'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
-            'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
+            'callback_amount'  => $paymentResponseData['transaction']['refund']['amount'] ?? $paymentResponseData['transaction']['amount'],
+            'tid'              => $parentTid ?? $paymentResponseData['transaction']['tid'],
+            'ref_tid'          => $paymentResponseData['transaction']['refund']['tid'] ?? $paymentResponseData['transaction']['tid'],
             'payment_name'     => $paymentResponseData['payment_method'],
             'additional_info'  => $additionalInfo ?? 0,
         ];
@@ -565,7 +570,7 @@ class PaymentService
         $this->transactionService->saveTransaction($transactionData);
     }
     
-    public function additionalPaymentInfo($paymentResponseData, $refund = 0, $credit = 0)
+    public function additionalPaymentInfo($paymentResponseData)
     {
         $lang = strtolower((string)$paymentResponseData['custom']['lang']);
         
@@ -599,12 +604,12 @@ class PaymentService
         }
         
         // Add the type param when the refund was executed
-        if(!empty($refund)) {
+        if(isset($paymentResponseData['refund'])) {
             $additionalInfo['type'] = 'debit';
         }
         
         // Add the type param when the credit was executed
-        if(!empty($credit)) {
+        if(isset($paymentResponseData['credit'])) {
             $additionalInfo['type'] = 'credit';
         }
            
