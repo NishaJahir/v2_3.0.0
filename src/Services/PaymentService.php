@@ -539,13 +539,18 @@ class PaymentService
         $this->paymentHelper->createPlentyPaymentToNnOrder($nnPaymentData);
     }
     
-    public function insertPaymentResponseIntoNnDb($paymentResponseData)
+    public function insertPaymentResponseIntoNnDb($paymentResponseData, $refundOrderTotalAmount = 0, $creditOrderTotalAmount = 0)
     {
-        $additionalInfo = $this->additionalPaymentInfo($paymentResponseData);
+        $additionalInfo = $this->additionalPaymentInfo($paymentResponseData, $refundOrderTotalAmount, $creditOrderTotalAmount);
+        
+        // Set the order total amount for Refund and Credit followups
+        if(!empty($refundOrderTotalAmount) || !empty($creditOrderTotalAmount)) {
+            $orderTotalAmount = $refundOrderTotalAmount ?? $creditOrderTotalAmount;
+        }
         
          $transactionData = [
             'order_no'         => $paymentResponseData['transaction']['order_no'],
-            'amount'           => $paymentResponseData['transaction']['amount'],
+            'amount'           => $orderTotalAmount ?? $paymentResponseData['transaction']['amount'],
             'callback_amount'  => $paymentResponseData['transaction']['amount'],
             'tid'              => $paymentResponseData['transaction']['tid'] ?? 0,
             'ref_tid'          => $paymentResponseData['transaction']['tid'] ?? 0,
@@ -560,16 +565,17 @@ class PaymentService
         $this->transactionService->saveTransaction($transactionData);
     }
     
-    public function additionalPaymentInfo($paymentResponseData)
+    public function additionalPaymentInfo($paymentResponseData, $refund = 0, $credit = 0)
     {
         $lang = strtolower((string)$paymentResponseData['custom']['lang']);
         
+        // Add the extra information for the further processing
         $additionalInfo = [
                             'currency' => $paymentResponseData['transaction']['currency'] ?? 0,
                             'test_mode' => !empty($paymentResponseData['transaction']['test_mode']) ? $this->paymentHelper->getTranslatedText('test_order',$lang) : 0,
                             'plugin_version' => $paymentResponseData['transaction']['system_version'] ?? NovalnetConstants::PLUGIN_VERSION,
                           ];
-                          
+        // Add the Bank details for the invoice payments                   
         if($paymentResponseData['result']['status'] == 'SUCCESS' && (in_array($paymentResponseData['payment_method'], ['novalnet_invoice', 'novalnet_prepayment']))) {
             $additionalInfo['invoice_account_holder'] = $paymentResponseData['transaction']['bank_details']['account_holder'];
             $additionalInfo['invoice_iban'] = $paymentResponseData['transaction']['bank_details']['iban'];
@@ -580,14 +586,26 @@ class PaymentService
             $additionalInfo['invoice_ref'] = $paymentResponseData['transaction']['invoice_ref'];
         }
         
+        // Add the store details for the cashpayment
         if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_cashpayment') {
             $additionalInfo['store_details'] = $paymentResponseData['transaction']['nearest_stores'];
             $additionalInfo['cp_due_date'] = $paymentResponseData['transaction']['due_date'];
         }
         
+        // Add the pament reference details for the Multibanco
         if($paymentResponseData['result']['status'] == 'SUCCESS' && $paymentResponseData['payment_method'] == 'novalnet_multibanco') {
             $additionalInfo['partner_payment_reference'] = $paymentResponseData['transaction']['partner_payment_reference'];
             $additionalInfo['service_supplier_id'] = $paymentResponseData['transaction']['service_supplier_id'];
+        }
+        
+        // Add the type param when the refund was executed
+        if(!empty($refund)) {
+            $additionalInfo['type'] = 'debit';
+        }
+        
+        // Add the type param when the credit was executed
+        if(!empty($credit)) {
+            $additionalInfo['type'] = 'credit';
         }
            
         return json_encode($additionalInfo);
