@@ -32,6 +32,8 @@ use Novalnet\Methods\NovalnetPaymentAbstract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Novalnet\Constants\NovalnetConstants;
 use Plenty\Plugin\Templates\Twig;
+use Plenty\Modules\EventProcedures\Services\Entries\ProcedureEntry;
+use Plenty\Modules\EventProcedures\Services\EventProceduresService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -61,6 +63,7 @@ class NovalnetServiceProvider extends ServiceProvider
      * @param PaymentService $paymentService
      * @param FrontendSessionStorageFactoryContract $sessionStorage
      * @param Twig $twig
+     * @param EventProceduresService $eventProceduresService
      */
     public function boot(Dispatcher $eventDispatcher,
                         BasketRepositoryContract $basketRepository,
@@ -68,7 +71,8 @@ class NovalnetServiceProvider extends ServiceProvider
                         PaymentHelper $paymentHelper, 
                         PaymentService $paymentService,
                         FrontendSessionStorageFactoryContract $sessionStorage,
-            Twig $twig
+                        Twig $twig,
+                        EventProceduresService $eventProceduresService
                         )
     {
         $this->registerPaymentMethods($payContainer);
@@ -76,6 +80,8 @@ class NovalnetServiceProvider extends ServiceProvider
         $this->registerPaymentRendering($eventDispatcher, $basketRepository, $paymentHelper, $paymentService, $sessionStorage, $twig);
 
         $this->registerPaymentExecute($eventDispatcher, $paymentHelper, $paymentService, $sessionStorage);
+        
+        $this->registerEvents($eventProceduresService);
         
         pluginApp(WizardContainerContract::class)->register('payment-novalnet-assistant', NovalnetAssistant::class);
     }
@@ -208,5 +214,49 @@ class NovalnetServiceProvider extends ServiceProvider
                     }
                 }
             });
+    }
+    
+    /**
+     * Register the Novalnet events
+     *
+     * @param PaymentMethodContainer $eventProceduresService
+     */
+    protected function registerEvents(EventProceduresService $eventProceduresService)
+    {
+        // Event for Onhold - Capture Process
+        $captureProcedureTitle = [
+            'de' => 'Novalnet | Bestätigen',
+            'en' => 'Novalnet | Confirm',
+        ];
+        $eventProceduresService->registerProcedure(
+            'Novalnet',
+            ProcedureEntry::EVENT_TYPE_ORDER,
+            $captureProcedureTitle,
+            '\Novalnet\Procedures\CaptureVoidEventProcedure@run'
+        );
+        
+        // Event for Onhold - Void Process
+        $voidProcedureTitle = [
+            'de' => 'Novalnet | Stornieren',
+            'en' => 'Novalnet | Cancel',
+        ];
+        $eventProceduresService->registerProcedure(
+            'Novalnet',
+            ProcedureEntry::EVENT_TYPE_ORDER,
+            $voidProcedureTitle,
+            '\Novalnet\Procedures\CaptureVoidEventProcedure@run'
+        );
+        
+        // Event for Onhold - Refund Process
+        $refundProcedureTitle = [
+            'de' =>  'Novalnet | Rückerstattung',
+            'en' =>  'Novalnet | Refund',
+        ];
+        $eventProceduresService->registerProcedure(
+            'Novalnet',
+            ProcedureEntry::EVENT_TYPE_ORDER,
+            $refundProcedureTitle,
+            '\Novalnet\Procedures\RefundEventProcedure@run'
+        );
     }
 }
