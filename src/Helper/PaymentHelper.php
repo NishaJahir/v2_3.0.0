@@ -411,10 +411,27 @@ class PaymentHelper
             $payment->currency        = $paymentResponseData['transaction']['currency'];
             $payment->amount          = $paymentResponseData['transaction']['status'] == 'CONFIRMED' ? ($paymentResponseData['transaction']['amount'] / 100) : 0;
             
+            // Set the transaction status
             $txnStatus = $paymentResponseData['transaction']['status'] ?? $paymentResponseData['result']['status'];
             
+            // Set the booking text
+            $bookingText = isset($paymentResponseData['bookingText']) ? $paymentResponseData['bookingText'] : $paymentResponseData['transaction']['tid'];
+            
+            // Set the Refund status to the payment if refund was execute
+            if(isset($paymentResponseData['refund'])) {
+                $payment->type = 'debit';
+                $payment->unaccountable = 1;
+                $payment->status = ($paymentResponseData['refund'] == 'Partial') ? Payment::STATUS_PARTIALLY_REFUNDED : Payment::STATUS_REFUNDED;
+            }
+            
+            // Not add the payment into account for the additional credits
+            if(isset($paymentResponseData['unaccountable']) && !empty($paymentResponseData['unaccountable'])) {
+                $payment->unaccountable = 1;
+            }
+            
+            
             $paymentProperty     = [];
-            $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $paymentResponseData['transaction']['tid']);
+            $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
             $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paymentResponseData['transaction']['tid']);
             $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
             $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $txnStatus);
