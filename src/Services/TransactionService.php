@@ -69,4 +69,26 @@ class TransactionService
         $order    = $database->query(TransactionLog::class)->where($key, '=', $value)->get();
         return $order;
     }
+    
+    /**
+     * Update the transaction log table data
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param array $transactionData
+     *
+     * return none
+     */
+    public function updateTransactionData($key, $value, $transactionData)
+    {
+        $database = pluginApp(DataBase::class);
+        $orderDetails    = $database->query(TransactionLog::class)->where($key, '=', $value)->get();
+        foreach($orderDetails as $orderDetail) {
+          $additionalInfo = json_decode($order->additionalInfo, true);
+          $additionalInfo['due_date'] = $transactionData['transaction']['due_date'];
+          $orderDetail->amount = $transactionData['transaction']['amount'];
+          $orderDetail->additionalInfo = json_encode($additionalInfo);
+        }
+        $database->save($orderDetail);
+    }
 }
