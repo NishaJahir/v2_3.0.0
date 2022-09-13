@@ -84,7 +84,7 @@ class TransactionService
         $database = pluginApp(DataBase::class);
         $orderDetails    = $database->query(TransactionLog::class)->where($key, '=', $value)->get();
         foreach($orderDetails as $orderDetail) {
-          $additionalInfo = json_decode($order->additionalInfo, true);
+          $additionalInfo = json_decode($orderDetail->additionalInfo, true);
           $additionalInfo['due_date'] = $transactionData['transaction']['due_date'];
           $orderDetail->amount = $transactionData['transaction']['amount'];
           $orderDetail->additionalInfo = json_encode($additionalInfo);
