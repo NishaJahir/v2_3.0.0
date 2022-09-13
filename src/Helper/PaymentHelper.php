@@ -608,5 +608,49 @@ class PaymentHelper
         
         return $refundStatus;
     }
+	
+    /**
+      * Creating Payment for credit note order
+      *
+      * @param object $payments
+      * @param array $paymentData
+      * @param string $comments
+      * @return none
+      */
+    
+    public function createRefundPayment($payments, $paymentResponseData, $comments) {
+        
+	// Get the parent order payment Id
+        foreach ($payments as $payment) {
+            $mop = $payment->mopId;
+            $currency = $payment->currency;
+            $parentPaymentId = $payment->id;
+        }
+	
+	// Refund TID
+	$refundTid = $paymentResponseData['transaction']['refund']['tid'] ?? $paymentResponseData['transaction']['tid'];
+	    
+        /** @var Payment $payment */
+        $payment = pluginApp(\Plenty\Modules\Payment\Models\Payment::class);
+       
+        $payment->updateOrderPaymentStatus = true;
+        $payment->mopId = (int) $mop;
+        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status = Payment::STATUS_CAPTURED;
+        $payment->currency = $currency;
+        $payment->amount = (float) ($paymentResponseData['transaction']['refund']['amount'] / 100);
+        $payment->receivedAt = date('Y-m-d H:i:s');
+        $payment->type = 'debit';
+        $payment->parentId = $parentPaymentId;
+        $payment->unaccountable = 0;
+        $paymentProperty     = [];
+        $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $comments);
+        $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $refundTid);
+        $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
+        $paymentProperty[]   = $this->getPaymentProperty(PaymentProperty::TYPE_EXTERNAL_TRANSACTION_STATUS, $paymentResponseData['transaction']['status']);
+        $payment->properties = $paymentProperty;
+        $paymentObj = $this->paymentRepository->createPayment($payment);
+        $this->assignPlentyPaymentToPlentyOrder($paymentObj, (int)$paymentResponseData['childOrderId']);
+    }
     
 }
