@@ -47,7 +47,6 @@ class CaptureVoidEventProcedure
     public function __construct(PaymentHelper $paymentHelper, PaymentService $paymentService)
     {
         $this->paymentHelper = $paymentHelper;
-        $this->transaction = $tranactionService;
         $this->paymentService = $paymentService; 
     }   
     
