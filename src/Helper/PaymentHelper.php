@@ -50,6 +50,7 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
+use Novalnet\Services\PaymentService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -94,6 +95,12 @@ class PaymentHelper
      * @var PaymentOrderRelationRepositoryContract
      */
     private $paymentOrderRelationRepository;
+	 
+    /**
+     *
+     * @var PaymentService
+     */
+    private $paymentService;
     
     /**
      * Constructor.
@@ -104,13 +111,15 @@ class PaymentHelper
      * @param PaymentRepositoryContract $paymentRepository
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
+     * @param PaymentService $paymentService
      */
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
                                 PaymentRepositoryContract $paymentRepository,
                                 OrderRepositoryContract $orderRepository,
-                                PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
+                                PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
+				PaymentService $paymentService
                                )
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
@@ -119,7 +128,7 @@ class PaymentHelper
         $this->paymentRepository       = $paymentRepository;
         $this->orderRepository         = $orderRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
-        
+        $this->paymentService  = $paymentService;
     }
     
     /**
