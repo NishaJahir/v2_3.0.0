@@ -95,7 +95,7 @@ class RefundEventProcedure
             }
             
             // Get the payment details
-            $paymentDetails = $payments->getPaymentsByOrderId($parentOrderId);
+            $paymentDetails = $this->paymentRepository->getPaymentsByOrderId($parentOrderId);
             
             // Get the payment currency
             foreach ($paymentDetails as $paymentDetail) {
@@ -147,13 +147,10 @@ class RefundEventProcedure
         
                     // Set the refund status it Partial or Full refund
                     $paymentResponseData['refund'] = $refundStatus;
-        
-                    // Booking Message
-                    $paymentResponseData['bookingText'] = $webhookComments;
                     
                     if ($order->typeId == OrderType::TYPE_CREDIT_NOTE) { // Create refund entry in credit note order
                         $paymentResponseData['childOrderId'] = $childOrderId;
-                        $this->paymentHelper->createRefundPayment($paymentDetails, $paymentResponseData, $webhookComments);
+                        $this->paymentHelper->createRefundPayment($paymentDetails, $paymentResponseData, $paymentResponseData['bookingText']);
                     } else {
                         // Get the Novalnet payment methods Id
                         $mop = $this->paymentHelper->getPaymentMethodByKey(strtoupper($transactionDetails['paymentName']));
