@@ -602,7 +602,7 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getRefundStatus($orderId)
+    public function getRefundStatus($orderId, $orderAmount)
     {
         // Get the transaction details for an order
         $transactionDetails = $this->transactionService->getTransactionData('orderNo', $orderId);
@@ -622,7 +622,7 @@ class PaymentHelper
             }
         }
         
-        $refundStatus = ($this->orderDetails->orderTotalAmount > $totalCallbackDebitAmount) ? 'Partial' : 'Full';
+        $refundStatus = ($orderAmount > $totalCallbackDebitAmount) ? 'Partial' : 'Full';
         
         return $refundStatus;
     }
