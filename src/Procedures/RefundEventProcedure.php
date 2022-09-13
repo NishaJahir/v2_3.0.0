@@ -148,7 +148,7 @@ class RefundEventProcedure
                     $this->paymentService->insertPaymentResponseIntoNnDb($paymentResponseData);
         
                     // Get refund status it is happened for Full amount or Partially
-                    $refundStatus = $this->paymentHelper->getRefundStatus($paymentResponseData['transaction']['order_no']);
+                    $refundStatus = $this->paymentHelper->getRefundStatus($paymentResponseData['transaction']['order_no'], $paymentResponseData['transaction']['amount']);
         
                     // Set the refund status it Partial or Full refund
                     $paymentResponseData['refund'] = $refundStatus;
