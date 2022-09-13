@@ -969,10 +969,10 @@ class PaymentService
             $paymentResponseData['mop'] = $mop[0];
 
             // Insert the updated transaction details into Novalnet DB
-            $this->paymentService->insertPaymentResponseIntoNnDb($paymentResponseData);
+            $this->insertPaymentResponseIntoNnDb($paymentResponseData);
             
             // Create the payment to the plenty order
-            $this->paymentHelper->createPlentyPaymentToNnOrder($this->eventData);
+            $this->paymentHelper->createPlentyPaymentToNnOrder($paymentResponseData);
         } catch(\Exception $e) {
             $this->getLogger(__METHOD__)->error('Novalnet::doCaptureVoid failed ' . $paymentRequestData['order_no'], $e);
         }
