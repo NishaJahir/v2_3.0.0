@@ -232,7 +232,7 @@ class NovalnetServiceProvider extends ServiceProvider
             'Novalnet',
             ProcedureEntry::EVENT_TYPE_ORDER,
             $captureProcedureTitle,
-            '\Novalnet\Procedures\CaptureVoidEventProcedure@run'
+            '\Novalnet\Procedures\CaptureEventProcedure@run'
         );
         
         // Event for Onhold - Void Process
@@ -244,7 +244,7 @@ class NovalnetServiceProvider extends ServiceProvider
             'Novalnet',
             ProcedureEntry::EVENT_TYPE_ORDER,
             $voidProcedureTitle,
-            '\Novalnet\Procedures\CaptureVoidEventProcedure@run'
+            '\Novalnet\Procedures\VoidEventProcedure@run'
         );
         
         // Event for Onhold - Refund Process
