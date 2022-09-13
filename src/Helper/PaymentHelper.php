@@ -542,4 +542,41 @@ class PaymentHelper
         $this->getLogger(__METHOD__)->error($k, $v);
     }
     
+    public function getDetailsFromPaymentProperty($orderId)
+    {
+        // Get the payment details
+        $paymentDetails = $this->paymentRepository->getPaymentsByOrderId($orderId);
+        
+        // Fetch the necessary data
+        foreach($paymentDetails as $paymentDetail)
+        {
+            $paymentProperties = $paymentDetail->properties;
+            foreach($paymentProperties as $paymentProperty)
+            {
+                  if ($paymentProperty->typeId == 1) {
+                    $tid = $paymentProperty->value;
+                  }
+                  if ($paymentProperty->typeId == 30) {
+                    $txStatus = $paymentProperty->value;
+                  }
+                  if ($paymentProperty->typeId == 21) {
+                     $invoiceDetails = $paymentProperty->value;
+                  }
+            }
+        }
+        
+        // Get Novalnet transaction details from the Novalnet database table
+		$nnDbTxDetails = $this->paymentService->getDatabaseValues($orderId);
+		
+		// Merge the array if bank details are there
+		if(!empty($invoiceDetails)) {
+			$nnDbTxDetails = array_merge($nnDbTxDetails, json_decode($invoiceDetails, true));
+		}
+		
+		// Get the transaction status as string for the previous payment plugin version
+		$nnDbTxDetails['tx_status'] = $paymentService->getTxStatusAsString($txStatus, $nnDbTxDetails['payment_id']);
+		
+		return $nnDbTxDetails;
+	}
+    
 }
