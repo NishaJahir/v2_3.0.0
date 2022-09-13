@@ -573,7 +573,7 @@ class PaymentService
     
     public function additionalPaymentInfo($paymentResponseData)
     {
-        $lang = strtolower((string)$paymentResponseData['custom']['lang']);
+        $lang = !empty($paymentResponseData['custom']['lang']) ? strtolower((string)$paymentResponseData['custom']['lang']) : $paymentResponseData['lang'];
         
         // Add the extra information for the further processing
         $additionalInfo = [
