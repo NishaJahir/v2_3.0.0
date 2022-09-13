@@ -51,6 +51,7 @@ use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Novalnet\Services\PaymentService;
+use Novalnet\Services\TransactionService;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -101,6 +102,11 @@ class PaymentHelper
      * @var PaymentService
      */
     private $paymentService;
+	
+    /**
+     * @var TransactionService
+     */
+    private $transactionService;
     
     /**
      * Constructor.
@@ -112,6 +118,7 @@ class PaymentHelper
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
      * @param PaymentService $paymentService
+     * @param TransactionService $transactionService
      */
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 AddressRepositoryContract $addressRepository,
@@ -119,7 +126,8 @@ class PaymentHelper
                                 PaymentRepositoryContract $paymentRepository,
                                 OrderRepositoryContract $orderRepository,
                                 PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
-				PaymentService $paymentService
+				PaymentService $paymentService,
+				TransactionService $transactionService
                                )
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
@@ -129,6 +137,7 @@ class PaymentHelper
         $this->orderRepository         = $orderRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         $this->paymentService  = $paymentService;
+	$this->transactionService = $transactionService;
     }
     
     /**
@@ -583,7 +592,7 @@ class PaymentHelper
 		}
 		
 		// Get the transaction status as string for the previous payment plugin version
-		$nnDbTxDetails['tx_status'] = $paymentService->getTxStatusAsString($txStatus, $nnDbTxDetails['payment_id']);
+		$nnDbTxDetails['tx_status'] = $this->paymentService->getTxStatusAsString($txStatus, $nnDbTxDetails['payment_id']);
 		
 		return $nnDbTxDetails;
 	}
@@ -596,7 +605,7 @@ class PaymentHelper
     public function getRefundStatus($orderId)
     {
         // Get the transaction details for an order
-        $transactionDetails = $this->transaction->getTransactionData('orderNo', $orderId);
+        $transactionDetails = $this->transactionService->getTransactionData('orderNo', $orderId);
         
         $totalCallbackDebitAmount = 0;
 
