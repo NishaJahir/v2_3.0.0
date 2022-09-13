@@ -541,18 +541,19 @@ class PaymentService
     
     public function insertPaymentResponseIntoNnDb($paymentResponseData, $parentTid = 0, $refundOrderTotalAmount = 0, $creditOrderTotalAmount = 0)
     {
+        
+         // Assign the payment method
+        if(empty($paymentResponseData['payment_method'])) {
+            $paymentResponseData['payment_method'] = $this->paymentHelper->getNnPaymentKey($paymentResponseData['transaction']['payment_type']); 
+        }
+        
         $additionalInfo = $this->additionalPaymentInfo($paymentResponseData);
         
         // Set the order total amount for Refund and Credit followups
         if(!empty($refundOrderTotalAmount) || !empty($creditOrderTotalAmount)) {
             $orderTotalAmount = $refundOrderTotalAmount ?? $creditOrderTotalAmount;
         }
-       
-        // Assign the payment method
-        if(empty($paymentResponseData['payment_method'])) {
-            $paymentResponseData['payment_method'] = $this->paymentHelper->getNnPaymentKey($paymentResponseData['transaction']['payment_type']); 
-        }
-        
+
          $transactionData = [
             'order_no'         => $paymentResponseData['transaction']['order_no'],
             'amount'           => $orderTotalAmount ?? $paymentResponseData['transaction']['amount'],
