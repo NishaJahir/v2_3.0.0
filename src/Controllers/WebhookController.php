@@ -18,11 +18,15 @@ use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Twig;
 use Novalnet\Helper\PaymentHelper;
+use Novalnet\Services\PaymentService;
 use Novalnet\Services\SettingsService;
 use \Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Novalnet\Constants\NovalnetConstants;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Novalnet\Services\TransactionService;
+use Plenty\Modules\Payment\Models\PaymentProperty;
+use \stdClass;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -48,6 +52,11 @@ class WebhookController extends Controller
      * @var PaymentHelper
      */
     private $paymentHelper;
+    
+    /**
+     * @var paymentService
+     */
+    private $paymentService;
     
     /**
      * @var ipAllowed
@@ -96,26 +105,37 @@ class WebhookController extends Controller
     private $paymentRepository;
     
     /**
+     * @var TransactionService
+     */
+    private $transactionService;
+    
+    /**
      * Webhook constructor.
      *
      * @param Request $request
      * @param PaymentHelper $paymentHelper
+     * @param PaymentService $paymentService
      * @param SettingsService $settingsService
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentRepositoryContract $paymentRepository
+     * @param TransactionService $transactionService
      */
     public function __construct(Request $request,
                                 PaymentHelper $paymentHelper,
+                                PaymentService $paymentService,
                                 SettingsService $settingsService,
                                 OrderRepositoryContract $orderRepository,
-                                PaymentRepositoryContract $paymentRepository
+                                PaymentRepositoryContract $paymentRepository,
+                                TransactionService $transactionService
                                 )
     {
         $this->eventData = $request->all();
         $this->paymentHelper = $paymentHelper;
+        $this->paymentService = $paymentService;
         $this->settingsService = $settingsService;
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
+        $this->transactionService = $transactionService;
     }
     
     /**
@@ -124,11 +144,6 @@ class WebhookController extends Controller
      */
     public function processNnWebhook() 
     {
-        try {
-            $this->eventData = json_decode($this->eventData, true);
-        } catch (Exception $e) {
-            return $this->renderTemplate('Received data is not in the JSON format' . $e);
-        }
         
         // validated the IP Address
         $this->validateIpAddress();
@@ -269,7 +284,7 @@ class WebhookController extends Controller
     public function getOrderDetails()
     {
         // Get the order details if the Novalnet transaction is alreay in the Novalnet database
-        $novalnetOrderDetails = $this->transaction->getTransactionData('tid', $this->parentTid);
+        $novalnetOrderDetails = $this->transactionService->getTransactionData('tid', $this->parentTid);
         
         // Use the initial transaction details
         $novalnetOrderDetail = $novalnetOrderDetails[0];
@@ -302,7 +317,7 @@ class WebhookController extends Controller
             // Get the total paid amounts for an order
             if($this->eventType != 'CREDIT') {
                 // Get the entire transaction details to the specific order
-                $getOrderDetails = $this->transaction->getTransactionData('orderNo', $novalnetOrderDetail->orderNo);
+                $getOrderDetails = $this->transactionService ->getTransactionData('orderNo', $novalnetOrderDetail->orderNo);
                 if(!empty($getOrderDetails)) {
                     $paidAmount = 0;
                     foreach($getOrderDetails as $getOrderDetail) {
@@ -313,7 +328,7 @@ class WebhookController extends Controller
             }
         } else {
             if(!empty($orderNo)) {
-                $orderObj = $this->orderObject($orderId);
+                $orderObj = $this->orderObject($orderNo);
                 // handle the communication break scenario
                 return $this->handleCommunicationBreak($orderObj);               
             }   
@@ -496,7 +511,7 @@ class WebhookController extends Controller
             $finalPaymentDetails = end($payments);
             
             $paymentProperty     = [];
-            $paymentProperty[]   = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $tid);
+            $paymentProperty[]   = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $webhookComments);
             $finalPaymentDetails->properties = $paymentProperty; 
             // Update the booking text
             $this->paymentRepository->updatePayment($finalPaymentDetails);
