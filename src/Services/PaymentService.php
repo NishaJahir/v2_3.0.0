@@ -940,4 +940,41 @@ class PaymentService
         
         return $multibancoComments;
     }
+    
+    public function doCaptureVoid($paymentRequestData, $paymentUrl)
+    {
+        try {
+            // Novalnet access key
+            $privateKey = $this->settingsService->getNnPaymentSettingsValue('novalnet_private_key');
+            
+            $paymentRequestData = [
+                                    'tid' => $paymentRequestData['tid'],
+                                    'lang' => 'DE'
+                                  ];
+            
+            // Send the payment capture/void call to Novalnet server
+            $paymentResponseData = $this->paymentHelper->executeCurl($paymentRequestData, $paymentUrl, $privateKey);
+            
+            $paymentResponseData = array_merge($paymentRequestData, $paymentResponseData);
+
+            // Booking Message 
+            if(in_array($paymentResponseData['transaction']['status'], ['PENDING', 'CONFIRMED'])) {
+				$paymentResponseData['bookingText'] = sprintf($this->paymentHelper->getTranslatedText('transaction_confirmation', $paymentRequestData['lang']), date('d.m.Y'), date('H:i:s'));
+			} else {
+				$paymentResponseData['bookingText'] = sprintf($this->paymentHelper->getTranslatedText('transaction_cancel', $paymentRequestData['lang']), date('d.m.Y'), date('H:i:s'));
+			}
+			
+			// Get the Novalnet payment methods Id
+            $mop = $this->paymentHelper->getPaymentMethodByKey(strtoupper($paymentRequestData['paymentName']));
+            $paymentResponseData['mop'] = $mop[0];
+
+            // Insert the updated transaction details into Novalnet DB
+            $this->paymentService->insertPaymentResponseIntoNnDb($paymentResponseData);
+            
+            // Create the payment to the plenty order
+            $this->paymentHelper->createPlentyPaymentToNnOrder($this->eventData);
+        } catch(\Exception $e) {
+            $this->getLogger(__METHOD__)->error('Novalnet::doCaptureVoid failed ' . $paymentRequestData['order_no'], $e);
+        }
+    }
 }
