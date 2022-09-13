@@ -63,7 +63,7 @@ class CaptureVoidEventProcedure
         $transactionDetails = $this->paymentHelper->getDetailsFromPaymentProperty($order->id);
         
         // Call the Capture process for the On-Hold payments
-        if($nnDbTxDetails['tx_status'] == 'ON_HOLD') {
+        if($transactionDetails['tx_status'] == 'ON_HOLD') {
             $this->paymentService->doCaptureVoid($transactionDetails, NovalnetConstants::PAYMENT_CAPTURE_URL);
         }
     }
