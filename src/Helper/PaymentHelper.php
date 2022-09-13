@@ -578,5 +578,35 @@ class PaymentHelper
 		
 		return $nnDbTxDetails;
 	}
+	
+	/**
+     * Get refund status
+     *
+     * @return string
+     */
+    public function getRefundStatus($orderId)
+    {
+        // Get the transaction details for an order
+        $transactionDetails = $this->transaction->getTransactionData('orderNo', $orderId);
+        
+        $totalCallbackDebitAmount = 0;
+
+        foreach($transactionDetails as $transactionDetail) {
+            if($transactionDetail->referenceTid != $transactionDetail->tid) {
+                if(!empty($transactionDetail->additionalInfo)) {
+                    $additionalInfo = json_decode($transactionDetail->additionalInfo, true);
+                    if($additionalInfo['type'] == 'debit') {
+                        $totalCallbackDebitAmount += $transactionDetail->callbackAmount;  
+                    }
+                } else {
+                    $totalCallbackDebitAmount += $transactionDetail->callbackAmount;
+                }
+            }
+        }
+        
+        $refundStatus = ($this->orderDetails->orderTotalAmount > $totalCallbackDebitAmount) ? 'Partial' : 'Full';
+        
+        return $refundStatus;
+    }
     
 }
