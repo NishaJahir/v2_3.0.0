@@ -54,10 +54,6 @@ class RefundEventProcedure
      */
     private $paymentService;
 
-    /**
-     * @var transaction
-     */
-    private $transaction;
 
     /**
      * Constructor.
@@ -71,7 +67,6 @@ class RefundEventProcedure
     public function __construct(PaymentRepositoryContract $paymentRepository,
                                 PaymentHelper $paymentHelper,
                                 SettingsService $settingsService,
-                                TransactionService $tranactionService,
                                 PaymentService $paymentService)
     {
         $this->paymentRepository = $paymentRepository;
