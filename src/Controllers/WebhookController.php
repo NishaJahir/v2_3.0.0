@@ -501,7 +501,7 @@ class WebhookController extends Controller
             $amountUpdateMessage = sprintf($this->paymentHelper->getTranslatedText('webhook_amount_update_message', $this->orderLanguage), sprintf('%0.2f', ($this->eventData['transaction']['amount']/100)) , $this->eventData['transaction']['currency'], date('d.m.Y'), date('H:i:s'));
             
             // Update the transaction details in the Novalnet DB
-            $transactionDetails = $this->transaction->updateTransactionData('orderNo', $this->eventData['transaction']['order_no'], $this->eventData);
+            $transactionDetails = $this->transactionService->updateTransactionData('orderNo', $this->eventData['transaction']['order_no'], $this->eventData);
 
             $webhookComments = (($this->eventData['transaction']['update_type'] == 'AMOUNT') ? $amountUpdateMessage : (($this->eventData['transaction']['update_type'] == 'DUE_DATE') ? $dueDateUpdateMessage : $dueDateUpdateMessage . $amountUpdateMessage));
             
@@ -530,7 +530,7 @@ class WebhookController extends Controller
         // If refund is executing
         if(!empty($this->eventData['transaction']['refund']['amount'])) {
             if(!empty($this->eventData['transaction']['refund']['tid'])) {
-                $webhookComments = sprintf($this->paymentHelper->getTranslatedText('webhook_new_tid_refund_execution', $this->orderLanguage), $this->parentTid, sprintf('%0.2f', ($this->eventData['transaction']['amount']/100)) , $this->eventData['transaction']['currency'], $eventTid);
+                $webhookComments = sprintf($this->paymentHelper->getTranslatedText('webhook_new_tid_refund_execution', $this->orderLanguage), $this->parentTid, sprintf('%0.2f', ($this->eventData['transaction']['amount']/100)) , $this->eventData['transaction']['currency'], $this->eventTid);
             } else {
                 $webhookComments = sprintf($this->paymentHelper->getTranslatedText('webhook_refund_execution', $this->orderLanguage), $this->parentTid, sprintf('%0.2f', ($this->eventData['transaction']['amount']/100)) , $this->eventData['transaction']['currency']);
             }
