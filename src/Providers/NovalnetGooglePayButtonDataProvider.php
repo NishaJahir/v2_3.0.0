@@ -50,8 +50,10 @@ class NovalnetGooglePayButtonDataProvider
         $sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
         $paymentService = pluginApp(PaymentService::class);
         
+        if(!empty($basket->basketAmount)) {
         // Get the order total basket amount
         $orderAmount = $paymentHelper->ConvertAmountToSmallerUnit($basket->basketAmount);
+        }
         // Gte the order language
         $orderLang = strtoupper($sessionStorage->getLocaleSettings()->language);
         
